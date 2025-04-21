@@ -7,6 +7,7 @@ import { FormUpdate } from "@/components/organismos/Solicitudes/FormUpdate";
 import Formulario from "@/components/organismos/Solicitudes/FormRegister";
 import { useSolicitud } from "@/hooks/Solicitudes/useSolicitud";
 import { Solicitud } from "@/types/Solicitud";
+import { Chip } from "@heroui/chip";
 
 export const SolicitudTable = () => {
   const { solicitudes, isLoading, isError, error, addSolicitud } =
@@ -45,6 +46,33 @@ export const SolicitudTable = () => {
   const columns: TableColumn<Solicitud>[] = [
     { key: "descripcion", label: "Nombre" },
     { key: "cantidad", label: "Valor" },
+    {
+      key: "created_at",
+      label: "Fecha Solicitud",
+      render: (solicitud: Solicitud) => (
+        <span>{new Date(solicitud.created_at).toLocaleDateString("es-ES")}</span>
+      ),
+    },
+    {
+      key: "updated_at",
+      label: "Fecha Actualización",
+      render: (solicitud: Solicitud) => (
+        <span>{new Date(solicitud.updated_at).toLocaleDateString("es-ES")}</span>
+      ),
+    },
+    {
+      key: "estado", 
+      label: "Estado",
+      render: (item) => {
+        if (item.aceptada)
+          return <Chip color="success" variant="flat">Aceptada</Chip>;
+        if (item.rechazada)
+          return <Chip color="danger" variant="flat">Rechazada</Chip>;
+        if (item.pendiente)
+          return <Chip color="warning" variant="flat">Pendiente</Chip>;
+        return <Chip color="default">Sin estado</Chip>;
+      }
+    }
   ];
 
   if (isLoading) {
@@ -99,7 +127,7 @@ export const SolicitudTable = () => {
       </Modall>
 
       <Modall
-        ModalTitle="Editar Usuario"
+        ModalTitle="Editar Solicitud"
         isOpen={IsOpenUpdate}
         onOpenChange={handleCloseUpdate}
       >
@@ -118,7 +146,8 @@ export const SolicitudTable = () => {
           data={SolicitudsWithKey}
           columns={columns}
           onEdit={handleEdit}
-          onDelete={() => {}}
+          showActions={true}
+          showEstado={false}
         />
       )}
     </div>

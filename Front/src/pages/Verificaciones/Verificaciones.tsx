@@ -7,11 +7,13 @@ import { useVerificacion } from "@/hooks/Verificaciones/useVerificacion";
 import { Verificacion } from "@/types/Verificacion";
 import Formulario from "@/components/organismos/Verificaciones/FormRegister";
 import { FormUpdate } from "@/components/organismos/Verificaciones/FormUpdate";
+import { useSitios } from "@/hooks/sitios/useSitios";
 
 export const VerificacionTable = () => {
   const { verificaciones, isLoading, isError, error, addVerificacion,  } =
     useVerificacion();
 
+    const {sitios: sitios} = useSitios()
   //Modal agregar
   const [isOpen, setIsOpen] = useState(false);
   const handleClose = () => setIsOpen(false);
@@ -27,24 +29,47 @@ export const VerificacionTable = () => {
     setSelectedVerificacion(null);
   };
 
-  const handleAddVerificacion = async (elemento: Verificacion) => {
+  const handleAddVerificacion = async (verifiacion: Verificacion) => {
     try {
-      await addVerificacion(elemento);
+      await addVerificacion(verifiacion);
       handleClose(); // Cerrar el modal después de darle agregar usuario
     } catch (error) {
       console.error("Error al agregar la verifiacion:", error);
     }
   };
 
-  const handleEdit = (elemento: Verificacion) => {
-    setSelectedVerificacion(elemento);
+  const handleEdit = (verifiacion: Verificacion) => {
+    setSelectedVerificacion(verifiacion);
     setIsOpenUpdate(true);
   };
 
   // Definir las columnas de la tabla
   const columns: TableColumn<Verificacion>[] = [
-    { key: "persona_encargada", label: "" },
+    { key: "persona_encargada", label: "Encargado" },
     { key: "persona_asignada", label: "Solicitante" },
+    { key: "hora_ingreso", label: "Ingreso" },
+    { key: "hora_salida", label: "Salida" },
+    { key: "fk_sitio", label: "Sitio",       
+      render: (verifiacion: Verificacion) => {
+            const sitio = sitios?.find(
+              (si) => si.id_sitio === verifiacion.fk_sitio
+            );
+            return <span>{sitio?.nombre ?? "No encontrado"}</span>;
+          },},
+    {
+      key: "created_at",
+      label: "Fecha Verificacion",
+      render: (verificacion: Verificacion) => (
+        <span>{new Date(verificacion.created_at).toLocaleDateString("es-ES")}</span>
+      ),
+    },
+    {
+      key: "updated_at",
+      label: "Fecha Actualización",
+      render: (verificacion: Verificacion) => (
+        <span>{new Date(verificacion.updated_at).toLocaleDateString("es-ES")}</span>
+      ),
+    },
   ];
 
   if (isLoading) {
@@ -67,7 +92,7 @@ export const VerificacionTable = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4 text-center">
-        Verificacions Registrados
+        Verificaciones Registradas
       </h1>
 
       <Buton

@@ -58,21 +58,7 @@ const RolModuloTable = () => {
         { key: "fk_modulo", label: "fk_modulo" },
         { key: "fk_permiso", label: "fk_permiso" },
 
-        // {
-        //     key: "estado",
-        //     label: "estado",
-        //     render: (user: RolModulo) => (
-        //         <Chip
-        //             className={`px-2 py-1 rounded ${user.estado ? "text-green-500" : " text-red-500" //color texto
-        //                 }`}
-                    
-        //                 color={`${user.estado ? "success" : "danger" }`} //color de fondo
-        //                 variant="flat"
-        //         >
-        //             {user.estado ? "Activo" : "Inactivo"}
-        //         </Chip>
-        //     ),
-        // },
+    
 
     ];
 

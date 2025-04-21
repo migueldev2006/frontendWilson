@@ -3,23 +3,43 @@ import { Form } from "@heroui/form";
 import Inpu from "@/components/molecules/input";
 import { Select, SelectItem } from "@heroui/react";
 import { Inventario } from "@/types/Inventario";
+import { useSitios } from "@/hooks/sitios/useSitios";
+import { useElemento } from "@/hooks/Elementos/useElemento";
 
 type FormularioProps = {
   addData: (inventario: Inventario) => Promise<void>;
   onClose: () => void;
   id: string;
+  idSitio:number
 };
 
-export default function Formulario({ addData, onClose, id }: FormularioProps) {
+export default function Formulario({
+  addData,
+  onClose,
+  id,
+  idSitio,
+}: FormularioProps) {
   const [formData, setFormData] = React.useState<Inventario>({
     id_inventario: 0,
     stock: 0,
     estado: true,
-    created_at:'',
-    updated_at:'',
-    fk_sitio: 0,
+    created_at: "",
+    updated_at: "",
+    fk_sitio: idSitio ?? 0,
     fk_elemento: 0,
+    imagen_elemento:""
   });
+
+  const {
+    sitios,
+    isLoading: loadingSitios,
+    isError: errorSitios,
+  } = useSitios();
+  const {
+    elementos,
+    isLoading: loadingElementos,
+    isError: errorElementos,
+  } = useElemento();
 
   const onSubmit = async (e: React.FormEvent) => {
     //preguntar si esta bien no usar el e: React.FormEvent
@@ -33,10 +53,11 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         id_inventario: 0,
         stock: 0,
         estado: true,
-        created_at:'',
-        updated_at:'',
+        created_at: "",
+        updated_at: "",
         fk_sitio: 0,
         fk_elemento: 0,
+        imagen_elemento:""
       });
       onClose();
     } catch (error) {
@@ -57,8 +78,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
       />
 
       <Select
-        aria-labelledby="estado"
-        labelPlacement="outside"
+        label="Estado"
         name="estado"
         placeholder="Estado"
         onChange={(e) =>
@@ -69,24 +89,39 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         <SelectItem key="false">Inactivo</SelectItem>
       </Select>
 
-      <Inpu
-        label="Sitio"
-        placeholder="Sitio"
-        type="number"
-        name="fk_sitio"
-        onChange={(e) =>
-          setFormData({ ...formData, fk_sitio: Number(e.target.value) })
-        }
-      />
-      <Inpu
-        label="Elemento"
-        placeholder="Elemento"
-        type="number"
-        name="fk_elemento"
-        onChange={(e) =>
-          setFormData({ ...formData, fk_elemento: Number(e.target.value) })
-        }
-      />
+      {!loadingSitios && !errorSitios && sitios && (
+        <Select
+          label="Sitio"
+          name="fk_sitio"
+          placeholder="Selecciona un sitio"
+          selectedKeys={formData.fk_sitio.toString()}
+          onChange={(e) =>
+            setFormData({ ...formData, fk_sitio: Number(e.target.value) })
+          }
+          isDisabled={!!idSitio}
+        >
+          {sitios.map((sitio) => (
+            <SelectItem key={sitio.id_sitio}>{sitio.nombre}</SelectItem>
+          ))}
+        </Select>
+      )}
+
+      {!loadingElementos && !errorElementos && elementos && (
+        <Select
+          label="Elemento"
+          name="fk_elemento"
+          placeholder="Selecciona un elemento"
+          onChange={(e) =>
+            setFormData({ ...formData, fk_elemento: Number(e.target.value) })
+          }
+        >
+          {elementos.map((elemento) => (
+            <SelectItem key={elemento.id_elemento}>
+              {elemento.nombre}
+            </SelectItem>
+          ))}
+        </Select>
+      )}
     </Form>
   );
 }

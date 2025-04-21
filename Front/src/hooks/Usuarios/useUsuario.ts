@@ -1,5 +1,5 @@
 import { axiosAPI } from '@/axios/axiosAPI';
-import { User } from '@/types/Usuario'
+import { User } from '@/schemas/User'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useUsuario() {
@@ -16,25 +16,33 @@ export function useUsuario() {
         }
     });
 
+
     const addUserMutation = useMutation({
         mutationFn: async(newUser: User) => {
             await axiosAPI.post<User>(url, newUser)
             return newUser
         },
         onSuccess: (user) => {
-            console.log(user);
+            console.log("Esta es la mutación:",user);
+            const oldData = queryClient.getQueryData(["users"]);
+            console.log("Datos anteriores:",oldData);
             queryClient.setQueryData<User[]>(["users"], (oldData) =>
                 oldData ? [...oldData,user] : [user]
             );
+            const newData = queryClient.getQueryData(["users"]);
+            console.log("Datos nuevos:",newData);
         },
         onError: (error) => {
             console.log("Error al cargar el usuario", error);
         }
     });
 
-    const getUserById = (id: number, users : User[] | undefined = data ): User | null => {
-        return users?.find((user) => user.id_usuario === id) || null;
-    }
+
+
+
+    const getUserById = (id: number, usersList: User[]): User | null => {
+        return usersList.find((user) => user.id_usuario === id) || null;
+    };
 
     const updateUserMutation = useMutation({
         mutationFn: async({ id, update } : { id: number; update: Partial<User> }) => {
@@ -83,6 +91,7 @@ export function useUsuario() {
     const addUser = async (usuario: User) => {
         return addUserMutation.mutateAsync(usuario);
     };
+
 
     const updateUser = async (id: number, update: Partial<User>) => {
         return updateUserMutation.mutateAsync({ id, update });

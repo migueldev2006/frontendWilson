@@ -17,9 +17,31 @@ export function useElemento() {
 
   const addElementoMutation = useMutation({
     mutationFn: async (newElemento: Elemento) => {
-      await axiosAPI.post<Elemento>(url, newElemento);
+      const formData = new FormData();
+    
+      formData.append("nombre", newElemento.nombre);
+      formData.append("descripcion", newElemento.descripcion);
+      formData.append("valor", newElemento.valor.toString());
+      formData.append("perecedero", String(newElemento.perecedero));
+      formData.append("no_perecedero", String(newElemento.no_perecedero));
+      formData.append("estado", String(newElemento.estado));
+      formData.append("fk_unidad_medida", newElemento.fk_unidad_medida.toString());
+      formData.append("fk_categoria", newElemento.fk_categoria.toString());
+      formData.append("fk_caracteristica", newElemento.fk_caracteristica.toString());
+    
+      if (newElemento.imagen_elemento instanceof File) {
+        formData.append("img", newElemento.imagen_elemento);
+      }
+    
+      await axiosAPI.post(url, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    
       return newElemento;
     },
+    
     onSuccess: (elemento) => {
       console.log(elemento);
       queryClient.setQueryData<Elemento[]>(["elementos"], (oldData) =>
@@ -46,7 +68,27 @@ export function useElemento() {
       id: number;
       update: Partial<Elemento>;
     }) => {
-      await axiosAPI.put<Elemento>(`${url}/${id}`, update);
+      const formData = new FormData();
+      formData.append("nombre", update.nombre || "");
+      formData.append("descripcion", update.descripcion || "");
+      formData.append("valor", String(update.valor ?? 0));
+      formData.append("perecedero", String(update.perecedero));
+      formData.append("no_perecedero", String(update.no_perecedero));
+      formData.append("estado", String(update.estado));
+      formData.append("fk_unidad_medida", String(update.fk_unidad_medida));
+      formData.append("fk_categoria", String(update.fk_categoria));
+      formData.append("fk_caracteristica", String(update.fk_caracteristica));
+    
+      if (update.imagen_elemento instanceof File) {
+        formData.append("img", update.imagen_elemento);
+      }
+    
+      await axiosAPI.put(`${url}/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    
       return { id, update };
     },
     onSuccess: ({ id, update }) => {

@@ -16,18 +16,29 @@ export default function SolicitudReportSelector() {
       id: "todos",
       title: "Solicitudes Registradas",
       description: (data: Solicitud[]) => {
-        const total = data.length
-        return `
-Enter tanto nos encontramos con las solicitudes la cuales decribe la forma en la que se es solicitado un elemento hasta su acepatcion, es importante aclarar que gracias  a estas solicitudes no es posible entender cual  quien es el usuario encargado de realizra la solicitud, a que elemnto la solicito y la cantidad.
-
-Sin embargo no siempre podremos depender de estas ya que en muchas ocasiones se deben realizar movimientos en su lugar.
-
-En tanto conocemos que haya un total de ${total} solicitudes realizadas.
-`;
+        return ``;
       },
-      headers: ["Descripcion", "Cantidad", "Fecha Creacion"],
-      accessors: ["descripcion", "cantidad", "created_at"],
-      withTable: true,
+      headers: [""],
+      accessors: [""],
+      withTable: false,
+      filterFn: (data: Solicitud[]) => data,
+    },
+    {
+      id: "",
+      title: "",
+      description: (data: Solicitud[]) => {
+        return `hola`;
+      },
+      withTable: false,
+      filterFn: (data: Solicitud[]) => data,
+    },
+    {
+      id: "",
+      title: "",
+      description: (data: Solicitud[]) => {
+        return `hola`;
+      },
+      withTable: false,
       filterFn: (data: Solicitud[]) => data,
     },
   ];

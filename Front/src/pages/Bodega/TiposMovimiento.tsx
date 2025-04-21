@@ -50,22 +50,20 @@ export const TipoMovimientoTable = () => {
   const columns: TableColumn<TipoMovimiento>[] = [
     { key: "nombre", label: "Nombre" },
     {
-      key: "estado",
-      label: "Estado",
-      render: (tipo: TipoMovimiento) => (
-        <Chip
-          className={`px-2 py-1 rounded ${
-            tipo.estado ? "text-green-500" : " text-red-500" //color texto
-          }`}
-          color={`${tipo.estado ? "success" : "danger"}`} //color de fondo
-          variant="flat"
-        >
-          {tipo.estado ? "Activo" : "Inactivo"}
-        </Chip>
+      key: "created_at",
+      label: "Fecha Creación",
+      render: (rol: TipoMovimiento) => (
+        <span>{new Date(rol.created_at).toLocaleDateString("es-ES", { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
       ),
     },
-    {key:"created_at", label:"Fecha Creacion"},
-    {key:"updated_at", label:"Fecha Actualizacion"}
+    {
+      key: "updated_at",
+      label: "Fecha Actualización",
+      render: (rol: TipoMovimiento) => (
+        <span>{new Date(rol.updated_at).toLocaleDateString("es-ES", { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
+      ),
+    },
+    { key: "estado", label: "Estado" },
   ];
 
   if (isLoading) {
@@ -121,7 +119,7 @@ export const TipoMovimientoTable = () => {
       </Modall>
 
       <Modall
-        ModalTitle="Editar Usuario"
+        ModalTitle="Editar Tipo de Movimiento"
         isOpen={IsOpenUpdate}
         onOpenChange={handleCloseUpdate}
       >

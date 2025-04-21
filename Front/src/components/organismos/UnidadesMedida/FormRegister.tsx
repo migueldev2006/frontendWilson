@@ -15,8 +15,8 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
     id_unidad: 0,
     nombre: "",
     estado: true,
-    created_at:'',
-    updated_at:'',
+    created_at: "",
+    updated_at: "",
   });
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -31,8 +31,8 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         id_unidad: 0,
         nombre: "",
         estado: true,
-        created_at:'',
-        updated_at:'',
+        created_at: "",
+        updated_at: "",
       });
       onClose();
     } catch (error) {
@@ -51,8 +51,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
       />
       <Select
-        aria-labelledby="estado"
-        labelPlacement="outside"
+        label="Estado"
         name="estado"
         placeholder="Estado"
         onChange={(e) =>

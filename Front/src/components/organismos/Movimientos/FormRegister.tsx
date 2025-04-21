@@ -2,7 +2,12 @@ import React from "react";
 import { Form } from "@heroui/form";
 import Inpu from "@/components/molecules/input";
 import { Movimiento } from "@/types/Movimiento";
-// import { Select, SelectItem } from "@heroui/react";
+import { useUsuario } from "@/hooks/Usuarios/useUsuario";
+import { useTipoMovimiento } from "@/hooks/TiposMovimento/useTipoMovimiento";
+import { useInventario } from "@/hooks/Inventarios/useInventario";
+import { Select, SelectItem } from "@heroui/react";
+import { useSitios } from "@/hooks/sitios/useSitios";
+import { useElemento } from "@/hooks/Elementos/useElemento";
 
 type FormularioProps = {
   addData: (movimiento: Movimiento) => Promise<void>;
@@ -17,8 +22,9 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
     cantidad: 0,
     hora_ingreso: "",
     hora_salida: "",
-    aceptado: true,
-    en_proceso: false,
+    estado:true,
+    aceptado: false,
+    en_proceso: true,
     cancelado: false,
     devolutivo: true,
     no_devolutivo: false,
@@ -28,7 +34,30 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
     fk_tipo_movimiento: 0,
     fk_sitio: 0,
     fk_inventario: 0,
+    tipo_movimiento: "",
   });
+
+  const { users, isLoading: loadingUsers, isError: errorUsers } = useUsuario();
+  const {
+    tipos,
+    isLoading: loadingTipos,
+    isError: errorTipos,
+  } = useTipoMovimiento();
+  const {
+    sitios,
+    isLoading: loadingSitios,
+    isError: errorSitios,
+  } = useSitios();
+  const {
+    inventarios,
+    isLoading: loadingInventarios,
+    isError: errorInventarios,
+  } = useInventario();
+  const {
+    elementos,
+    isLoading: loadingElementos,
+    isError: errorElementos,
+  } = useElemento();
 
   const onSubmit = async (e: React.FormEvent) => {
     //preguntar si esta bien no usar el e: React.FormEvent
@@ -44,24 +73,30 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         cantidad: 0,
         hora_ingreso: "",
         hora_salida: "",
+        estado:true,
         aceptado: false,
         en_proceso: true,
         cancelado: false,
         devolutivo: true,
         no_devolutivo: false,
-        created_at:'',
-        updated_at:'',
+        created_at: "",
+        updated_at: "",
         fk_usuario: 0,
         fk_tipo_movimiento: 0,
         fk_sitio: 0,
         fk_inventario: 0,
+        tipo_movimiento: "",
       });
       onClose();
     } catch (error) {
       console.error("Error al cargar el usuario", error);
     }
   };
+  const [sitioSeleccionado, setSitioSeleccionado] = React.useState<
+    number | null
+  >(null);
 
+  console.log(inventarios);
   return (
     <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
       <Inpu
@@ -104,64 +139,109 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         }
       />
 
-      {/* <Select
-        aria-labelledby="estado"
-        labelPlacement="outside"
-        name="estado"
-        placeholder="Estado"
-        onChange={(e) =>
-          setFormData({ ...formData, estado: e.target.value === "true" })
-        } // Convierte a booleano
-      >
-        <SelectItem key="true">Activo</SelectItem>
-        <SelectItem key="false">Inactivo</SelectItem>
-      </Select>
-
-      <Inpu label="Estado" placeholder="Estado" type="checkbox" name="estado" value={formData.estado.toString()} onChange={(e) => setFormData({ ...formData, estado: e.target.checked })} /> */}
-
-      <Inpu
-        label="Usuario"
-        placeholder="Usuario"
-        type="number"
-        name="fk_usuario"
-        value={formData.fk_usuario.toString()}
-        onChange={(e) =>
-          setFormData({ ...formData, fk_usuario: Number(e.target.value) })
-        }
-      />
-      <Inpu
-        label="Tipo Movimiento"
-        placeholder="Tipo Movimiento"
-        type="number"
-        name="fk_tipo_movimiento"
-        value={formData.fk_tipo_movimiento.toString()}
-        onChange={(e) =>
+      <Select
+        label="Tipo de Movimiento"
+        name="tipo_movimiento"
+        placeholder="Selecciona un tipo"
+        onChange={(e) => {
+          const value = e.target.value;
           setFormData({
             ...formData,
-            fk_tipo_movimiento: Number(e.target.value),
-          })
-        }
-      />
-      <Inpu
-        label="Sitio"
-        placeholder="Sitio"
-        type="number"
-        name="fk_sitio"
-        value={formData.fk_sitio.toString()}
-        onChange={(e) =>
-          setFormData({ ...formData, fk_sitio: Number(e.target.value) })
-        }
-      />
-      <Inpu
-        label="Inventario"
-        placeholder="Inventario"
-        type="number"
-        name="fk_inventario"
-        value={formData.fk_inventario.toString()}
-        onChange={(e) =>
-          setFormData({ ...formData, fk_inventario: Number(e.target.value) })
-        }
-      />
+            tipo_movimiento:
+              value === "devolutivo" ? "Devolutivo" : "No Devolutivo",
+            devolutivo: value === "devolutivo",
+            no_devolutivo: value === "no_devolutivo",
+          });
+        }}
+      >
+        <SelectItem key="devolutivo">Devolutivo</SelectItem>
+        <SelectItem key="no_devolutivo">No Devolutivo</SelectItem>
+      </Select>
+
+      {!loadingUsers && !errorUsers && users && (
+        <Select
+          label="Usuario"
+          name="fk_usuario"
+          placeholder="Selecciona un Usuario"
+          onChange={(e) =>
+            setFormData({ ...formData, fk_usuario: Number(e.target.value) })
+          }
+        >
+          {users.map((usuario) => (
+            <SelectItem key={usuario.id_usuario}>{usuario.nombre}</SelectItem>
+          ))}
+        </Select>
+      )}
+
+      {!loadingTipos && !errorTipos && tipos && (
+        <Select
+          label="Tipo Movimiento"
+          name="fk_tipo_movimiento"
+          placeholder="Selecciona un tipo"
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              fk_tipo_movimiento: Number(e.target.value),
+            })
+          }
+        >
+          {tipos.map((tipo) => (
+            <SelectItem key={tipo.id_tipo}>{tipo.nombre}</SelectItem>
+          ))}
+        </Select>
+      )}
+
+      {!loadingSitios && !errorSitios && sitios && (
+        <Select
+          label="Sitio"
+          name="fk_sitio"
+          placeholder="Selecciona un sitio"
+          onChange={(e) => {
+            const sitioId = Number(e.target.value);
+            setFormData({ ...formData, fk_sitio: sitioId });
+            setSitioSeleccionado(sitioId);
+            setFormData((prev) => ({ ...prev, fk_inventario: 0 })); // opcional: limpiar inventario seleccionado
+          }}
+        >
+          {sitios.map((sitio) => (
+            <SelectItem key={sitio.id_sitio}>{sitio.nombre}</SelectItem>
+          ))}
+        </Select>
+      )}
+
+      {!loadingInventarios &&
+        !errorInventarios &&
+        inventarios &&
+        !loadingElementos &&
+        !errorElementos &&
+        elementos &&
+        sitioSeleccionado && ( // <- asegúrate de que hay un sitio seleccionado
+          <Select
+            label="Elemento del Inventario"
+            name="fk_inventario"
+            placeholder="Selecciona un elemento del inventario"
+            value={formData.fk_inventario}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                fk_inventario: Number(e.target.value),
+              })
+            }
+          >
+            {inventarios
+              .filter((inv) => inv.fk_sitio === sitioSeleccionado) // <- filtrado clave
+              .map((inventario) => {
+                const elemento = elementos.find(
+                  (e) => e.id_elemento === inventario.fk_elemento
+                );
+                return (
+                  <SelectItem key={inventario.id_inventario}>
+                    {elemento ? elemento.nombre : "Elemento no disponible"}
+                  </SelectItem>
+                );
+              })}
+          </Select>
+        )}
     </Form>
   );
 }

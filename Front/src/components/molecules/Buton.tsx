@@ -3,7 +3,7 @@ import { Button } from "@heroui/button";
 
 type propsBut = {
     text?: string,
-    type :"button" | "submit" | "reset" | undefined,
+    type? :"button" | "submit" | "reset" | undefined,
     className?: string,
     color? : "default" | "primary" | "secondary" | "success" | "warning" | "danger" | undefined,
     variant? : "solid" | "bordered" | "light" | "flat" | "faded" | "shadow" | "ghost" | undefined

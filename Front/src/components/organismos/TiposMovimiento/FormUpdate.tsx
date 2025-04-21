@@ -1,69 +1,76 @@
 import React, { useState, useEffect } from "react";
-import { Form } from "@heroui/form"
+import { Form } from "@heroui/form";
 import Inpu from "@/components/molecules/input";
 import { TipoMovimiento } from "@/types/TipoMovimiento";
 import { useTipoMovimiento } from "@/hooks/TiposMovimento/useTipoMovimiento";
 
-
-
 type Props = {
-    tipos: TipoMovimiento[] ;
-    tipoId: number;
-    id: string
-    onclose: () => void;
-
-}
+  tipos: TipoMovimiento[];
+  tipoId: number;
+  id: string;
+  onclose: () => void;
+};
 
 export const FormUpdate = ({ tipos, tipoId, id, onclose }: Props) => {
-    const [formData, setFormData] = useState<Partial<TipoMovimiento>>({
-        id_tipo: 0,
-        nombre: "",
-        estado:true,
-    });
+  const [formData, setFormData] = useState<Partial<TipoMovimiento>>({
+    id_tipo: 0,
+    nombre: "",
+    estado: true,
+  });
 
-    const {updateTipoMovimiento, getTipoMovimientoById} = useTipoMovimiento()
+  const { updateTipoMovimiento, getTipoMovimientoById } = useTipoMovimiento();
 
-    useEffect(() => { // se ejecuta cuando algo se cambie en un usuario, obtiene el id y modifica el FormData
-        const foundTipoMovimiento = getTipoMovimientoById(tipoId);
+  useEffect(() => {
+    // se ejecuta cuando algo se cambie en un usuario, obtiene el id y modifica el FormData
+    const foundTipoMovimiento = getTipoMovimientoById(tipoId);
 
-        if (foundTipoMovimiento) {
-            setFormData(foundTipoMovimiento);
-        }
+    if (foundTipoMovimiento) {
+      setFormData(foundTipoMovimiento);
+    }
+  }, [tipos, tipoId]);
 
-    }, [tipos, tipoId]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //se ejecuta cuando el usuario cambia algo en un campo
+    const { name, value, type, checked } = e.target;
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => { //se ejecuta cuando el usuario cambia algo en un campo
-        const { name, value, type, checked } = e.target;
+    setFormData((prev: Partial<TipoMovimiento>) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
-        setFormData((prev : Partial<TipoMovimiento>) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-        }));
-    };
-
-
-    const handleSubmit = async (e : React.FormEvent) => {
-
-        e.preventDefault();
-        if (!formData.id_tipo) {
-            return <p className="text-center text-gray-500">Usuario no encontrado</p>;
-        }
-        
-        try {
-            await updateTipoMovimiento(formData.id_tipo, formData);
-            onclose();
-        } catch (error) {
-            console.log("Error al actualizar el tipo de movimiento", error);
-        }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.id_tipo) {
+      return <p className="text-center text-gray-500">Tipo de Movimiento no encontrado</p>;
     }
 
-    return (
-        <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit}>
-            <Inpu label="Nombre" placeholder="Nombre" type="text" name="nombre" value={formData.nombre ?? ''} onChange={handleChange} />
-            <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
-                Guardar Cambios
-            </button>
-        </Form>
-    )
+    try {
+      await updateTipoMovimiento(formData.id_tipo, formData);
+      onclose();
+    } catch (error) {
+      console.log("Error al actualizar el tipo de movimiento", error);
+    }
+  };
 
-}
+  return (
+    <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit}>
+      <Inpu
+        label="Nombre"
+        placeholder="Nombre"
+        type="text"
+        name="nombre"
+        value={formData.nombre ?? ""}
+        onChange={handleChange}
+      />
+      <div className="justify-center pl-10">
+        <button
+          type="submit"
+          className="w-80 bg-blue-700 text-white p-2 rounded-xl "
+        >
+          Guardar Cambios
+        </button>
+      </div>
+    </Form>
+  );
+};

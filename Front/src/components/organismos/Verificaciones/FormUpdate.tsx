@@ -24,7 +24,6 @@ export const FormUpdate = ({
     hora_ingreso: "",
     hora_salida: "",
     observaciones: "",
-    fk_inventario: 0,
   });
 
   const { updateVerificacion, getVerificacionById } = useVerificacion();
@@ -106,9 +105,14 @@ export const FormUpdate = ({
         value={formData.observaciones ?? ""}
       />
 
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
-        Guardar Cambios
-      </button>
+      <div className="justify-center pl-10">
+        <button
+          type="submit"
+          className="w-80 bg-blue-700 text-white p-2 rounded-xl "
+        >
+          Guardar Cambios
+        </button>
+      </div>
     </Form>
   );
 };

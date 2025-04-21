@@ -3,6 +3,8 @@ import { Form } from "@heroui/form"
 import Inpu from "@/components/molecules/input";
 import { Area } from "@/types/area";
 import { Select, SelectItem } from "@heroui/react";
+import {useSede} from "@/hooks/sedes/useSedes"
+
 
 type FormularioProps = {
 
@@ -13,12 +15,14 @@ type FormularioProps = {
 
 export default function Formulario({ addData, onClose, id }: FormularioProps) {
 
+    const { sede, isLoading: loadingSedes, isError: errorSedes } = useSede();
 
     const [formData, setFormData] = React.useState<Area>({
         id_area: 0,
         nombre: "",
         persona_encargada: "",
         estado: true,
+        created_at:"",
         fk_sede: 0,
     });
 
@@ -34,6 +38,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
                 nombre: "",
                 persona_encargada: "",
                 estado: true,
+                created_at:"",
                 fk_sede: 0,
             });
             onClose();
@@ -62,8 +67,24 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
 
             
 
-            <Inpu label="Sede" placeholder="Sede" type="number" name="fk_sede" value={formData.fk_sede.toString()} onChange={(e) => setFormData({ ...formData, fk_sede: Number(e.target.value) })} />
+            {/* <Inpu label="Sede" placeholder="Sede" type="number" name="fk_sede" value={formData.fk_sede.toString()} onChange={(e) => setFormData({ ...formData, fk_sede: Number(e.target.value) })} /> */}
 
+            {!loadingSedes && !errorSedes && sede && (
+                    <Select
+                      label="sedes"
+                      name="fk_sede"
+                      placeholder="Selecciona una sede"
+                      onChange={(e) =>
+                        setFormData({ ...formData, fk_sede: Number(e.target.value) })
+                      }
+                    >
+                      {sede.map((sedes) => (
+                        <SelectItem key={sedes.id_sede}>
+                          {sedes.nombre}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  )}
         </Form>
     )
 }

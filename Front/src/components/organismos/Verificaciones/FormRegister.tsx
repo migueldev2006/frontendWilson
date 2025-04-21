@@ -2,6 +2,10 @@ import React from "react";
 import { Form } from "@heroui/form";
 import Inpu from "@/components/molecules/input";
 import { Verificacion } from "@/types/Verificacion";
+import { Select, SelectItem } from "@heroui/react";
+import { useSitios } from "@/hooks/sitios/useSitios";
+import { useVerificacion } from "@/hooks/Verificaciones/useVerificacion";
+
 
 type FormularioProps = {
   addData: (verificacion: Verificacion) => Promise<void>;
@@ -17,10 +21,15 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
     hora_ingreso: "",
     hora_salida: "",
     observaciones: "",
-    created_at:'',
-    updated_at:'',
-    fk_inventario: 0,
+    created_at: "",
+    updated_at: "",
+    fk_sitio: 0,
   });
+
+  const { sitios, isLoading: loadingSitios } = useSitios();
+  const [elementosSitio, setElementosSitio] = React.useState([]);
+  const { getElementosPorSitio } = useVerificacion();
+
 
   const onSubmit = async (e: React.FormEvent) => {
     //preguntar si esta bien no usar el e: React.FormEvent
@@ -37,9 +46,9 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         hora_ingreso: "",
         hora_salida: "",
         observaciones: "",
-        created_at:'',
-        updated_at:'',
-        fk_inventario: 0,
+        created_at: "",
+        updated_at: "",
+        fk_sitio: 0,
       });
       onClose();
     } catch (error) {
@@ -99,16 +108,37 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         }
       />
 
-      <Inpu
-        label="Inventario"
-        placeholder="Inventario"
-        type="number"
-        name="fk_inventario"
-        value={formData.fk_inventario.toString()}
-        onChange={(e) =>
-          setFormData({ ...formData, fk_inventario: Number(e.target.value) })
-        }
-      />
+      {!loadingSitios && sitios && (
+        <Select
+          label="Sitio"
+          name="fk_sitio"
+          placeholder="Selecciona un sitio"
+          selectedKeys={
+            formData.fk_sitio ? formData.fk_sitio.toString() : undefined
+          }
+          onSelectionChange={async (key) => {
+            const idSitio = Number(key);
+            setFormData({
+              ...formData,
+              fk_sitio: idSitio,
+            });
+          
+            try {
+              const res = await getElementosPorSitio(idSitio).refetch();
+              setElementosSitio(res.data || []);
+            } catch (error) {
+              console.error("Error al obtener elementos del sitio:", error);
+            }
+          }
+          }
+        >
+          {sitios.map((sitio) => (
+            <SelectItem key={sitio.id_sitio.toString()}>
+              {sitio.nombre}
+            </SelectItem>
+          ))}
+        </Select>
+      )}
     </Form>
   );
 }

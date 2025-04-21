@@ -3,7 +3,6 @@ import { TableColumn } from "@/components/organismos/table.tsx";
 import Buton from "@/components/molecules/Buton";
 import Modall from "@/components/molecules/modal";
 import { useState } from "react";
-import { Chip } from "@heroui/chip";
 import { useElemento } from "@/hooks/Elementos/useElemento";
 import { Elemento } from "@/types/Elemento";
 import Formulario from "@/components/organismos/Elementos/FormRegister";
@@ -49,24 +48,58 @@ export const ElementosTable = () => {
 
   // Definir las columnas de la tabla
   const columns: TableColumn<Elemento>[] = [
-    { key: "nombre", label: "Nombre" },
-    { key: "valor", label: "Valor" },
-    { key: "imagen_elemento", label: "Elemento" },
     {
-      key: "estado",
-      label: "estado",
-      render: (elemento: Elemento) => (
-        <Chip
-          className={`px-2 py-1 rounded ${
-            elemento.estado ? "text-green-500" : " text-red-500" //color texto
-          }`}
-          color={`${elemento.estado ? "success" : "danger"}`} //color de fondo
-          variant="flat"
-        >
-          {elemento.estado ? "Activo" : "Inactivo"}
-        </Chip>
+      label:"Imagen",
+      key: 'imagen_elemento',
+      render: (item: Elemento) => {
+        return item.imagen_elemento ? (
+          <img src={`http://localhost:3000/img/${item.imagen_elemento}`} alt="Imagen" width={200} height={50} />
+        ) : (
+          <span>Sin imagen</span>
+        );
+      },
+    },
+    { key: "nombre", label: "Nombre" },
+    { key: "descripcion", label: "Descripcion" },
+    { key: "valor", label: "Valor" },
+    { key: "tipo_elemento", label: "Tipo Elemento",
+      render:(elementos:Elemento) => (
+        <span>
+        {elementos.perecedero
+          ? "Perecedero"
+          :elementos.no_perecedero
+          ? "No Perecedero"
+          :"No Especificado"
+        }</span>
+      ),
+     },
+    {
+      key: "created_at",
+      label: "Fecha Creación",
+      render: (rol: Elemento) => (
+        <span>
+          {new Date(rol.created_at).toLocaleDateString("es-ES", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          })}
+        </span>
       ),
     },
+    {
+      key: "updated_at",
+      label: "Fecha Actualización",
+      render: (rol: Elemento) => (
+        <span>
+          {new Date(rol.updated_at).toLocaleDateString("es-ES", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          })}
+        </span>
+      ),
+    },
+    { key: "estado", label: "Estado"},
   ];
 
   if (isLoading) {

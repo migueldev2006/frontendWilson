@@ -3,6 +3,7 @@ import { Form } from "@heroui/form"
 import Inpu from "@/components/molecules/input";
 import { Pformacion } from "@/types/programaFormacion";
 import { Select, SelectItem } from "@heroui/react";
+import {useAreas} from "@/hooks/areas/useAreas"
 
 type FormularioProps = {
 
@@ -13,7 +14,7 @@ type FormularioProps = {
 
 export default function Formulario({ addData, onClose, id }: FormularioProps) {
 
-
+    const { areas, isLoading: loadingAreas, isError: errorAreas } = useAreas();
     const [formData, setFormData] = React.useState<Pformacion>({
         id_programa: 0,
         nombre: "",
@@ -60,8 +61,23 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
            
            
 
-            <Inpu label="area" placeholder="area" type="number" name="fk_area" value={formData.fk_area.toString()} onChange={(e) => setFormData({ ...formData, fk_area: Number(e.target.value) })} />
-
+            {/* <Inpu label="area" placeholder="area" type="number" name="fk_area" value={formData.fk_area.toString()} onChange={(e) => setFormData({ ...formData, fk_area: Number(e.target.value) })} /> */}
+              {!loadingAreas && !errorAreas && areas && (
+                                <Select
+                                  label="areas"
+                                  name="fk_area"
+                                  placeholder="Selecciona una area"
+                                  onChange={(e) =>
+                                    setFormData({ ...formData, fk_area: Number(e.target.value) })
+                                  }
+                                >
+                                  {areas.map((area) => (
+                                    <SelectItem key={area.id_area}>
+                                      {area.nombre}
+                                    </SelectItem>
+                                  ))}
+                                </Select>
+                              )}
         </Form>
     )
 }

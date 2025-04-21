@@ -1,14 +1,11 @@
 import Tap from "@/components/molecules/Tabs";
 import UsersTable from './usuarios';
-import AreaTable from './areas';
-import FcihasTable from './fichas';
-import ProgramasTable from './programas';
-import RolModuloTable from './rolModulo';
-import SedeTable from './sedes';
-import SitiosTable from './sitios';
-import PermisoTable from './permisos';
-import Home from '../Home/Home';
-
+import TipoSitioTable from './tipoSitio'
+import CentrosTable from './centros'
+import ModulosTable from './modulo'
+import RutasTable from "./rutas";
+import MunicipiosTable from "./municipio";
+import CategoriasTable from "./categorias";
 const Admin =() => {
 
         const tabs = [
@@ -20,53 +17,34 @@ const Admin =() => {
             {
                 key : "2",
                 title : "Centros",
-                content : <></>
+                content : <CentrosTable/>
             },
             {
                 key : "3",
-                title : "Areas",
-                content : <AreaTable/>
+                title : "Tipos de Sitios",
+                content : <TipoSitioTable/>
             },
             {
                 key : "4",
-                title : "#",
-                content : <Home/>
+                title : "Modulos",
+                content : <ModulosTable/>
             },
             {
                 key : "5",
-                title : "Fichas",
-                content : <FcihasTable/>
+                title : "Rutas",
+                content : <RutasTable/>
             },
             {
                 key : "6",
-                title : "Programas de formación",
-                content : <ProgramasTable/>
+                title : "Municipios",
+                content : <MunicipiosTable/>
             },
             {
                 key : "7",
-                title : "permisos",
-                content : <Home/>
+                title : "Categorias",
+                content : <CategoriasTable/>
             },
-            {
-                key : "8",
-                title : "Rol Modulo",
-                content : <RolModuloTable/>
-            },
-            {
-                key : "9",
-                title : "sedes",
-                content : <SedeTable/>
-            },
-            {
-                key : "10",
-                title : "sitios",
-                content : <SitiosTable/>
-            },
-            {
-                key : "11",
-                title : "permisos",
-                content : <PermisoTable/>
-            }
+            
         ]
 
   return (

@@ -31,6 +31,33 @@ A continuacion bridaremos un listado general de los roles registrado en el siste
       withTable: true,
       filterFn: (data: TipoMovimiento[]) => data,
     },
+    {
+      id: "activos",
+      title: "Roles Activos",
+      description: (data: TipoMovimiento[]) => {
+        const activos = data.filter((e) => e.estado);
+        const total = activos.length;
+        return `
+Tenemos entre la garn variedad de roles no siempre todos van a estar activos hay algunas ocasiones en las que por motivos de no implementar mas un rol que se deciden llevar acabo el proceso de desactivacion bien sea que por el momento ya no hay usuarios con ese rol o que posiblemente no se vilvera a usar mas
+
+Actualmente hay ${total} roles con estado activo.
+
+Estos roles representan los recursos disponibles y operativos dentro del sistema.`;
+      },
+      accessors: ["nombre", "valor", "created_at"],
+      headers: ["Nombre", "Valor", "Fecha de creación"],
+      withTable: true,
+      filterFn: (data: TipoMovimiento[]) => data.filter((e) => e.estado),
+    },
+    {
+      id: "",
+      title: "",
+      description: (data: TipoMovimiento[]) => {
+        return `hola`;
+      },
+      withTable: false,
+      filterFn: (data: TipoMovimiento[]) => data,
+    },
   ];
 
   const selected = reports.find((r) => r.id === selectedReport);

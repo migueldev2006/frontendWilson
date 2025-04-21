@@ -11,7 +11,12 @@ type Props = {
   onclose: () => void;
 };
 
-export const FormUpdate = ({ solicitudes, solicitudId, id, onclose }: Props) => {
+export const FormUpdate = ({
+  solicitudes,
+  solicitudId,
+  id,
+  onclose,
+}: Props) => {
   const [formData, setFormData] = useState<Partial<Solicitud>>({
     id_solicitud: 0,
     descripcion: "",
@@ -47,14 +52,14 @@ export const FormUpdate = ({ solicitudes, solicitudId, id, onclose }: Props) => 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.id_solicitud) {
-      return <p className="text-center text-gray-500">Usuario no encontrado</p>;
+      return <p className="text-center text-gray-500">Solicitud no encontrada</p>;
     }
 
     try {
       await updateSolicitud(formData.id_solicitud, formData);
       onclose();
     } catch (error) {
-      console.log("Error al actualizar el usuario", error);
+      console.log("Error al actualizar la solicitud", error);
     }
   };
 
@@ -77,9 +82,14 @@ export const FormUpdate = ({ solicitudes, solicitudId, id, onclose }: Props) => 
         onChange={handleChange}
       />
 
-      <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
-        Guardar Cambios
-      </button>
+      <div className="justify-center pl-10">
+        <button
+          type="submit"
+          className="w-80 bg-blue-700 text-white p-2 rounded-xl "
+        >
+          Guardar Cambios
+        </button>
+      </div>
     </Form>
   );
 };

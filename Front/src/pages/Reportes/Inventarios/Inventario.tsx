@@ -14,31 +14,31 @@ export default function InventarioReportSelector() {
   const reports = [
     {
       id: "todos",
-      title: "Inventarios",
+      title: "Tipos de Movimiento Registrados",
       description: (data: Inventario[]) => {
-        const total = data.length;
-        const activos = data.filter((i) => i.estado).length;
-        const inactivos = total - activos;
-
-        const fechaMasReciente = data.reduce((ultima, actual) => {
-          const fechaActual = new Date(actual.updated_at);
-          return fechaActual > new Date(ultima.updated_at) ? actual : ultima;
-        }, data[0]);
-
-        return `
-El presente reporte detalla el estado de los tipos de movimiento registrados en el sistema de inventario. 
-Actualmente, se encuentran registrados un total de ${total} movimientos de inventario, 
-de los cuales ${activos} están activos y ${inactivos} inactivos.
-      
-La última modificación registrada en los movimientos se realizó el día ${new Date(fechaMasReciente.updated_at).toLocaleDateString()}.
-          
-Este informe permite una visión general del comportamiento de los movimientos asociados a los elementos dentro de los distintos sitios, 
-proporcionando información clave para la toma de decisiones y control logístico.
-        `;
+        return ``;
       },
-      headers: ["Stock", "Fecha Creacion", "Fecha Actualizacion"],
-      accessors: ["stock", "created_at", "updated_at"],
-      withTable: true,
+      headers: [""],
+      accessors: [""],
+      withTable: false,
+      filterFn: (data: Inventario[]) => data,
+    },
+    {
+      id: "",
+      title: "",
+      description: (data: Inventario[]) => {
+        return `hola`;
+      },
+      withTable: false,
+      filterFn: (data: Inventario[]) => data,
+    },
+    {
+      id: "",
+      title: "",
+      description: (data: Inventario[]) => {
+        return `hola`;
+      },
+      withTable: false,
       filterFn: (data: Inventario[]) => data,
     },
   ];

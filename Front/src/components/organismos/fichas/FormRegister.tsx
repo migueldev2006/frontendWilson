@@ -3,6 +3,8 @@ import { Form } from "@heroui/form"
 import Inpu from "@/components/molecules/input";
 import { Ficha } from "@/types/Ficha";
 import { Select, SelectItem } from "@heroui/react";
+import {usePrograma} from "@/hooks/programas/usePrograma"
+
 
 type FormularioProps = {
 
@@ -13,7 +15,7 @@ type FormularioProps = {
 
 export default function Formulario({ addData, onClose, id }: FormularioProps) {
 
-
+    const { programas, isLoading: loadingProgramas, isError: errorPrograma } = usePrograma();
     const [formData, setFormData] = React.useState<Ficha>({
         id_ficha: 0,
         codigo_ficha: 0,
@@ -49,7 +51,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
                 labelPlacement="outside"
                 name="estado"
                 placeholder="Estado"
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value === "true" })} // Convierte a booleano
+                onChange={(e) => setFormData({ ...formData, estado: e.target.value === "true" })} 
             >
                 <SelectItem key="true">Activo</SelectItem>
                 <SelectItem key="false" >Inactivo</SelectItem>
@@ -60,8 +62,26 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
            
            
 
-            <Inpu label="programa" placeholder="programa" type="number" name="fk_programa" value={formData.fk_programa.toString()} onChange={(e) => setFormData({ ...formData, fk_programa: Number(e.target.value) })} />
+            {/* <Inpu label="programa" placeholder="programa" type="number" name="fk_programa" value={formData.fk_programa.toString()} onChange={(e) => setFormData({ ...formData, fk_programa: Number(e.target.value) })} /> */}
 
+
+            {!loadingProgramas && !errorPrograma && programas && (
+                    <Select
+                      label="programa"
+                      name="fk_programa"
+                      placeholder="Selecciona un programa"
+                      onChange={(e) =>
+                        setFormData({ ...formData, fk_programa: Number(e.target.value) })
+                      }
+                    >
+                      {programas.map((programa) => (
+                        <SelectItem key={programa.id_programa}>
+                          {programa.nombre}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  )}
+        
         </Form>
     )
 }

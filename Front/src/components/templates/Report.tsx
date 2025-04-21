@@ -13,6 +13,7 @@ interface ReportTemplateProps<T> {
   headers: string[];
   accessors: string[];
   data: T[];
+  footerText?: string;
 }
 
 export function ReportTemplate<T>({

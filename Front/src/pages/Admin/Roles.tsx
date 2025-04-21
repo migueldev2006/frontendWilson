@@ -53,16 +53,14 @@ export const RolTable = () => {
       key: "estado",
       label: "Estado",
       render: (rol: Rol) => (
-        <Chip
-          className={`px-2 py-1 rounded ${
-            rol.estado ? "text-green-500" : " text-red-500" //color texto
-          }`}
-          color={`${rol.estado ? "success" : "danger"}`} //color de fondo
-          variant="flat"
-        >
-          {rol.estado ? "Activo" : "Inactivo"}
-        </Chip>
-        
+        <span>{new Date(rol.created_at).toLocaleDateString("es-ES", { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
+      ),
+    },
+    {
+      key: "updated_at",
+      label: "Fecha Actualización",
+      render: (rol: Rol) => (
+        <span>{new Date(rol.updated_at).toLocaleDateString("es-ES", { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
       ),
     },
     {key:"created_at", label:"Fecha Creacion"},

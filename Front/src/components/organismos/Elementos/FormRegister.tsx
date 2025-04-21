@@ -3,6 +3,9 @@ import { Form } from "@heroui/form";
 import Inpu from "@/components/molecules/input";
 import { Elemento } from "@/types/Elemento";
 import { Select, SelectItem } from "@heroui/react";
+import { useUnidad } from "@/hooks/UnidadesMedida/useUnidad";
+import { useCategoria } from "@/hooks/Categorias/useCategorias";
+import { useCaracteristica } from "@/hooks/Caracteristicas/useCaracteristicas";
 
 type FormularioProps = {
   addData: (elemento: Elemento) => Promise<void>;
@@ -14,6 +17,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
   const [formData, setFormData] = React.useState<Elemento>({
     id_elemento: 0,
     nombre: "",
+    descripcion:"",
     valor: 0,
     perecedero: true,
     no_perecedero: false,
@@ -24,7 +28,24 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
     fk_unidad_medida: 0,
     fk_categoria: 0,
     fk_caracteristica: 0,
+    tipo_elemento:""
   });
+
+  const {
+    unidades,
+    isLoading: loadingUnidades,
+    isError: errorUnidades,
+  } = useUnidad();
+  const {
+    categorias,
+    isLoading: loadingCategorias,
+    isError: errorCategorias,
+  } = useCategoria();
+  const {
+    caracteristicas,
+    isLoading: loadingCaracteristicas,
+    isError: errorCaracteristicas,
+  } = useCaracteristica();
 
   const onSubmit = async (e: React.FormEvent) => {
     //preguntar si esta bien no usar el e: React.FormEvent
@@ -37,6 +58,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
       setFormData({
         id_elemento: 0,
         nombre: "",
+        descripcion:"",
         valor: 0,
         perecedero: true,
         no_perecedero: false,
@@ -47,6 +69,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         fk_unidad_medida: 0,
         fk_categoria: 0,
         fk_caracteristica: 0,
+        tipo_elemento:""
       });
       onClose();
     } catch (error) {
@@ -63,6 +86,14 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         name="nombre"
         value={formData.nombre}
         onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+      />
+      <Inpu
+        label="Descripcion"
+        placeholder="Descripcion"
+        type="text"
+        name="descripcion"
+        value={formData.descripcion}
+        onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
       />
       <Inpu
         label="Valor"
@@ -101,8 +132,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
       </Select>
 
       <Select
-        aria-labelledby="estado"
-        labelPlacement="outside"
+        label="Estado"
         name="estado"
         placeholder="Estado"
         onChange={(e) =>
@@ -117,52 +147,67 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         label="Imagen"
         type="file"
         name="imagen_elemento"
+        accept="image/*"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              const base64 = reader.result as string;
-              setFormData({ ...formData, imagen_elemento: base64 });
-            };
-            reader.readAsDataURL(file);
+            setFormData({ ...formData, imagen_elemento: file });
           }
         }}
       />
-      <Inpu
-        label="Unidad Medida"
-        placeholder="Unidad Medida"
-        type="number"
-        name="fk_unidad_medida"
-        value={formData.fk_unidad_medida.toString()}
-        onChange={(e) =>
-          setFormData({ ...formData, fk_unidad_medida: Number(e.target.value) })
-        }
-      />
-      <Inpu
-        label="Categoria"
-        placeholder="Categoria"
-        type="number"
-        name="fk_categoria"
-        value={formData.fk_categoria.toString()}
-        onChange={(e) =>
-          setFormData({ ...formData, fk_categoria: Number(e.target.value) })
-        }
-      />
+      {!loadingUnidades && !errorUnidades && unidades && (
+        <Select
+          label="Unidad Medida"
+          name="fk_unidad_medida"
+          placeholder="Selecciona una unidad"
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              fk_unidad_medida: Number(e.target.value),
+            })
+          }
+        >
+          {unidades.map((unidad) => (
+            <SelectItem key={unidad.id_unidad}>{unidad.nombre}</SelectItem>
+          ))}
+        </Select>
+      )}
+      {!loadingCategorias && !errorCategorias && categorias && (
+        <Select
+          label="Categoria"
+          name="fk_categoria"
+          placeholder="Selecciona una categoria"
+          onChange={(e) =>
+            setFormData({ ...formData, fk_categoria: Number(e.target.value) })
+          }
+        >
+          {categorias.map((categoria) => (
+            <SelectItem key={categoria.id_categoria}>
+              {categoria.nombre}
+            </SelectItem>
+          ))}
+        </Select>
+      )}
 
-      <Inpu
-        label="Caracteristica"
-        placeholder="Caracteristica"
-        type="number"
-        name="fk_caracteristica"
-        value={formData.fk_caracteristica.toString()}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            fk_caracteristica: Number(e.target.value),
-          })
-        }
-      />
+      {!loadingCaracteristicas && !errorCaracteristicas && caracteristicas && (
+        <Select
+          label="Caracteristica"
+          name="fk_caracteristica"
+          placeholder="Selecciona una caracteristica"
+          onChange={(e) =>
+            setFormData({
+              ...formData,
+              fk_caracteristica: Number(e.target.value),
+            })
+          }
+        >
+          {caracteristicas.map((caracteristica) => (
+            <SelectItem key={caracteristica.id_caracteristica}>
+              {caracteristica.nombre}
+            </SelectItem>
+          ))}
+        </Select>
+      )}
     </Form>
   );
 }

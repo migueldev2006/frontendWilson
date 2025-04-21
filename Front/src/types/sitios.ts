@@ -4,6 +4,7 @@ export type Sitios = {
     persona_encargada: string;
     ubicacion: string;
     estado: boolean;
+    created_at:string;
     fk_tipo_sitio: number;
     fk_area: number;
 }

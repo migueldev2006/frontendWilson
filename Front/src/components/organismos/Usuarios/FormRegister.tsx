@@ -1,86 +1,135 @@
-import React from "react";
-import { Form } from "@heroui/form"
-import Inpu from "@/components/molecules/input";
-import { User } from "@/types/Usuario";
+
+import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UserSchema, User } from "@/schemas/User";
+import { Form } from "@heroui/form";
 
 type FormularioProps = {
-
     addData: (user: User) => Promise<void>;
     onClose: () => void;
-    id: string
-}
+    id: string;
+};
 
 export default function Formulario({ addData, onClose, id }: FormularioProps) {
 
-
-    const [formData, setFormData] = React.useState<User>({
-        id_usuario: 0,
-        documento: 0,
-        nombre: "",
-        apellido: "",
-        edad: 0,
-        telefono: "",
-        correo: "",
-        estado: true,
-        cargo: "",
-        password: "",
-        fk_rol: 0,
+    
+    const {
+        control,
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<User>({
+        resolver: zodResolver(UserSchema),
+        mode: "onChange", 
     });
 
-    const onSubmit = async (e : React.FormEvent) => { //preguntar si esta bien no usar el e: React.FormEvent
-        //y aqui el preventdefault
-        e.preventDefault();
+    const onSubmit = async (data: User) => {
+        console.log(data);
         try {
-            console.log("Enviando formulario con datos:", formData);
-            await addData(formData);
-            console.log("Usuario guardado correctamente");
-            setFormData({
-                id_usuario: 0,
-                documento: 0,
-                nombre: "",
-                apellido: "",
-                edad: 0,
-                telefono: "",
-                correo: "",
-                estado: true,
-                cargo: "",
-                password: "",
-                fk_rol: 0,
-            });
+            await addData(data);
             onClose();
+            
         } catch (error) {
-            console.error("Error al cargar el usuario", error);
+            console.error("Error al guardar:", error);
         }
-    }
+    };
+
 
     return (
-        <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
-            <Inpu label="Documento" placeholder="Documento" type="text" name="documento" onChange={(e) => setFormData({ ...formData, documento: Number(e.target.value) })} />
-            <Inpu label="Nombre" placeholder="Nombre" type="text" name="nombre" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} />
-            <Inpu label="Apellido" placeholder="Apellido" type="text" name="apellido" value={formData.apellido} onChange={(e) => setFormData({ ...formData, apellido: e.target.value })} />
-            <Inpu label="Edad" placeholder="Edad" type="number" name="edad" onChange={(e) => setFormData({ ...formData, edad: Number(e.target.value) })} />
-            <Inpu label="Telefono" placeholder="Telefono" type="number" name="telefono" value={formData.telefono} onChange={(e) => setFormData({ ...formData, telefono: e.target.value })} />
-            <Inpu label="Correo" placeholder="Correo" type="email" name="correo" value={formData.correo} onChange={(e) => setFormData({ ...formData, correo: e.target.value })} />
+        <Form id={id} onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
+           
+            <Input
+                label="Documento"
+                type="text"
+                placeholder="Documento"
+                {...register("documento", { valueAsNumber: true })}
+                isInvalid={!!errors.documento}
+                errorMessage={errors.documento?.message}
+            />
+            <Input
+                label="Nombre"
+                type="text"
+                placeholder="Nombre"
+                {...register("nombre")}
+                isInvalid={!!errors.nombre}
+                errorMessage={errors.nombre?.message}
+            />
+            <Input
+                label="Apellido"
+                type="text"
+                placeholder="Apellido"
+                {...register("apellido")}
+                isInvalid={!!errors.apellido}
+                errorMessage={errors.apellido?.message}
+            />
+            <Input
+                label="Edad"
+                type="text"
+                placeholder="Edad"
+                {...register("edad", { valueAsNumber: true })}
+                isInvalid={!!errors.edad}
+                errorMessage={errors.edad?.message}
+            />
+            <Input
+                label="Teléfono"
+                type="text"
+                placeholder="Teléfono"
+                {...register("telefono")}
+                isInvalid={!!errors.telefono}
+                errorMessage={errors.telefono?.message}
+            />
+            <Input
+                label="Correo"
+                type="email"
+                placeholder="Correo"
+                {...register("correo")}
+                isInvalid={!!errors.correo}
+                errorMessage={errors.correo?.message}
+            />
 
-            <Select
-                aria-labelledby="estado"
-                labelPlacement="outside"
+            <Controller
+                control={control}
                 name="estado"
-                placeholder="Estado"
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value === "true" })} // Convierte a booleano
-            >
-                <SelectItem key="true">Activo</SelectItem>
-                <SelectItem key="false" >Inactivo</SelectItem>
-            </Select>
-
-            {/* <Inpu label="Estado" placeholder="Estado" type="checkbox" name="estado" value={formData.estado.toString()} onChange={(e) => setFormData({ ...formData, estado: e.target.checked })} /> */}
-
-            <Inpu label="Cargo" placeholder="Cargo" type="text" name="cargo" value={formData.cargo} onChange={(e) => setFormData({ ...formData, cargo: e.target.value })} />
-            <Inpu label="Paasword" placeholder="Password" type="password" name="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
-
-            <Inpu label="Rol" placeholder="Rol" type="number" name="fk_rol" value={formData.fk_rol.toString()} onChange={(e) => setFormData({ ...formData, fk_rol: Number(e.target.value) })} />
-
+                render={({ field }) => (
+                    <Select
+                        label="Estado"
+                        placeholder="Selecciona estado"
+                        {...field} 
+                        value={field.value ? "true" : "false"}
+                        onChange={(e) => field.onChange(e.target.value === "true")} 
+                    >
+                        <SelectItem key="true">Activo</SelectItem>
+                        <SelectItem key="false">Inactivo</SelectItem>
+                    </Select>
+                )}
+            />
+            {errors.estado && <p className="text-red-500">{errors.estado?.message}</p>}
+            <Input
+                label="Cargo"
+                type="text"
+                placeholder="Cargo"
+                {...register("cargo")}
+                isInvalid={!!errors.cargo}
+                errorMessage={errors.cargo?.message}
+            />
+            <Input
+                label="Contraseña"
+                type="password"
+                placeholder="Password"
+                {...register("password")}
+                isInvalid={!!errors.password}
+                errorMessage={errors.password?.message}
+            />
+            <Input
+                label="Rol"
+                type="text"
+                placeholder="Rol"
+                {...register("fk_rol", { valueAsNumber: true })}
+                isInvalid={!!errors.fk_rol}
+                errorMessage={errors.fk_rol?.message}
+            />
         </Form>
-    )
+    );
 }
