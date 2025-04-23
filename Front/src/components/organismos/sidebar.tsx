@@ -40,7 +40,6 @@ const menuItems = [
     children: [
       { name: "Usuarios", icon: UserCircleIcon, href: "/usuarios" },
       { name: "Tipos Sitios", icon: BuildingOffice2Icon, href: "/tiposSitios" },
-      { name: "Tipos Sitios", icon: BuildingOffice2Icon, href: "/tiposSitios" },
       { name: "Sitios", icon: BuildingOfficeIcon, href: "/sitios" },
       { name: "Municipios", icon: HomeModernIcon, href: "/municipios" },
       { name: "Centros", icon: AcademicCapIcon, href: "/centros" },
@@ -84,10 +83,12 @@ const menuItems = [
     href: "/reportes/usuarios",
     children: [
       { name: "Usuarios", icon: UserCircleIcon, href: "/reportes/usuarios" },
+      { name: "Usuarios Fichas", icon: UserCircleIcon, href: "/reportes/usuariosFichas" },
       { name: "Municipios", icon: HomeModernIcon, href: "/reportes/municipios" },
       { name: "Centros", icon: AcademicCapIcon, href: "/reportes/centros" },
       { name: "Areas", icon: GlobeAmericasIcon, href: "/reportes/areas" },
       { name: "Fichas", icon: TagIcon, href: "/reportes/fichas" },      
+      { name: "Programas Formacion", icon: TagIcon, href: "/reportes/programas" },      
       { name: "Roles", icon: UsersIcon, href: "/roles" },
       { name: "Rol Modulo", icon: DocumentCheckIcon, href: "/reportes/rolModulo" },
       { name: "Modulos", icon: RectangleGroupIcon, href: "/reportes/modulos" },
@@ -107,6 +108,7 @@ const menuItems = [
     href: "/estadisticas/usuarios",
     children: [
       { name: "Usuarios", icon: UserCircleIcon, href: "/estadisticas/usuarios" },
+      { name: "Usuarios Ficha", icon: UserCircleIcon, href: "/estadisticas/usuariosFicha" },
       { name: "Centros", icon: UserCircleIcon, href: "/estadisticas/centros" },
       { name: "Tipos Sitios", icon: BuildingOffice2Icon, href: "/estadisticas/tiposSitios" },
       { name: "Sitios", icon: BuildingOfficeIcon, href: "/estadisticas/sitios" },

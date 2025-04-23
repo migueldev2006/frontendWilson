@@ -51,28 +51,25 @@ const Dashboard = () => {
     <div className="p-6 space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-blue-100 dark:bg-zinc-800 dark:text-white">
-            <p className="text-sm text-blue-700">Total de Elementos</p>
-            <p className="text-2xl font-bold text-blue-900">
-              {elementos.length}
-            </p>
+          <p className="text-sm text-blue-700">Total de Elementos</p>
+          <p className="text-2xl font-bold text-blue-900">{elementos.length}</p>
         </Card>
         <Card className="bg-yellow-100 dark:bg-zinc-800 dark:text-white">
-            <p className="text-sm text-yellow-700">Movimientos Pendientes</p>
-            <p className="text-2xl font-bold text-yellow-900">
-              {movimientosPendientes.length}
-            </p>
+          <p className="text-sm text-yellow-700">Movimientos Pendientes</p>
+          <p className="text-2xl font-bold text-yellow-900">
+            {movimientosPendientes.length}
+          </p>
         </Card>
         <Card className="bg-green-100 dark:bg-zinc-800 dark:text-white">
-            <p className="text-sm text-green-700">Verificaciones Realizadas</p>
-            <p className="text-2xl font-bold text-green-900">
-              {verificaciones.length}
-            </p>
+          <p className="text-sm text-green-700">Verificaciones Realizadas</p>
+          <p className="text-2xl font-bold text-green-900">
+            {verificaciones.length}
+          </p>
         </Card>
       </div>
-
       <div className="bg-white p-4 rounded-xl shadow dark:bg-zinc-800 dark:text-white">
         <h2 className="text-lg font-semibold mb-4">Movimientos por Estado</h2>
-        <div className="w-full h-72">
+        <div className="w-full ">
           <Bar
             data={estadisticas}
             options={{
@@ -82,7 +79,6 @@ const Dashboard = () => {
           />
         </div>
       </div>
-
       <div className="bg-white p-4 rounded-xl shadow dark:bg-zinc-800 dark:text-white">
         <h2 className="text-lg font-semibold mb-4">Últimos Movimientos</h2>
         <div className="overflow-x-auto">
