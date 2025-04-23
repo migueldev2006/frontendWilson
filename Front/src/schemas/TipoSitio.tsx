@@ -3,7 +3,9 @@ import { z } from "zod";
 export const TipoSitioSchema = z.object({
     id_tipo : z.number().optional(),
     nombre : z.string().min(4,"Mínimo 4 caracteres"),
-    estado : z.boolean().default(true)
+    estado : z.boolean().default(true),
+    created_at : z
+    .string().default(" "),
 })
 
 export type TipoSitio = z.infer<typeof TipoSitioSchema>

@@ -9,7 +9,6 @@ import { Centro } from "@/schemas/Centro";
 import { useCentro } from "@/hooks/Centros/useCentros";
 
 
-
 const CentrosTable = () => {
 
     const { centros, isLoading, isError, error, addCentro, changeState } = useCentro();

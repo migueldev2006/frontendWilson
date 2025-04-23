@@ -38,8 +38,9 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
 
 
     return (
+        
         <Form id={id} onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
-           
+            <p>JSON.strin</p>
             <Input
                 label="Documento"
                 type="text"
