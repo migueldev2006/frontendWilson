@@ -96,7 +96,7 @@ export const VerificacionTable = () => {
       </h1>
 
       <Buton
-        text="Nuevo elemento"
+        text="Nueva Verificacion"
         onPress={() => setIsOpen(true)}
         type="button"
         color="primary"
@@ -110,13 +110,13 @@ export const VerificacionTable = () => {
         onOpenChange={handleClose}
       >
         <Formulario
-          id="element-form"
+          id="verificacion-form"
           addData={handleAddVerificacion}
           onClose={handleClose}
         />
         <button
           type="submit"
-          form="user-form"
+          form="verificacion-form"
           className="bg-blue-500 text-white p-2 rounded-md"
         >
           Guardar
@@ -143,7 +143,6 @@ export const VerificacionTable = () => {
           data={VerificacionsWithKey}
           columns={columns}
           onEdit={handleEdit}
-          onDelete={() => {}}
         />
       )}
     </div>

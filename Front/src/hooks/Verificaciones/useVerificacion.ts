@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export function useVerificacion() {
   const queryClient = useQueryClient();
 
-  const url = "verifiaccion";
+  const url = "verificacion";
 
   const { data, isLoading, isError, error } = useQuery<Verificacion[]>({
     queryKey: ["verificaciones"],
@@ -15,16 +15,10 @@ export function useVerificacion() {
     },
   });
 
-  const getElementosPorSitio = (id_sitio:number) => {
-    return useQuery({
-    queryKey: ["verificaciones", id_sitio],
-    queryFn: async () => {
-      const res = await axiosAPI.get(`${url}/${id_sitio}`);
-      return res.data;
-    },
-    enabled: !!id_sitio,
-  });
-  }
+  const getElementosPorSitio = async (id_sitio: number) => {
+    const res = await axiosAPI.get(`${url}/${id_sitio}`);
+    return res.data;
+  };
 
   const addVerificacionMutation = useMutation({
     mutationFn: async (newVerificacion: Verificacion) => {

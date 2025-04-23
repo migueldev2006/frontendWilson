@@ -8,7 +8,7 @@ interface ReportCardProps {
 
 export const ReportCard = ({ title, onClick }: ReportCardProps) => (
   <Card
-    className="cursor-pointer border border-blue-900 py-4"
+    className="rounded rounded-2xl cursor-pointer border border-blue-900 py-4"
     onClick={onClick}
   >
     <CardContent className="p-3">

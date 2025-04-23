@@ -6,7 +6,6 @@ import { Select, SelectItem } from "@heroui/react";
 import { useSitios } from "@/hooks/sitios/useSitios";
 import { useVerificacion } from "@/hooks/Verificaciones/useVerificacion";
 
-
 type FormularioProps = {
   addData: (verificacion: Verificacion) => Promise<void>;
   onClose: () => void;
@@ -29,7 +28,6 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
   const { sitios, isLoading: loadingSitios } = useSitios();
   const [elementosSitio, setElementosSitio] = React.useState([]);
   const { getElementosPorSitio } = useVerificacion();
-
 
   const onSubmit = async (e: React.FormEvent) => {
     //preguntar si esta bien no usar el e: React.FormEvent
@@ -117,23 +115,32 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
             formData.fk_sitio ? formData.fk_sitio.toString() : undefined
           }
           onSelectionChange={async (key) => {
-            const idSitio = Number(key);
-            setFormData({
-              ...formData,
+            const keyValue = Array.from(key)[0]; // key es un Set, convertimos a array y tomamos el primer valor
+          
+            console.log("Key real extraída del Set:", keyValue);
+          
+            const idSitio = Number(keyValue);
+            if (isNaN(idSitio)) {
+              console.error("ID de sitio inválido:", keyValue);
+              return;
+            }
+          
+            setFormData((prev) => ({
+              ...prev,
               fk_sitio: idSitio,
-            });
+            }));
           
             try {
-              const res = await getElementosPorSitio(idSitio).refetch();
+              const res = await getElementosPorSitio(idSitio);
               setElementosSitio(res.data || []);
-            } catch (error) {
-              console.error("Error al obtener elementos del sitio:", error);
+            } catch (err) {
+              console.error("Error al obtener elementos del sitio:", err);
             }
-          }
-          }
+          }}
+          
         >
           {sitios.map((sitio) => (
-            <SelectItem key={sitio.id_sitio.toString()}>
+            <SelectItem key={sitio.id_sitio.toString()}  >
               {sitio.nombre}
             </SelectItem>
           ))}

@@ -4,9 +4,12 @@ import { ReportTemplate } from "@/components/templates/Report";
 import { ReportCard } from "@/components/molecules/ReportCard";
 import { useRol } from "@/hooks/Roles/useRol";
 import { Rol } from "@/types/Rol";
+import { User } from "@/types/Usuario";
+import { useUsuario } from "@/hooks/Usuarios/useUsuario";
 
-export default function RolReportSelector() {
+export default function RolReport() {
   const { roles } = useRol();
+  const { users } = useUsuario();
   const [fechaInicio, setFechaInicio] = useState<string>("");
   const [fechaFin, setFechaFin] = useState<string>("");
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
@@ -69,31 +72,75 @@ Este reporte brinda una visión general del total de roles registrados en el sis
     {
       id: "activos e inactivos",
       title: "Roles Activos e Inactivos",
-      description: (data: Rol[]) => {
+      description: (data: Rol[], inicio?: string, fin?: string) => {
         const activos = data.filter((e) => e.estado);
         const inactivos = data.filter((e) => !e.estado).length;
         const total = activos.length;
+        const rango =
+          inicio && fin
+            ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+            : "";
         return `
+        ${rango}
 Tenemos entre la garn variedad de roles no siempre todos van a estar activos hay algunas ocasiones en las que por motivos de no implementar mas un rol que se deciden llevar acabo el proceso de desactivacion bien sea que por el momento ya no hay usuarios con ese rol o que posiblemente no se vilvera a usar mas
 
 Actualmente hay ${total} roles con estado activo y ${inactivos} de ellos esta inactivado.
 
 Estos roles representan los recursos disponibles y operativos dentro del sistema.`;
       },
-      accessors: ["nombre", "valor", "created_at"],
-      headers: ["Nombre", "Valor", "Fecha de creación"],
+      accessors: ["nombre", "created_at"],
+      headers: ["Nombre", "Fecha de creación"],
       withTable: true,
       filterFn: (data: Rol[]) => data.filter((e) => e.estado),
     },
     {
-      id: "",
-      title: "",
-      description: (data: Rol[]) => {
-        return `hola`;
+      id: "mas-usados",
+      title: "Roles Más Usados por los Usuarios",
+      description: (
+        roles: Rol[],
+        inicio?: string,
+        fin?: string,
+      ) => {
+        if (!users) return "No hay datos de usuarios disponibles para este informe.";
+    
+        const conteo: Record<number, number> = {};
+        users.forEach((u) => {
+          if (u.fk_rol != null) {
+            conteo[u.fk_rol] = (conteo[u.fk_rol] || 0) + 1;
+          }
+        });
+    
+        const rolesOrdenados = Object.entries(conteo)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 2);
+    
+        const topRoles = rolesOrdenados.map(([idStr, cantidad], index) => {
+          const id = Number(idStr);
+          const rol = roles.find((r) => r.id_rol === id);
+          return `#${index + 1}: ${rol?.nombre ?? "Desconocido"} con ${cantidad} usuarios asignados.`;
+        });
+    
+        const rango = inicio && fin ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.` : "";
+    
+        return `
+    ${rango}
+    
+    Este informe analiza los roles más comunes según la cantidad de usuarios que los tienen asignados.
+    
+    ${topRoles.join("\n")}
+    
+    Esto permite identificar los roles más relevantes actualmente en uso dentro del sistema.
+        `;
       },
       withTable: false,
-      filterFn: (data: Rol[]) => data,
-    },
+      filterFn: (roles: Rol[], usuarios?: User[]) => {
+        if (!usuarios) return roles;
+        const idsUsados = new Set(usuarios.map((u) => u.fk_rol));
+        return roles.filter((rol) => idsUsados.has(rol.id_rol));
+      },
+    }
+    
+    
   ];
 
   const selected = reports.find((r) => r.id === selectedReport);
@@ -160,7 +207,7 @@ Estos roles representan los recursos disponibles y operativos dentro del sistema
       </div>
 
       {fechaInicio && fechaFin ? (
-        <div className="flex ml-12 mr-12 gap-4  grid xl:grid-cols-3">
+        <div className="p-4 grid md:grid-cols-3 gap-4">
           {reports.map((r) => (
             <ReportCard
               key={r.id}

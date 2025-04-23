@@ -113,13 +113,13 @@ export const SolicitudTable = () => {
         onOpenChange={handleClose}
       >
         <Formulario
-          id="element-form"
+          id="solicitud-form"
           addData={handleAddSolicitud}
           onClose={handleClose}
         />
         <button
           type="submit"
-          form="user-form"
+          form="solicitud-form"
           className="bg-blue-500 text-white p-2 rounded-md"
         >
           Guardar

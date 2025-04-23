@@ -153,13 +153,13 @@ export const MovimientoTable = () => {
         onOpenChange={handleClose}
       >
         <Formulario
-          id="element-form"
+          id="movimiento-form"
           addData={handleAddMovimiento}
           onClose={handleClose}
         />
         <button
           type="submit"
-          form="user-form"
+          form="movimiento-form"
           className="bg-blue-500 text-white p-2 rounded-md"
         >
           Guardar
@@ -186,7 +186,8 @@ export const MovimientoTable = () => {
           data={MovimientoWithKey}
           columns={columns}
         onEdit={handleEdit}
-        onDelete={()=> {}}
+        showActions={true}
+        showEstado={false}
         />
       )}
     </div>

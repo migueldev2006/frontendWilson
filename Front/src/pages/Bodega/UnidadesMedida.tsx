@@ -133,6 +133,7 @@ export const UnidadTable = () => {
           columns={columns}
           onEdit={handleEdit}
           onDelete={handleState}
+          showEstado={false}
         />
       )}
     </div>

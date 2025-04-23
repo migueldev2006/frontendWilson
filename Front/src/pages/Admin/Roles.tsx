@@ -3,15 +3,13 @@ import { TableColumn } from "@/components/organismos/table.tsx";
 import Buton from "@/components/molecules/Buton";
 import Modall from "@/components/molecules/modal";
 import { useState } from "react";
-import { Chip } from "@heroui/chip";
 import { useRol } from "@/hooks/Roles/useRol";
 import { Rol } from "@/types/Rol";
 import Formulario from "@/components/organismos/Roles/FormRegister";
 import { FormUpdate } from "@/components/organismos/Roles/FormUpdate";
 
 export const RolTable = () => {
-  const { roles, isLoading, isError, error, addRol, changeState } =
-    useRol();
+  const { roles, isLoading, isError, error, addRol, changeState } = useRol();
 
   //Modal agregar
   const [isOpen, setIsOpen] = useState(false);
@@ -19,9 +17,7 @@ export const RolTable = () => {
 
   //Modal actualizar
   const [IsOpenUpdate, setIsOpenUpdate] = useState(false);
-  const [selectedRol, setSelectedRol] = useState<Rol | null>(
-    null
-  );
+  const [selectedRol, setSelectedRol] = useState<Rol | null>(null);
 
   const handleCloseUpdate = () => {
     setIsOpenUpdate(false);
@@ -50,21 +46,32 @@ export const RolTable = () => {
   const columns: TableColumn<Rol>[] = [
     { key: "nombre", label: "Nombre" },
     {
-      key: "estado",
-      label: "Estado",
+      key: "created_at",
+      label: "Fecha Creacion",
       render: (rol: Rol) => (
-        <span>{new Date(rol.created_at).toLocaleDateString("es-ES", { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
+        <span>
+          {new Date(rol.created_at).toLocaleDateString("es-ES", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          })}
+        </span>
       ),
     },
     {
       key: "updated_at",
       label: "Fecha Actualización",
       render: (rol: Rol) => (
-        <span>{new Date(rol.updated_at).toLocaleDateString("es-ES", { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
+        <span>
+          {new Date(rol.updated_at).toLocaleDateString("es-ES", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          })}
+        </span>
       ),
     },
-    {key:"created_at", label:"Fecha Creacion"},
-    {key:"updated_at", label:"Fecha Actualizacion"}
+    { key: "estado", label: "EStado" },
   ];
 
   if (isLoading) {
@@ -79,17 +86,13 @@ export const RolTable = () => {
     ?.filter((rol) => rol?.id_rol !== undefined)
     .map((rol) => ({
       ...rol,
-      key: rol.id_rol
-        ? rol.id_rol.toString()
-        : crypto.randomUUID(),
+      key: rol.id_rol ? rol.id_rol.toString() : crypto.randomUUID(),
       estado: Boolean(rol.estado),
     }));
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">
-        Roles Registrados
-      </h1>
+      <h1 className="text-2xl font-bold mb-4 text-center">Roles Registrados</h1>
 
       <Buton
         text="Nuevo rol"
