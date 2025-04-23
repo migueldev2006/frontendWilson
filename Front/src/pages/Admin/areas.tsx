@@ -55,23 +55,11 @@ const AreaTable = () => {
     // Definir las columnas de la tabla
     const columns: TableColumn<Area>[] = [
         { key: "nombre", label: "Nombre" },
-        { key: "persona_encargada", label: "persona_encargada" },
+        { key: "persona_encargada", label: "persona encargada" },
+        { key: "estado", label: "Estado" },
+        { key: "created_at", label: "fecha de creacion" },
+        { key: "updated_at", label: "fecha de actualizacion" }
 
-        {
-            key: "estado",
-            label: "estado",
-            render: (area: Area) => (
-                <Chip
-                    className={`px-2 py-1 rounded ${area.estado ? "text-green-500" : " text-red-500" //color texto
-                        }`}
-                    
-                        color={`${area.estado ? "success" : "danger" }`} //color de fondo
-                        variant="flat"
-                >
-                    {area.estado ? "Activo" : "Inactivo"}
-                </Chip>
-            ),
-        },
 
     ];
 

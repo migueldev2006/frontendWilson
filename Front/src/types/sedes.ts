@@ -3,5 +3,6 @@ export type Sede = {
     nombre: string;
     estado: boolean;
     created_at:string;
+    updated_at:string;
     fk_centro: number;
 }

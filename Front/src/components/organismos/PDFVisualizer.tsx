@@ -16,7 +16,7 @@ export const VisualizadorPDF = ({ component, onBack }: Props) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-4 mb-2">
+      <div className="flex gap-4 mb-2 mt-4 ml-4">
         <Button onClick={onBack}>
           Volver reportes
         </Button>

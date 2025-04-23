@@ -5,10 +5,10 @@ import GraficaBase from "@/components/graficasBase/graficas";
 Chart.register(...registerables);
 
 const RolModuloEstadisticas = () => {
-  const { programas, isLoading } = useRolModulo();
+  const { rolModulos, isLoading } = useRolModulo();
 
   if (isLoading) return <p>Cargando...</p>;
-  if (!programas || programas.length === 0) return <p>No hay datos de programas.</p>;
+  if (!rolModulos || rolModulos.length === 0) return <p>No hay datos de programas.</p>;
 
 
   
@@ -16,7 +16,7 @@ const RolModuloEstadisticas = () => {
   const meses = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
 
-  programas.forEach((area) => {
+  rolModulos.forEach((area) => {
    
 
 

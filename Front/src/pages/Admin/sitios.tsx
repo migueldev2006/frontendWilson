@@ -57,22 +57,10 @@ const SitiosTable = () => {
         { key: "nombre", label: "Nombre" },
         { key: "persona_encargada", label: "persona_encargada" },
         { key: "ubicacion", label: "ubicacion" },
-
-        {
-            key: "estado",
-            label: "estado",
-            render: (user: Sitios) => (
-                <Chip
-                    className={`px-2 py-1 rounded ${user.estado ? "text-green-500" : " text-red-500" //color texto
-                        }`}
-                    
-                        color={`${user.estado ? "success" : "danger" }`} //color de fondo
-                        variant="flat"
-                >
-                    {user.estado ? "Activo" : "Inactivo"}
-                </Chip>
-            ),
-        },
+        { key: "estado", label: "Estado" },
+        { key: "created_at", label: "fecha de creacion" },
+        { key: "updated_at", label: "fecha de actualizacion" }
+   
 
     ];
 

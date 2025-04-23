@@ -3,6 +3,7 @@ export type Pformacion = {
     nombre: string;
     estado: boolean;
     created_at:string;
+    updated_at:string;
     fk_area: number;
 }
 

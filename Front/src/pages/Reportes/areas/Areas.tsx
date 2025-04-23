@@ -5,20 +5,51 @@ import { ReportTemplate } from "@/components/templates/Report";
 import { ReportCard } from "@/components/molecules/ReportCard";
 import { Area  } from "@/types/area";
 
-export default function ElementoReportArea() {
+export default function ReportArea() {
   const { areas } = useAreas();
+  const [fechaInicio, setFechaInicio] = useState<string>("");
+  const [fechaFin, setFechaFin] = useState<string>("");
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
 
   if (!areas) return <p>Cargando...</p>;
-
+  const filtrarPorFechas = (
+      data: Area[],
+      fechaInicio: string,
+      fechaFin: string
+    ) => {
+      if (!fechaInicio || !fechaFin) return [];
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
+      return data.filter((rol) => {
+        const fecha = new Date(rol.created_at);
+        return fecha >= inicio && fecha <= fin;
+      });
+    };
+  
+    const formatFecha = (fecha: string) => {
+      const date = new Date(fecha);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // +1 porque los meses van de 0 a 11
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+    
+  
+    const dataPorFecha = filtrarPorFechas(areas, fechaInicio, fechaFin);
+  
   const reports = [
     {
       id: "todos",
-      title: "REPORTE GENERAL DE ÁREAS REGISTRADAS – SGDSS Sede Yamboro",
-      description: (data: Area []) => {
+      title: "REPORTE GENERAL DE ÁREAS REGISTRADAS - SGDSS Sede Yamboro",
+      description: (data: Area[], inicio: string, fin: string) => {
         const total = data.length;
         const activos = data.filter((e) => e.estado).length;
-        return `
+        const rango =
+        inicio && fin
+          ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+          : "";
+      return `
+${rango}
 Se han registrado un total de ${total} areas.
 De ellos, ${activos} están activos actualmente.
 
@@ -42,10 +73,15 @@ Observaciones Relevantes
     {
       id: "activos",
       title: "REPORTE DE ÁREAS ACTIVAS – SGDSS Sede Yamboro",
-      description: (data: Area []) => {
+      description: (data: Area [],inicio: string, fin: string) => {
         const activos = data.filter((e) => e.estado);
         const total = activos.length;
-        return `
+        const rango =
+        inicio && fin
+          ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+          : "";
+      return `
+${rango}
 Actualmente hay ${total} areas con estado activo.
 
 Resumen General
@@ -69,9 +105,14 @@ Observaciones Relevantes
     {
       id: "id_area",
       title: "REPORTE DE ÁREAS INACTIVAS - SGDSS Sede Yamboro",
-      description: (data: Area []) => {
+      description: (data: Area [],inicio: string, fin: string) => {
         const inactivos = data.filter((e) => !e.estado).length;
-        return `
+        const rango =
+        inicio && fin
+          ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+          : "";
+      return `
+${rango}
 Se han encontrado ${inactivos} areas con estado inactivo.
 
 Resumen General
@@ -95,7 +136,7 @@ Observaciones Relevantes
     {
       id: "nuevos",
       title: "REPORTE MENSUAL – NUEVAS ÁREAS REGISTRADAS en el SGDSS  Sede Yamboro",
-      description: (data: Area []) => {
+      description: (data: Area [],inicio: string, fin: string) => {
         const now = new Date();
         const delMes = data.filter((e) => {
           const created = new Date(e.created_at);
@@ -105,7 +146,12 @@ Observaciones Relevantes
           );
         }).length;
 
-        return `
+        const rango =
+        inicio && fin
+          ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+          : "";
+      return `
+${rango}
 Este mes se han registrado ${delMes} nuevas Areas.
 
 
@@ -134,7 +180,11 @@ Observaciones Relevantes:
   const handleBack = () => setSelectedReport(null);
 
   if (selectedReport && selected) {
-    const dataFiltrada = selected.filterFn(areas);
+    const dataPorFecha = filtrarPorFechas(areas, fechaInicio, fechaFin);
+    const dataFiltrada = selected.filterFn(dataPorFecha).map((item) => ({
+      ...item,
+      created_at: formatFecha(item.created_at),
+    }));
 
     return (
       <VisualizadorPDF
@@ -142,7 +192,7 @@ Observaciones Relevantes:
         component={
           <ReportTemplate
             title={selected.title}
-            description={selected.description(dataFiltrada)}
+            description={selected.description(dataFiltrada,fechaInicio, fechaFin)}
             headers={
               selected.withTable && selected.headers ? selected.headers : []
             }
@@ -157,17 +207,50 @@ Observaciones Relevantes:
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
-      {reports.map((r) => (
-        <ReportCard
-          key={r.id}
-          title={r.title}
-          description={
-            typeof r.description === "function" ? r.description(areas) : ""
-          }
-          onClick={() => setSelectedReport(r.id)}
-        />
-      ))}
-    </div>
+    <>
+      <div className="p-4">
+        <div className="flex justify-center">
+          <div className="grid  xl:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-center font-medium">
+                Fecha de inicio
+              </label>
+              <input
+                type="date"
+                className="w-full border rounded p-2"
+                value={fechaInicio}
+                onChange={(e) => setFechaInicio(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm text-center font-medium">Fecha de fin</label>
+              <input
+                type="date"
+                className="w-full border rounded p-2"
+                value={fechaFin}
+                onChange={(e) => setFechaFin(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {fechaInicio && fechaFin ? (
+        <div className="flex ml-12 mr-12 gap-4  grid xl:grid-cols-3">
+          {reports.map((r) => (
+            <ReportCard
+              key={r.id}
+              title={r.title}
+              description={r.description(r.filterFn(dataPorFecha), fechaInicio, fechaFin)}
+              onClick={() => setSelectedReport(r.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-gray-500 text-center">
+          Selecciona un rango de fechas para ver los reportes disponibles.
+        </p>
+      )}
+    </>
   );
 }

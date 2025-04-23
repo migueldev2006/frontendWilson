@@ -54,23 +54,11 @@ const FcihasTable = () => {
 
     // Definir las columnas de la tabla
     const columns: TableColumn<Ficha>[] = [
-        { key: "codigo_ficha", label: "codigo_ficha" },
-
-        {
-            key: "estado",
-            label: "estado",
-            render: (ficha: Ficha) => (
-                <Chip
-                    className={`px-2 py-1 rounded ${ficha.estado ? "text-green-500" : " text-red-500" //color texto
-                        }`}
-                    
-                        color={`${ficha.estado ? "success" : "danger" }`} //color de fondo
-                        variant="flat"
-                >
-                    {ficha.estado ? "Activo" : "Inactivo"}
-                </Chip>
-            ),
-        },
+        { key: "codigo_ficha", label: "codigo ficha" },
+        { key: "estado", label: "Estado" },
+        { key: "created_at", label: "fecha de creacion" },
+        { key: "updated_at", label: "fecha de actualizacion" }
+      
 
     ];
 

@@ -20,6 +20,8 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         id_ficha: 0,
         codigo_ficha: 0,
         estado: true,
+        created_at:"",
+        updated_at:"",
         fk_programa: 0,
     });
 
@@ -34,6 +36,8 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
                 id_ficha: 0,
                 codigo_ficha: 0,
                 estado: true,
+                created_at:"",
+                updated_at:"",
                 fk_programa: 0,
             });
             onClose();
