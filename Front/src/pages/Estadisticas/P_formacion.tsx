@@ -15,6 +15,7 @@ const ProgramaEstadisticas = ()=>{
     programas.forEach((programa)=>{
         const programaKey =`area ${programa.fk_area}`;
         conteoPorArea[programaKey]=(conteoPorArea[programaKey]||0)+1;
+        
     })
     const areas= Object.keys(conteoPorArea);
     const cantidadesAreas = Object.values(conteoPorArea);

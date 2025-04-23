@@ -55,22 +55,11 @@ const SedeTable = () => {
     // Definir las columnas de la tabla
     const columns: TableColumn<Sede>[] = [
         { key: "nombre", label: "Nombre" },
+        { key: "estado", label: "Estado" },
+        { key: "created_at", label: "fecha de creacion" },
+        { key: "updated_at", label: "fecha de actualizacion" }
 
-        {
-            key: "estado",
-            label: "estado",
-            render: (sede: Sede) => (
-                <Chip
-                    className={`px-2 py-1 rounded ${sede.estado ? "text-green-500" : " text-red-500" //color texto
-                        }`}
-                    
-                        color={`${sede.estado ? "success" : "danger" }`} //color de fondo
-                        variant="flat"
-                >
-                    {sede.estado ? "Activo" : "Inactivo"}
-                </Chip>
-            ),
-        },
+       
 
     ];
 

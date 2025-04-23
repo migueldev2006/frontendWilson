@@ -4,5 +4,6 @@ export type Area = {
     persona_encargada: string;
     estado: boolean;
     created_at:string;
+    updated_at:string;
     fk_sede: number;
 }

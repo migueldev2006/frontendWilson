@@ -93,7 +93,7 @@ export function useRolModulo() {
     // };
 
     return {
-        programas: data,
+        rolModulos: data,
         isLoading,
         isError,
         error,

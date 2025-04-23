@@ -17,6 +17,8 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
     const [formData, setFormData] = React.useState<Sede>({
         id_sede: 0,
         nombre: "",
+        created_at:"",
+        updated_at:"",
         estado: true,
         fk_centro: 0,
     });
@@ -32,6 +34,8 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
                 id_sede: 0,
                 nombre: "",
                 estado: true,
+                created_at:"",
+                updated_at:"",
                 fk_centro: 0,
             });
             onClose();
