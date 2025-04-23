@@ -4,7 +4,7 @@ import GraficaBase from "@/components/graficasBase/graficas";
 
 Chart.register(...registerables);
 
-const sedesEstadisticas = () => {
+const SedesEstadisticas = () => {
   const { sede, isLoading } = useSede();
 
   if (isLoading) return <p>Cargando...</p>;
@@ -75,4 +75,4 @@ const sedesEstadisticas = () => {
   );
 };
 
-export default sedesEstadisticas;
+export default SedesEstadisticas;

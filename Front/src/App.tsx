@@ -53,6 +53,21 @@ import ModulosTable from "./pages/Admin/modulo";
 import RutasTable from "./pages/Admin/rutas";
 import CategoriasTable from "./pages/Admin/categorias";
 import ReportArea from "./pages/Reportes/areas/Areas";
+import ReportUserFicha from "./pages/Reportes/userFichas/userFichas";
+import ReportSedes from "./pages/Reportes/sedes/sedes";
+import ReportProgramasFormacion from "./pages/Reportes/Pformacion/pFormacion";
+import ReportFichas from "./pages/Reportes/fichas/Fichas";
+import ReportSitios from "./pages/Reportes/sitios/sitios";
+import AreaEstadisticas from "./pages/Estadisticas/Area";
+import EstadisticasFichas from "./pages/Estadisticas/Ficha";
+import ProgramaEstadisticas from "./pages/Estadisticas/P_formacion";
+import SedesEstadisticas from "./pages/Estadisticas/sedes";
+import UserFichaEstadisticas from "./pages/Estadisticas/userFicha";
+import RolModuloEstadisticas from "./pages/Estadisticas/Rol_Modulo";
+import ReportRolModulo from "./pages/Reportes/RolModulo/rolModulo";
+import SitioEstadisticas from "./pages/Estadisticas/sitios";
+import PermisosEstadisticas from "./pages/Estadisticas/permisos";
+import RutasEstadisticas from "./pages/Estadisticas/Rutas";
 
 function App() {
   const { authenticated } = useAuth();
@@ -67,6 +82,8 @@ function App() {
             path="/estadisticas/usuarios"
             element={<UsuariosEstadisticas />}
           />
+          <Route path="reportes/usuariosFichas" element={<ReportUserFicha />} />
+          <Route path="estadisticas/usuariosFicha" element={<UserFichaEstadisticas/>} />
           <Route path="/centros" element={<CentrosTable />} />
           <Route
             path="/estadisticas/centros"
@@ -97,6 +114,7 @@ function App() {
             element={<ModulosEstadisticas />}
           />
           <Route path="rutas" element={<RutasTable/>}/>
+          <Route path="estadisticas/rutas" element={<RutasEstadisticas/>}/>
 
           <Route
             path="/estadisticas/caracteristicas"
@@ -104,14 +122,26 @@ function App() {
           />
           <Route path="areas" element={<AreaTable />} />
           <Route path="reportes/areas" element={<ReportArea />} />
+          <Route path="estadisticas/areas" element={<AreaEstadisticas />} />
           <Route path="fichas" element={<FcihasTable />} />
+          <Route path="reportes/fichas" element={<ReportFichas />} />
+          <Route path="estadisticas/fichas" element={<EstadisticasFichas />} />
           <Route path="permisos" element={<PermisoTable />} />
+          <Route path="estadisticas/permisos" element={<PermisosEstadisticas />} />
           <Route path="programas" element={<ProgramasTable />} />
+          <Route path="reportes/programas" element={<ReportProgramasFormacion />} />
+          <Route path="estadisticas/programas" element={<ProgramaEstadisticas/>} />
           <Route path="sedes" element={<SedeTable />} />
+          <Route path="reportes/sedes" element={<ReportSedes />} />
+          <Route path="estadisticas/sedes" element={<SedesEstadisticas />} />
           <Route path="sitios" element={<SitiosTable />} />
+          <Route path="reportes/sitios" element={<ReportSitios />} />
+          <Route path="estadisticas/sitios" element={<SitioEstadisticas />} />
           <Route path="roles" element={<RolTable />} />
           <Route path="reportes/roles" element={<RolReport />} />
           <Route path="estadisticas/roles" element={<RolesEstadisticas />} />
+          <Route path="reportes/rolModulo" element={<ReportRolModulo />} />
+          <Route path="estadisticas/rolModulo" element={<RolModuloEstadisticas />} />
           <Route path="bodega/unidades" element={<UnidadTable />} />
           <Route
             path="estadisticas/unidades"
