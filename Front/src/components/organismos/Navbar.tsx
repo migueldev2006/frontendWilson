@@ -14,7 +14,7 @@ import { BellIcon } from "@heroicons/react/24/outline";
 import { ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom"; // Asegúrate de importar useNavigate
 import Modall from "../molecules/modal";
-import { useNotificaciones } from "@/hooks/Notificaciones/useNotificacion";
+//import { useNotificaciones } from "@/hooks/Notificaciones/useNotificacion";
 
 type NavProps = {
   en_proceso: string;
@@ -27,24 +27,24 @@ type NavProps = {
 
 export function Nav({ children }: NavProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [notificationes, setNotificationes] = useState<NavProps[]>([]);
+  //const [notificationes, setNotificationes] = useState<NavProps[]>([]);
   const navigate = useNavigate();
-  const {
-    notificaciones,
-    isLoading,
-    aceptarMovimiento,
-    cancelarMovimiento,
-    aceptarSolicitud,
-    cancelarSolicitud,
-  } = useNotificaciones();
+  // const {
+  //   notificaciones,
+  //   isLoading,
+  //   aceptarMovimiento,
+  //   cancelarMovimiento,
+  //   aceptarSolicitud,
+  //   cancelarSolicitud,
+  // } = useNotificaciones();
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  // const handleCloseModal = () => {
+  //   setIsModalOpen(false);
+  // };
 
-  function handleClickNotificacion(id_notificacion: number): void {
-    throw new Error("Function not implemented.");
-  }
+  // function handleClickNotificacion(id_notificacion: number): void {
+  //   throw new Error("Function not implemented.");
+  // }
 
   const handleGoToPerfil = () => {
     navigate("/perfil");
@@ -65,11 +65,11 @@ export function Nav({ children }: NavProps) {
             <DropdownTrigger>
               <button className="relative text-gray-700 dark:text-white">
                 <BellIcon className="w-6 h-6" />
-                {notificationes.length > 0 && (
+                {/* {notificationes.length > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-600 text-white rounded-full px-1.5 text-xs">
                     {notificationes.length}
                   </span>
-                )}
+                )} */}
               </button>
             </DropdownTrigger>
             <DropdownMenu
@@ -120,7 +120,7 @@ export function Nav({ children }: NavProps) {
         <div>{children}</div>
       </Navbar>
 
-      <Modall
+      {/* <Modall
         ModalTitle="Notificaciones"
         isOpen={isModalOpen}
         onOpenChange={handleCloseModal}
@@ -182,7 +182,7 @@ export function Nav({ children }: NavProps) {
             ))
           )}
         </div>
-      </Modall>
+      </Modall> */}
     </>
   );
 }

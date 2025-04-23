@@ -1,116 +1,117 @@
 import { useState } from "react";
+import { useCategoria } from "@/hooks/Categorias/useCategorias";
 import { VisualizadorPDF } from "@/components/organismos/PDFVisualizer";
 import { ReportTemplate } from "@/components/templates/Report";
 import { ReportCard } from "@/components/molecules/ReportCard";
-import { useModulo } from "@/hooks/Modulos/useModulo";
-import { Modulo } from "@/schemas/Modulo";
+import { Categoria } from "@/schemas/Categorias";
 
-export default function ModulosReport() {
-  const { modulos } = useModulo();
+export default function CategoriaReport() {
+  const { categorias } = useCategoria();
   const [fechaInicio, setFechaInicio] = useState<string>("");
   const [fechaFin, setFechaFin] = useState<string>("");
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
 
+  if (!categorias) return <p>Cargando...</p>;
 
-  if (!modulos) return <p>Cargando...</p>;
-
-  const filtrarPorFechas = (data: Modulo[], inicio: string, fin: string) => {
+  const filtrarPorFechas = (data: Categoria[], inicio: string, fin: string) => {
     if (!inicio || !fin) return [];
     const from = new Date(`${inicio}T00:00:00`);
     const to = new Date(`${fin}T23:59:59`);
-    return data.filter((modulos) => {
-      const fecha = new Date(modulos.created_at);
+    return data.filter((categoria) => {
+      const fecha = new Date(categoria.created_at);
       return fecha >= from && fecha <= to;
     });
   };
+
   const formatFecha = (fecha: string) => {
     const d = new Date(fecha);
     d.setHours(d.getHours() + 5);
     return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
 };
 
-const dataFiltrada = filtrarPorFechas(modulos, fechaInicio, fechaFin);
+  const dataFiltrada = filtrarPorFechas(categorias, fechaInicio, fechaFin);
 
   const reports = [
     {
       id: "todos",
-      title: "Modulos Disponibles",
-      description: (data: Modulo[],inicio?: string, fin?: string) => {
+      title: "Total de Categorías Registradas",
+      description: (data: Categoria[], inicio?: string, fin?: string) => {
         const total = data.length;
         const activos = data.filter((e) => e.estado).length;
         const rango = inicio && fin ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.` : "";
+
         return `
-        ${rango}
-En el presente reporte se ofrece un resumen general de los módulos registrados en el sistema, detallando información como su nombre y fecha de creación.
+${rango}
 
-Llevar un control adecuado de los módulos permite garantizar una estructura organizada del sistema, facilitando su mantenimiento, evolución y el control de acceso por parte de los usuarios según sus roles y permisos.
+En este reporte se presenta el total de categorías registradas en el sistema. De un total de ${total} categorías, ${activos} están activas.
 
-Hasta el momento, se han registrado un total de ${total} módulos. 
-De ellos, ${activos} se encuentran activos actualmente, lo cual representa las funcionalidades disponibles y en uso dentro del sistema.
+Las categorías permiten organizar y clasificar la información de manera estructurada.
 
-A continuación se muestra una tabla con los datos de los módulos registrados:`;
+A continuación se listan los registros encontrados:`;
       },
-      accessors: ["nombre", "created_at"],
       headers: ["Nombre", "Fecha de creación"],
+      accessors: ["nombre", "created_at"],
       withTable: true,
-      filterFn: (data: Modulo[]) => data,
+      filterFn: (data: Categoria[]) => data,
     },
-
     {
-      id: "activos ",
-      title: "Modulos Activos ",
-      description: (data: Modulo[], inicio?: string, fin?: string) => {
+      id: "activos",
+      title: "Categorías Activas",
+      description: (data: Categoria[], inicio?: string, fin?: string) => {
         const activos = data.filter((e) => e.estado).length;
         const rango = inicio && fin ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.` : "";
+
         return `
-        ${rango}
+${rango}
+
 Se han encontrado ${activos} categorías activas en el sistema.`.trim();
       },
-      accessors: ["nombre", "created_at"],
       headers: ["Nombre", "Fecha de creación"],
+      accessors: ["nombre", "created_at"],
       withTable: true,
-      filterFn: (data: Modulo[]) => data.filter((e) => e.estado),
+      filterFn: (data: Categoria[]) => data.filter((e) => e.estado),
+    },
+
+    {
+      id: "inactivos",
+      title: "Categorías Inactivas",
+      description: (data: Categoria[], inicio?: string, fin?: string) => {
+        const inactivos = data.filter((e) => !e.estado).length;
+        const rango = inicio && fin ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.` : "";
+
+        return `
+${rango}
+
+Actualmente hay ${inactivos} categorías inactivas.`.trim();
+      },
+      headers: ["Nombre", "Fecha de creación"],
+      accessors: ["nombre", "created_at"],
+      withTable: true,
+      filterFn: (data: Categoria[]) => data.filter((e) => !e.estado),
     },
     {
-          id: "inactivos",
-          title: "Modulos Inactivos",
-          description: (data: Modulo[], inicio?: string, fin?: string) => {
-            const inactivos = data.filter((e) => !e.estado).length;
-            const rango = inicio && fin ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.` : "";
-    
-            return `
-    ${rango}
-    
-    Actualmente hay ${inactivos} Modulos inactivos.`.trim();
-          },
-          headers: ["Nombre", "Fecha de creación"],
-          accessors: ["nombre", "created_at"],
-          withTable: true,
-          filterFn: (data: Modulo[]) => data.filter((e) => !e.estado),
-        },
-        {
-              id: "nuevos",
-              title: "Modulos Nuevos ",
-              description: (data: Modulo[], inicio?: string, fin?: string) => {
-                if (!inicio || !fin) return "No se proporcionó un rango de fechas.";
-        
-               
-        
-                return `
-        Entre el ${formatFecha(inicio)} y el ${formatFecha(fin)}, se han registrado los siguientes Modulos:`.trim();
-              },
-              headers: ["Nombre", "Fecha de creación"],
-              accessors: ["nombre", "created_at"],
-              withTable: true,
-              filterFn: (data: Modulo[]) => data,
-            },
+      id: "nuevos",
+      title: "Categorías Nuevas ",
+      description: (data: Categoria[], inicio?: string, fin?: string) => {
+        if (!inicio || !fin) return "No se proporcionó un rango de fechas.";
+
+       
+
+        return `
+Entre el ${formatFecha(inicio)} y el ${formatFecha(fin)}, se han registrado las siguientes categorías:`.trim();
+      },
+      headers: ["Nombre", "Fecha de creación"],
+      accessors: ["nombre", "created_at"],
+      withTable: true,
+      filterFn: (data: Categoria[]) => data,
+    },
   ];
 
   const selected = reports.find((r) => r.id === selectedReport);
   const handleBack = () => setSelectedReport(null);
 
   if (selectedReport && selected) {
-    const dataPorFecha = filtrarPorFechas(modulos, fechaInicio, fechaFin);
+    const dataPorFecha = filtrarPorFechas(categorias, fechaInicio, fechaFin);
     const dataFiltrada = selected.filterFn(dataPorFecha).map((item) => ({
       ...item,
       created_at: formatFecha(item.created_at),
@@ -134,7 +135,7 @@ Se han encontrado ${activos} categorías activas en el sistema.`.trim();
 
   return (
     <>
-    <div className="p-4">
+      <div className="p-4">
         <div className="flex justify-center">
           <div className="grid xl:grid-cols-2 gap-4">
             <div>

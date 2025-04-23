@@ -40,6 +40,7 @@ const menuItems = [
     children: [
       { name: "Usuarios", icon: UserCircleIcon, href: "/usuarios" },
       { name: "Tipos Sitios", icon: BuildingOffice2Icon, href: "/tiposSitios" },
+      { name: "Tipos Sitios", icon: BuildingOffice2Icon, href: "/tiposSitios" },
       { name: "Sitios", icon: BuildingOfficeIcon, href: "/sitios" },
       { name: "Municipios", icon: HomeModernIcon, href: "/municipios" },
       { name: "Centros", icon: AcademicCapIcon, href: "/centros" },

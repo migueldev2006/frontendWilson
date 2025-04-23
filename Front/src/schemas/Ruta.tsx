@@ -6,7 +6,8 @@ export const RutaSchema = z.object({
     descripcion : z.string({required_error : "Descripción requerida"}).min(3,"Mínimo 3 caracteres"),
     url_destino : z.string().min(8,"Mínimo 8 caracteres"),
     estado : z.boolean().default(true),
-    fk_modulo : z.number({required_error : "Módulo requerido"})
+    fk_modulo : z.number({required_error : "Módulo requerido"}),
+    created_at : z.string().default("")
 })
 
 export type Ruta = z.infer<typeof RutaSchema>

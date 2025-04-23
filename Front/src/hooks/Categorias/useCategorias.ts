@@ -1,5 +1,5 @@
 import { axiosAPI } from '@/axios/axiosAPI';
-import { Categoria } from '@/types/Categorias'
+import { Categoria } from '@/schemas/Categorias'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useCategoria() {

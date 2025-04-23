@@ -1,5 +1,5 @@
 import { axiosAPI } from '@/axios/axiosAPI';
-import { Caracteristica } from '@/types/Caracteristica'
+import { Caracteristicas } from '@/schemas/Caracteristicas'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useCaracteristica() {
@@ -8,7 +8,7 @@ export function useCaracteristica() {
 
     const url = 'caracteristicas';
 
-    const { data, isLoading, isError, error } = useQuery<Caracteristica[]>({
+    const { data, isLoading, isError, error } = useQuery<Caracteristicas[]>({
         queryKey: ["caracteristicas"],
         queryFn: async () => {
             const res = await axiosAPI.get(url);
@@ -17,13 +17,13 @@ export function useCaracteristica() {
     });
 
     const addCaracteristicaMutation = useMutation({
-        mutationFn: async(newCaracteristica: Caracteristica) => {
-            await axiosAPI.post<Caracteristica>(url, newCaracteristica)
+        mutationFn: async(newCaracteristica: Caracteristicas) => {
+            await axiosAPI.post<Caracteristicas>(url, newCaracteristica)
             return newCaracteristica
         },
         onSuccess: (caracteristica) => {
             console.log(caracteristica);
-            queryClient.setQueryData<Caracteristica[]>(["caracteristicas"], (oldData) =>
+            queryClient.setQueryData<Caracteristicas[]>(["caracteristicas"], (oldData) =>
                 oldData ? [...oldData,caracteristica] : [caracteristica]
             );
         },
@@ -32,17 +32,17 @@ export function useCaracteristica() {
         }
     });
 
-    const getCaracteristicaById = (id: number, caracteristicas : Caracteristica[] | undefined = data ): Caracteristica | null => {
+    const getCaracteristicaById = (id: number, caracteristicas : Caracteristicas[] | undefined = data ): Caracteristicas | null => {
         return caracteristicas?.find((caracteristica) => caracteristica.id_caracteristica === id) || null;
     }
 
     const updateCaracteristicaMutation = useMutation({
-        mutationFn: async({ id, update } : { id: number; update: Partial<Caracteristica> }) => {
-            await axiosAPI.put<Caracteristica>(`${url}/${id}`, update);
+        mutationFn: async({ id, update } : { id: number; update: Partial<Caracteristicas> }) => {
+            await axiosAPI.put<Caracteristicas>(`${url}/${id}`, update);
             return {id, update}
         },
         onSuccess: ({ id, update }) => {
-            queryClient.setQueryData<Caracteristica[]>(["caracteristicas"], (oldData) =>
+            queryClient.setQueryData<Caracteristicas[]>(["caracteristicas"], (oldData) =>
                 oldData
                     ? oldData.map((caracteristica) =>
                         caracteristica.id_caracteristica === id ? { ...caracteristica, ...update } : caracteristica
@@ -58,11 +58,11 @@ export function useCaracteristica() {
 
     
 
-    const addCaracteristica = async (caracteristica: Caracteristica) => {
+    const addCaracteristica = async (caracteristica: Caracteristicas) => {
         return addCaracteristicaMutation.mutateAsync(caracteristica);
     };
 
-    const updateCaracteristica = async (id: number, update: Partial<Caracteristica>) => {
+    const updateCaracteristica = async (id: number, update: Partial<Caracteristicas>) => {
         return updateCaracteristicaMutation.mutateAsync({ id, update });
     };
 

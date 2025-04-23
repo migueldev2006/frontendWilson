@@ -30,7 +30,6 @@ import MunicipioEstadisticas from "./pages/Estadisticas/Municipios";
 import CategoriasEstadisticas from "./pages/Estadisticas/Categorias";
 import ModulosReport from "./pages/Reportes/Modulos/Modulos";
 import ModulosEstadisticas from "./pages/Estadisticas/Modulos";
-import RutasEstadisticas from "./pages/Estadisticas/Rutas";
 import CaracteristicasEstadisticas from "./pages/Estadisticas/Caracteristicas";
 import Login from "./pages/Login";
 import { useAuth } from "./providers/AuthProvider";
@@ -53,6 +52,7 @@ import { RolesEstadisticas } from "./pages/Estadisticas/Rol";
 import ModulosTable from "./pages/Admin/modulo";
 import RutasTable from "./pages/Admin/rutas";
 import CategoriasTable from "./pages/Admin/categorias";
+import ReportArea from "./pages/Reportes/areas/Areas";
 
 function App() {
   const { authenticated } = useAuth();
@@ -103,7 +103,7 @@ function App() {
             element={<CaracteristicasEstadisticas />}
           />
           <Route path="areas" element={<AreaTable />} />
-          <Route path="reportes/areas" element={<Report />} />
+          <Route path="reportes/areas" element={<ReportArea />} />
           <Route path="fichas" element={<FcihasTable />} />
           <Route path="permisos" element={<PermisoTable />} />
           <Route path="programas" element={<ProgramasTable />} />

@@ -14,53 +14,53 @@ export default function RolReport() {
   const [fechaFin, setFechaFin] = useState<string>("");
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
 
-  if (!roles) return <p>Cargando...</p>;
+    if (!roles) return <p>Cargando...</p>;
 
-  const filtrarPorFechas = (
-    data: Rol[],
-    fechaInicio: string,
-    fechaFin: string
-  ) => {
-    if (!fechaInicio || !fechaFin) return [];
-    const inicio = new Date(fechaInicio);
-    const fin = new Date(fechaFin);
-    return data.filter((rol) => {
-      const fecha = new Date(rol.created_at);
-      return fecha >= inicio && fecha <= fin;
-    });
-  };
+    const filtrarPorFechas = (
+      data: Rol[],
+      fechaInicio: string,
+      fechaFin: string
+    ) => {
+      if (!fechaInicio || !fechaFin) return [];
+      const inicio = new Date(fechaInicio);
+      const fin = new Date(fechaFin);
+      return data.filter((rol) => {
+        const fecha = new Date(rol.created_at);
+        return fecha >= inicio && fecha <= fin;
+      });
+    };
 
-  const formatFecha = (fecha: string) => {
-    const date = new Date(fecha);
-    const day = String(date.getDate()).padStart(2, "0");
-    const month = String(date.getMonth() + 1).padStart(2, "0"); // +1 porque los meses van de 0 a 11
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
-  
+    const formatFecha = (fecha: string) => {
+      const date = new Date(fecha);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // +1 porque los meses van de 0 a 11
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+    
 
-  const dataPorFecha = filtrarPorFechas(roles, fechaInicio, fechaFin);
+    const dataPorFecha = filtrarPorFechas(roles, fechaInicio, fechaFin);
 
-  const reports = [
-    {
-      id: "todos",
-      title: "Roles Registrados",
-      description: (data: Rol[], inicio?: string, fin?: string) => {
-        const total = data.length;
-        const activos = data.filter((e) => e.estado).length;
-        const rango =
-          inicio && fin
-            ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
-            : "";
-        return `
-${rango}
+    const reports = [
+      {
+        id: "todos",
+        title: "Roles Registrados",
+        description: (data: Rol[], inicio?: string, fin?: string) => {
+          const total = data.length;
+          const activos = data.filter((e) => e.estado).length;
+          const rango =
+            inicio && fin
+              ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+              : "";
+          return `
+  ${rango}
 
-Los roles son muy importantes puesto que gacias ellos el usario va apoder tener el acceso a ciertos modulos de nuestro sistema, es decir que de aqui pparte sobre a que opciones puede acceder en nusetro software.
+  Los roles son muy importantes puesto que gacias ellos el usario va apoder tener el acceso a ciertos modulos de nuestro sistema, es decir que de aqui pparte sobre a que opciones puede acceder en nusetro software.
 
-Si bien es cierto algunos de nuestro roles deben darsel ciertos permisos, ya que gracias a ello es que pueden acceder alos modulos correspondeintes.
+  Si bien es cierto algunos de nuestro roles deben darsel ciertos permisos, ya que gracias a ello es que pueden acceder alos modulos correspondeintes.
 
-Se han registrado un total de ${total} roles.
-De ellos, ${activos} están activos actualmente.
+  Se han registrado un total de ${total} roles.
+  De ellos, ${activos} están activos actualmente.
 
 Este reporte brinda una visión general del total de roles registrados en el sistema.`;
       },
@@ -84,7 +84,7 @@ Este reporte brinda una visión general del total de roles registrados en el sis
         ${rango}
 Tenemos entre la garn variedad de roles no siempre todos van a estar activos hay algunas ocasiones en las que por motivos de no implementar mas un rol que se deciden llevar acabo el proceso de desactivacion bien sea que por el momento ya no hay usuarios con ese rol o que posiblemente no se vilvera a usar mas
 
-Actualmente hay ${total} roles con estado activo y ${inactivos} de ellos esta inactivado.
+  Actualmente hay ${total} roles con estado activo y ${inactivos} de ellos esta inactivado.
 
 Estos roles representan los recursos disponibles y operativos dentro del sistema.`;
       },
@@ -143,68 +143,68 @@ Estos roles representan los recursos disponibles y operativos dentro del sistema
     
   ];
 
-  const selected = reports.find((r) => r.id === selectedReport);
-  const handleBack = () => setSelectedReport(null);
+    const selected = reports.find((r) => r.id === selectedReport);
+    const handleBack = () => setSelectedReport(null);
 
-  if (selectedReport && selected) {
-    const dataPorFecha = filtrarPorFechas(roles, fechaInicio, fechaFin);
-    const dataFiltrada = selected.filterFn(dataPorFecha).map((item) => ({
-      ...item,
-      created_at: formatFecha(item.created_at),
-    }));
+    if (selectedReport && selected) {
+      const dataPorFecha = filtrarPorFechas(roles, fechaInicio, fechaFin);
+      const dataFiltrada = selected.filterFn(dataPorFecha).map((item) => ({
+        ...item,
+        created_at: formatFecha(item.created_at),
+      }));
+
+      return (
+        <VisualizadorPDF
+          onBack={handleBack}
+          component={
+            <ReportTemplate
+              title={`${selected.title}`}
+              description={selected.description(
+                dataFiltrada,
+                fechaInicio,
+                fechaFin
+              )}
+              headers={
+                selected.withTable && selected.headers ? selected.headers : []
+              }
+              accessors={
+                selected.withTable && selected.accessors ? selected.accessors : []
+              }
+              data={selected.withTable ? dataFiltrada : []}
+            />
+          }
+        />
+      );
+    }
 
     return (
-      <VisualizadorPDF
-        onBack={handleBack}
-        component={
-          <ReportTemplate
-            title={`${selected.title}`}
-            description={selected.description(
-              dataFiltrada,
-              fechaInicio,
-              fechaFin
-            )}
-            headers={
-              selected.withTable && selected.headers ? selected.headers : []
-            }
-            accessors={
-              selected.withTable && selected.accessors ? selected.accessors : []
-            }
-            data={selected.withTable ? dataFiltrada : []}
-          />
-        }
-      />
-    );
-  }
-
-  return (
-    <>
-      <div className="p-4">
-        <div className="flex justify-center">
-          <div className="grid  xl:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm text-center font-medium">
-                Fecha de inicio
-              </label>
-              <input
-                type="date"
-                className="w-full border rounded p-2"
-                value={fechaInicio}
-                onChange={(e) => setFechaInicio(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-sm text-center font-medium">Fecha de fin</label>
-              <input
-                type="date"
-                className="w-full border rounded p-2"
-                value={fechaFin}
-                onChange={(e) => setFechaFin(e.target.value)}
-              />
+      <>
+        <div className="p-4">
+          <div className="flex justify-center">
+            <div className="grid  xl:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm text-center font-medium">
+                  Fecha de inicio
+                </label>
+                <input
+                  type="date"
+                  className="w-full border rounded p-2"
+                  value={fechaInicio}
+                  onChange={(e) => setFechaInicio(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-center font-medium">Fecha de fin</label>
+                <input
+                  type="date"
+                  className="w-full border rounded p-2"
+                  value={fechaFin}
+                  onChange={(e) => setFechaFin(e.target.value)}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
       {fechaInicio && fechaFin ? (
         <div className="p-4 grid md:grid-cols-3 gap-4">
