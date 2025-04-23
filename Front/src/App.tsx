@@ -28,9 +28,11 @@ import MunicipioReport from "./pages/Reportes/Municipios/Municipios";
 import CategoriaReport from "./pages/Reportes/Categorias/Categorias";
 import MunicipioEstadisticas from "./pages/Estadisticas/Municipios";
 import CategoriasEstadisticas from "./pages/Estadisticas/Categorias";
+import ModulosTable from "./pages/Admin/modulo";
 import ModulosReport from "./pages/Reportes/Modulos/Modulos";
 import ModulosEstadisticas from "./pages/Estadisticas/Modulos";
 import RutasEstadisticas from "./pages/Estadisticas/Rutas";
+import RutasTable from "./pages/Admin/rutas";
 import CaracteristicasEstadisticas from "./pages/Estadisticas/Caracteristicas";
 
 import Login from "./pages/Login"
@@ -58,9 +60,11 @@ function App() {
           <Route path="/reportes/categorias" element={<CategoriaReport />} />
           <Route path="/estadisticas/categorias" element={<CategoriasEstadisticas />} />
           <Route path="/reportes/modulos" element={<ModulosReport />} />
+          <Route path="/modulos" element={<ModulosTable />} />
           <Route path="/estadisticas/modulos" element={<ModulosEstadisticas />} />
           <Route path="/estadisticas/caracteristicas" element={<CaracteristicasEstadisticas />} />
           <Route path="areas" element={<AreaTable />} />
+          <Route path="/rutas" element={<RutasTable />} />
           <Route path="/estadisticas/rutas" element={<RutasEstadisticas />} />
           <Route path="fichas" element={<FcihasTable />} />
           <Route path="permisos" element={<PermisoTable />} />
