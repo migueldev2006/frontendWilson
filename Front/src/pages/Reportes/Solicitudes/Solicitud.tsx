@@ -71,13 +71,14 @@ const {elementos} = useElemento()
             : "";
 
         return `
-    ${rango}
+${rango}
+
     
-    Este informe presenta las tres solicitudes con la mayor cantidad de unidades pedidas.
+Este informe presenta las tres solicitudes con la mayor cantidad de unidades pedidas.
     
-    ${top.join("\n")}
+${top.join("\n")}
     
-    Estos datos pueden ayudarte a identificar los elementos más críticos en términos de demanda.`;
+Estos datos pueden ayudarte a identificar los elementos más críticos en términos de demanda.`;
       },
       withTable: false,
       filterFn: (data: Solicitud[]) => data,
@@ -104,13 +105,13 @@ const {elementos} = useElemento()
             : "";
 
         return `
-    ${rango}
+${rango}
     
-    Este informe muestra qué usuario ha realizado más solicitudes dentro del sistema.
+Este informe muestra qué usuario ha realizado más solicitudes dentro del sistema.
     
-    Usuario: ${usuario?.nombre ?? "Desconocido"} con ${total} solicitudes realizadas.
+Usuario: ${usuario?.nombre ?? "Desconocido"} con ${total} solicitudes realizadas.
     
-    Estos datos pueden ser útiles para identificar usuarios activos o áreas de alta demanda.`;
+Estos datos pueden ser útiles para identificar usuarios activos o áreas de alta demanda.`;
       },
       withTable: false,
       filterFn: (data: Solicitud[]) => data,
@@ -183,7 +184,7 @@ const {elementos} = useElemento()
             <ReportCard
               key={r.id}
               title={r.title}
-              description={r.description(r.filterFn(dataPorFecha))}
+              description={r.description(r.filterFn(dataPorFecha), fechaInicio, fechaFin)}
               onClick={() => setSelectedReport(r.id)}
             />
           ))}

@@ -46,7 +46,7 @@ export default function ReportInventario() {
     {
       id: "sitios-mayor-inventario",
       title: "Sitios con Mayor Cantidad de Inventario",
-      description: (inventarios: Inventario[], _?: string, __?: string,) => {
+      description: (inventarios: Inventario[], inicio?:string, fin?:string) => {
         const conteo: Record<number, number> = {};
         inventarios.forEach((inv) => {
           conteo[inv.fk_sitio] = (conteo[inv.fk_sitio] || 0) + inv.fk_elemento;
@@ -60,12 +60,20 @@ export default function ReportInventario() {
             return `#${i + 1}: ${nombreSitio} - ${total} unidades`;
           });
     
+          const rango =
+          inicio && fin
+            ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+            : "";
+
         return `
-    Este informe presenta los sitios con mayor inventario total acumulado.
+${rango}
+
     
-    ${top.join("\n")}
+Este informe presenta los sitios con mayor inventario total acumulado.
     
-    Este análisis puede ayudar a identificar centros de almacenamiento más cargados.`;
+${top.join("\n")}
+    
+Este análisis puede ayudar a identificar centros de almacenamiento más cargados.`;
       },
       withTable: false,
       filterFn: (data: Inventario[]) => data,
@@ -73,7 +81,7 @@ export default function ReportInventario() {
     {
       id: "inventarios-mayores-elementos",
       title: "Inventarios con Mayor Cantidad de Elementos",
-      description: (inventarios: Inventario[], _?: string, __?: string) => {
+      description: (inventarios: Inventario[], inicio:string, fin:string) => {
         const top = [...inventarios]
           .sort((a, b) => b.fk_elemento - a.fk_elemento)
           .slice(0, 5)
@@ -83,12 +91,20 @@ export default function ReportInventario() {
             return `#${i + 1}: ${nombreElemento} - ${inv.fk_elemento} unidades en ${nombreSitio}`;
           });
     
+          const rango =
+          inicio && fin
+            ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+            : "";
+
         return `
-    Estos son los inventarios con más unidades registradas (sin distinguir por tipo de stock):
+${rango}
+
     
-    ${top.join("\n")}
+Estos son los inventarios con más unidades registradas (sin distinguir por tipo de stock):
     
-    Pueden representar los elementos más abastecidos en tu sistema.`;
+${top.join("\n")}
+    
+Pueden representar los elementos más abastecidos en tu sistema.`;
       },
       withTable: false,
       filterFn: (data: Inventario[]) => data,
@@ -97,7 +113,7 @@ export default function ReportInventario() {
     {
       id: "mayor-stock-elemento-sitio",
       title: "Mayor Stock Disponible por Elemento y Sitio",
-      description: (inventarios: Inventario[], _?: string, __?: string) => {
+      description: (inventarios: Inventario[], inicio?: string, fin?: string) => {
         const top = [...inventarios]
           .sort((a, b) => b.stock - a.stock)
           .slice(0, 5)
@@ -108,7 +124,15 @@ export default function ReportInventario() {
           });
 
           
+          const rango =
+          inicio && fin
+            ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+            : "";
+
         return `
+${rango}
+
+    
     Este informe muestra los inventarios con mayor stock disponible (no comprometido).
     
     ${top.join("\n")}
@@ -121,7 +145,7 @@ export default function ReportInventario() {
     {
       id: "valor-economico-inventario",
       title: "Valor Económico del Inventario Disponible",
-      description: (inventarios: Inventario[], _?: string, __?: string) => {
+      description: (inventarios: Inventario[],inicio:string, fin:string) => {
         const valores: { nombre: string; costo: number; stock: number }[] = inventarios.map((inv) => {
           const elemento = elementos?.find((el) => el.id_elemento === inv.fk_elemento);
           const valor = elemento?.valor ?? 0;
@@ -141,15 +165,23 @@ export default function ReportInventario() {
         };
         
     
+        const rango =
+          inicio && fin
+            ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+            : "";
+
         return `
+${rango}
+
+    
 Resumen Económico del Inventario
     
 Valor total del inventario disponible: $${totalGeneral.toFixed(2)}
 Elemento con mayor valor acumulado: ${top.nombre} ($${top.costo.toFixed(2)} en stock)
 Valor promedio por tipo de elemento: $${promedio.toFixed(2)}
     
-    Este análisis ayuda a comprender el peso económico de los elementos actualmente disponibles en el sistema.  
-    Además, permite priorizar auditorías o verificaciones sobre elementos de mayor costo para evitar pérdidas o desbalances.
+Este análisis ayuda a comprender el peso económico de los elementos actualmente disponibles en el sistema.  
+Además, permite priorizar auditorías o verificaciones sobre elementos de mayor costo para evitar pérdidas o desbalances.
     
 Este informe se genera con base en el valor monetario declarado en los elementos multiplicado por el stock actual en cada inventario.
     
@@ -161,17 +193,17 @@ Solo se consideran los inventarios con stock positivo.
       headers: ["Elemento", "Stock Disponible", "Valor Total"],
       filterFn: (inventarios: Inventario[]) => inventarios.filter((i) => i.stock > 0),
     }
-    
-    
-    
-    
   ];
 
   const selected = reports.find((r) => r.id === selectedReport);
   const handleBack = () => setSelectedReport(null);
 
   if (selectedReport && selected) {
-    const dataFiltrada = selected.filterFn(inventarios);
+    const dataPorFecha = filtrarPorFechas(inventarios, fechaInicio, fechaFin);
+    const dataFiltrada = selected.filterFn(dataPorFecha).map((item) => ({
+      ...item,
+      created_at: formatFecha(item.created_at),
+    }));
 
     return (
       <VisualizadorPDF
@@ -179,7 +211,7 @@ Solo se consideran los inventarios con stock positivo.
         component={
           <ReportTemplate
             title={`${selected.title}`}
-            description={selected.description(dataFiltrada)}
+            description={selected.description(dataFiltrada,fechaInicio,fechaFin)}
             headers={
               selected.withTable && selected.headers ? selected.headers : []
             }
@@ -228,7 +260,7 @@ Solo se consideran los inventarios con stock positivo.
             <ReportCard
               key={r.id}
               title={r.title}
-              description={r.description(r.filterFn(dataPorFecha))}
+              description={r.description(r.filterFn(dataPorFecha),fechaInicio,fechaFin)}
               onClick={() => setSelectedReport(r.id)}
             />
           ))}

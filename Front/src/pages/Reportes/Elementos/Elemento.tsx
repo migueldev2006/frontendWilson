@@ -4,11 +4,8 @@ import { VisualizadorPDF } from "@/components/organismos/PDFVisualizer";
 import { ReportTemplate } from "@/components/templates/Report";
 import { ReportCard } from "@/components/molecules/ReportCard";
 import { Elemento } from "@/types/Elemento";
-import { Categoria } from "@/types/Categorias";
-import { Unidad } from "@/types/Unidad";
 import { useUnidad } from "@/hooks/UnidadesMedida/useUnidad";
 import { useCategoria } from "@/hooks/Categorias/useCategorias";
-import { Caracteristica } from "@/types/Caracteristica";
 import { useCaracteristica } from "@/hooks/Caracteristicas/useCaracteristicas";
 
 export default function ReportElemento() {
@@ -239,6 +236,8 @@ A continuacion daremos a conocer las unidades
             title={`${selected.title}`}
             description={selected.description(
               dataFiltrada,
+              fechaInicio,
+              fechaFin
             )}
             headers={
               selected.withTable && selected.headers ? selected.headers : []

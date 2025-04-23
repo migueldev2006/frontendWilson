@@ -65,11 +65,12 @@ export default function ReportVerificacion() {
             : "";
     
         return `
-    ${rango}
+${rango}
+
     
-    Este informe muestra cuál ha sido el sitio más verificado dentro del sistema.
+Este informe muestra cuál ha sido el sitio más verificado dentro del sistema.
     
-    Sitio más verificado: ${sitio?.nombre ?? "Desconocido"} con un total de ${total} verificaciones realizadas.`;
+Sitio más verificado: ${sitio?.nombre ?? "Desconocido"} con un total de ${total} verificaciones realizadas.`;
       },
       withTable: false,
       filterFn: (verificaciones?: Verificacion[]) => verificaciones ?? [],
@@ -90,13 +91,14 @@ export default function ReportVerificacion() {
             : "";
 
         return `
-    ${rango}
+${rango}
     
-    Este informe presenta un listado detallado de todas las verificaciones registradas en el sistema.
+
+Este informe presenta un listado detallado de todas las verificaciones registradas en el sistema.
     
-    Total de verificaciones: ${total}.
+Total de verificaciones: ${total}.
     
-    La verificación es un paso fundamental en el proceso de control y supervisión de elementos y materiales.`;
+La verificación es un paso fundamental en el proceso de control y supervisión de elementos y materiales.`;
       },
       accessors: [
         "id_sitio",
@@ -147,11 +149,12 @@ export default function ReportVerificacion() {
             : "";
 
         return `
-    ${rango}
+${rango}
     
-    Este informe determina la franja horaria más frecuente en la que se han realizado verificaciones.
+
+Este informe determina la franja horaria más frecuente en la que se han realizado verificaciones.
     
-    Horario más común: ${horaFormateada}, con un total de ${horaFrecuente?.[1]} verificaciones coincidentes.
+Horario más común: ${horaFormateada}, con un total de ${horaFrecuente?.[1]} verificaciones coincidentes.
     
     Esto puede indicar los momentos de mayor actividad o supervisión.`;
       },
@@ -185,6 +188,7 @@ export default function ReportVerificacion() {
 
         return `
     ${rango}
+    
     
     Este informe identifica a la persona que más ha sido asignada a procesos de verificación.
     

@@ -59,16 +59,17 @@ export default function ReportMovimiento() {
             : "";
 
         return `
-    ${rango}
-    
-    Durante este periodo, se registraron un total de ${total} movimientos.  
-    De ellos:
+${rango}
 
-    ${aceptados} han sido aceptados
-    ${pendientes} han quedado pendientes
-    ${rechazados} han sidorechazados
     
-    Este informe proporciona una vista general del comportamiento del sistema de movimientos.`;
+Durante este periodo, se registraron un total de ${total} movimientos.  
+De ellos:
+
+${aceptados} han sido aceptados
+${pendientes} han quedado pendientes
+${rechazados} han sidorechazados
+    
+Este informe proporciona una vista general del comportamiento del sistema de movimientos.`;
       },
       withTable: false,
       filterFn: (data: Movimiento[]) => data,
@@ -78,8 +79,8 @@ export default function ReportMovimiento() {
       title: "Elementos con Mayor Frecuencia de Movimientos",
       description: (
         movimientos: Movimiento[],
-        _?: string,
-        __?: string,
+        inicio?:string,
+        fin?:string
       ) => {
         const conteo: Record<number, number> = {};
         movimientos.forEach((m) => {
@@ -95,13 +96,20 @@ export default function ReportMovimiento() {
               "Desconocido";
             return `${i + 1}: ${nombre} - ${cantidad} movimientos`;
           });
+          const rango =
+          inicio && fin
+            ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+            : "";
 
         return `
-    Este informe detalla los tres elementos a los que más se les han realizado movimientos.
+${rango}
+
     
-    ${top.join("\n")}
+Este informe detalla los tres elementos a los que más se les han realizado movimientos.
     
-    Estos datos son útiles para detectar qué recursos tienen más rotación.`;
+${top.join("\n")}
+    
+Estos datos son útiles para detectar qué recursos tienen más rotación.`;
       },
       withTable: false,
       filterFn: (data: Movimiento[]) => data,
@@ -109,7 +117,7 @@ export default function ReportMovimiento() {
     {
       id: "estado-movimientos",
       title: "Estado Más Frecuente de los Movimientos",
-      description: (movimientos: Movimiento[]) => {
+      description: (movimientos: Movimiento[], inicio?:string, fin?:string) => {
         const aceptados = movimientos.filter((m) => m.aceptado).length;
         const pendientes = movimientos.filter((m) => m.en_proceso).length;
         const rechazados = movimientos.filter((m) => m.cancelado).length;
@@ -122,15 +130,23 @@ export default function ReportMovimiento() {
 
         const mayor = estados.sort((a, b) => b.cantidad - a.cantidad)[0];
 
+        const rango =
+          inicio && fin
+            ? `Fecha: ${formatFecha(inicio)} al ${formatFecha(fin)}.`
+            : "";
+
         return `
-    El estado más frecuente en los movimientos registrados ha sido: ${mayor.tipo} con ${mayor.cantidad} ocurrencias.
+${rango}
+
     
-    Distribución total:
+El estado más frecuente en los movimientos registrados ha sido: ${mayor.tipo} con ${mayor.cantidad} ocurrencias.
+    
+Distribución total:
 Aceptados: ${aceptados}
 Pendientes: ${pendientes}
 Rechazados: ${rechazados}
     
-    Esto refleja la tendencia actual de respuesta en los procesos de movimiento dentro del sistema.`;
+Esto refleja la tendencia actual de respuesta en los procesos de movimiento dentro del sistema.`;
       },
       withTable: false,
       filterFn: (data: Movimiento[]) => data,
@@ -141,7 +157,11 @@ Rechazados: ${rechazados}
   const handleBack = () => setSelectedReport(null);
 
   if (selectedReport && selected) {
-    const dataFiltrada = selected.filterFn(movimientos);
+    const dataPorFecha = filtrarPorFechas(movimientos, fechaInicio, fechaFin);
+    const dataFiltrada = selected.filterFn(dataPorFecha).map((item) => ({
+      ...item,
+      created_at: formatFecha(item.created_at),
+    }));
 
     return (
       <VisualizadorPDF
@@ -149,7 +169,7 @@ Rechazados: ${rechazados}
         component={
           <ReportTemplate
             title={`${selected.title}`}
-            description={selected.description(dataFiltrada)}
+            description={selected.description(dataFiltrada, fechaInicio, fechaFin)}
             data={selected.withTable ? dataFiltrada : []}
           />
         }
@@ -194,7 +214,7 @@ Rechazados: ${rechazados}
             <ReportCard
               key={r.id}
               title={r.title}
-              description={r.description(r.filterFn(dataPorFecha))}
+              description={r.description(r.filterFn(dataPorFecha), fechaInicio, fechaFin)}
               onClick={() => setSelectedReport(r.id)}
             />
           ))}

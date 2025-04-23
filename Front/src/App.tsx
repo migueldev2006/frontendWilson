@@ -31,6 +31,7 @@ import ReportVerificacion from "./pages/Reportes/Verificaciones/Verificacion";
 import { VerificacionesEstadisticas } from "./pages/Estadisticas/Verificacion";
 import { InventarioSitio } from "./pages/Bodega/Inventario/Sitios/InventarioSitio";
 import { InventarioArea } from "./pages/Bodega/Inventario/Areas/InventarioArea";
+import {RolesEstadisticas} from "./pages/Estadisticas/Rol";
 
 
 function App() {
@@ -47,7 +48,7 @@ function App() {
         <Route path="sitios" element={<SitiosTable />} />
         <Route path="roles" element={<RolTable />} />
         <Route path="reportes/roles" element={<RolReport />} />
-        <Route path="estadisticas/roles" element={<RolReport />} />
+        <Route path="estadisticas/roles" element={<RolesEstadisticas />} />
         <Route path="bodega/unidades" element={<UnidadTable />} />
         <Route path="estadisticas/unidades" element={<UnidadesEstadisticas />} />
         <Route path="bodega/elementos" element={<ElementosTable />} />
@@ -63,7 +64,7 @@ function App() {
         <Route path="estadisticas/inventario" element={<InventarioEstadisticas />} />
         <Route path="bodega/movimientos" element={<MovimientoTable />} />
         <Route path="reportes/movimientos" element={<ReportMovimiento/>} />
-        <Route path="estadistaicas/movimientos" element={<MovimientoEstadisticas />} />
+        <Route path="estadisticas/movimientos" element={<MovimientoEstadisticas />} />
         <Route path="bodega/tipos" element={<TipoMovimientoTable />} />
         <Route path="estadisticas/tipos" element={<TipoEstadisticas />} />
         <Route path="solicitudes" element={<SolicitudTable/>}/>
