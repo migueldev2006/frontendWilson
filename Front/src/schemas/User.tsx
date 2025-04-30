@@ -62,8 +62,7 @@ export const UserSchema = z.object({
         .string({ required_error: "Cargo es requerido" }),
     password: z
         .string({ required_error: "Contraseña es requerido" }),
-    created_at : z
-        .string().default(" "),
+    created_at: z.string().default(""),
     fk_rol: z
         .number({ required_error: "Rol es requerido" })
 })
@@ -95,4 +94,4 @@ export const tokenSchema = z.object({
 })
 
 
-export type LoginRes =z.infer<typeof tokenSchema>
+export type LoginRes = z.infer<typeof tokenSchema>

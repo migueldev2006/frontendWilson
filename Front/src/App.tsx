@@ -37,6 +37,9 @@ import CaracteristicasEstadisticas from "./pages/Estadisticas/Caracteristicas";
 
 import Login from "./pages/Login"
 import { useAuth } from "./providers/AuthProvider"
+import StockEstadisticas from "./pages/Estadisticas/Stock";
+import TopElementosUsados from "./pages/Estadisticas/TopElementos";
+import MovimientosMensuales from "./pages/Estadisticas/MovimientoMes";
 
 
 function App() {
@@ -75,7 +78,10 @@ function App() {
           <Route path="unidades" element={<UnidadTable />} />
           <Route path="elementos" element={<ElementosTable />} />
           <Route path="inventario" element={<Inventario />} />
+          <Route path="inventario/estadistica" element={<StockEstadisticas />} />
           <Route path="movimientos" element={<MovimientoTable />} />
+          <Route path="movimientos/estadistica" element={<TopElementosUsados />} />
+          <Route path="movimientos/mes/estadistica" element={<MovimientosMensuales />} />
           <Route path="tipos" element={<TipoMovimientoTable />} />
           <Route path="solicitudes" element={<SolicitudTable />} />
           <Route path="verificaciones" element={<VerificacionTable />} />

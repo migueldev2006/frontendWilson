@@ -8,3 +8,9 @@ export type Inventario = {
   fk_elemento: number;
   imagen_elemento:string;
 };
+
+export type InventarioItem = {
+  sitio: string;
+  elemento: string;
+  stock: number;
+};
