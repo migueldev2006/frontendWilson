@@ -1,7 +1,7 @@
 export type Unidad = {
-  id_unidad: number;
+  id_unidad?: number;
   nombre: string;
   estado: boolean;
-  created_at:string;
-  updated_at:string;
+  created_at?:string;
+  updated_at?:string;
 };

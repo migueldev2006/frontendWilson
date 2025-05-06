@@ -1,55 +1,30 @@
-import { axiosAPI } from "@/axios/axiosAPI";
-import { Elemento } from "@/types/Elemento";
+import { ElementoPostData, postElemento } from "@/axios/Elementos/postElemento";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Elemento } from "@/types/Elemento";
+import { putElemento } from "@/axios/Elementos/putElemento";
+import { deleteElemento } from "@/axios/Elementos/deleteElemento";
+import { getElemento } from "@/axios/Elementos/getElemento";
 
 export function useElemento() {
   const queryClient = useQueryClient();
 
-  const url = "elemento";
-
   const { data, isLoading, isError, error } = useQuery<Elemento[]>({
     queryKey: ["elementos"],
-    queryFn: async () => {
-      const res = await axiosAPI.get(url);
-      return res.data;
-    },
+    queryFn: getElemento,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
   });
 
   const addElementoMutation = useMutation({
-    mutationFn: async (newElemento: Elemento) => {
-      const formData = new FormData();
-    
-      formData.append("nombre", newElemento.nombre);
-      formData.append("descripcion", newElemento.descripcion);
-      formData.append("valor", newElemento.valor.toString());
-      formData.append("perecedero", String(newElemento.perecedero));
-      formData.append("no_perecedero", String(newElemento.no_perecedero));
-      formData.append("estado", String(newElemento.estado));
-      formData.append("fk_unidad_medida", newElemento.fk_unidad_medida.toString());
-      formData.append("fk_categoria", newElemento.fk_categoria.toString());
-      formData.append("fk_caracteristica", newElemento.fk_caracteristica.toString());
-    
-      if (newElemento.imagen_elemento instanceof File) {
-        formData.append("img", newElemento.imagen_elemento);
-      }
-    
-      await axiosAPI.post(url, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+    mutationFn: postElemento,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["elementos"],
       });
-    
-      return newElemento;
-    },
-    
-    onSuccess: (elemento) => {
-      console.log(elemento);
-      queryClient.setQueryData<Elemento[]>(["elementos"], (oldData) =>
-        oldData ? [...oldData, elemento] : [elemento]
-      );
     },
     onError: (error) => {
-      console.log("Error al cargar el elemento", error);
+      console.error("Error al cargar el elemento", error);
     },
   });
 
@@ -61,47 +36,11 @@ export function useElemento() {
   };
 
   const updateElementoMutation = useMutation({
-    mutationFn: async ({
-      id,
-      update,
-    }: {
-      id: number;
-      update: Partial<Elemento>;
-    }) => {
-      const formData = new FormData();
-      formData.append("nombre", update.nombre || "");
-      formData.append("descripcion", update.descripcion || "");
-      formData.append("valor", String(update.valor ?? 0));
-      formData.append("perecedero", String(update.perecedero));
-      formData.append("no_perecedero", String(update.no_perecedero));
-      formData.append("estado", String(update.estado));
-      formData.append("fk_unidad_medida", String(update.fk_unidad_medida));
-      formData.append("fk_categoria", String(update.fk_categoria));
-      formData.append("fk_caracteristica", String(update.fk_caracteristica));
-    
-      if (update.imagen_elemento instanceof File) {
-        formData.append("img", update.imagen_elemento);
-      }
-    
-      await axiosAPI.put(`${url}/${id}`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+    mutationFn: ({id, data}:{id:number, data:Elemento}) => putElemento(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["elementos"],
       });
-    
-      return { id, update };
-    },
-    onSuccess: ({ id, update }) => {
-      console.log("dato 1: ", id, " dato 2: ", update);
-      queryClient.setQueryData<Elemento[]>(["elementos"], (oldData) =>
-        oldData
-          ? oldData.map((elemento) =>
-              elemento.id_elemento === id
-                ? { ...elemento, ...update }
-                : elemento
-            )
-          : []
-      );
     },
 
     onError: (error) => {
@@ -110,21 +49,12 @@ export function useElemento() {
   });
 
   const changeStateMutation = useMutation({
-    mutationFn: async (id_elemento: number) => {
-      await axiosAPI.put<Elemento>(`elemento/cambiarEstado/${id_elemento}`);
-      return id_elemento;
-    },
+    mutationFn:deleteElemento,
 
-    onSuccess: (id_elemento: number) => {
-      queryClient.setQueryData<Elemento[]>(["elementos"], (oldData) =>
-        oldData
-          ? oldData.map((elemento: Elemento) =>
-              elemento.id_elemento == id_elemento
-                ? { ...elemento, estado: !elemento.estado }
-                : elemento
-            )
-          : []
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["elementos"],
+      });
     },
 
     onError: (error) => {
@@ -132,12 +62,16 @@ export function useElemento() {
     },
   });
 
-  const addElemento = async (elemento: Elemento) => {
-    return addElementoMutation.mutateAsync(elemento);
+  const addElemento = async (elemento: Elemento): Promise<{ id_elemento: number }> => {
+    const response = await addElementoMutation.mutateAsync(elemento);
+    if (response && response.id_elemento) {
+      return { id_elemento: response.id_elemento };
+    }
+    throw new Error("Respuesta inesperada de la API");
   };
 
-  const updateElemento = async (id: number, update: Partial<Elemento>) => {
-    return updateElementoMutation.mutateAsync({ id, update });
+  const updateElemento = async (id: number, data:Elemento) => {
+    return updateElementoMutation.mutateAsync({ id, data});
   };
 
   const changeState = async (id_elemento: number) => {

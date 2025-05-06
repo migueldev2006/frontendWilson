@@ -1,83 +1,109 @@
-import React from "react";
-import { Form } from "@heroui/form"
-import Inpu from "@/components/molecules/input";
-import { Pformacion } from "@/types/programaFormacion";
-import { Select, SelectItem } from "@heroui/react";
-import {useAreas} from "@/hooks/areas/useAreas"
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, Controller } from "react-hook-form";
+import { Form } from "@heroui/form";
+import { Input } from "@heroui/input";
+import { addToast, Select, SelectItem } from "@heroui/react";
+import { programaCreate, programaCreateSchema } from "@/schemas/programas";
+import { useAreas } from "@/hooks/areas/useAreas";
 
 type FormularioProps = {
+  addData: (data: programaCreate) => Promise<void>;
+  onClose: () => void;
+  id: string;
+};
 
-    addData: (Programa: Pformacion) => Promise<void>;
-    onClose: () => void;
-    id: string
-}
+export default function FormularioSede({
+  addData,
+  onClose,
+  id,
+}: FormularioProps) {
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<programaCreate>({
+    resolver: zodResolver(programaCreateSchema),
+    mode: "onChange",
+  });
 
-export default function Formulario({ addData, onClose, id }: FormularioProps) {
+  const { areas } = useAreas();
 
-    const { areas, isLoading: loadingAreas, isError: errorAreas } = useAreas();
-    const [formData, setFormData] = React.useState<Pformacion>({
-        id_programa: 0,
-        nombre: "",
-        estado: true,
-        fk_area: 0,
-    });
-
-    const onSubmit = async (e : React.FormEvent) => { //preguntar si esta bien no usar el e: React.FormEvent
-        //y aqui el preventdefault
-        e.preventDefault();
-        try {
-            console.log("Enviando formulario con datos:", formData);
-            await addData(formData);
-            console.log("ficha guardada correctamente");
-            setFormData({
-                id_programa: 0,
-                nombre: "",
-                estado: true,
-                fk_area: 0,
-            });
-            onClose();
-        } catch (error) {
-            console.error("Error al cargar el programa", error);
-        }
+  const onSubmit = async (data: programaCreate) => {
+    try {
+      await addData(data);
+      onClose();
+      addToast({
+        title: "Registro Exitoso",
+        description: "Programa agregado correctamente",
+        color: "success",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
+    } catch (error) {
+      console.error("Error al guardar el programa:", error);
     }
+  };
+  console.log("Errores", errors);
+  return (
+    <Form
+      id={id}
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full space-y-4"
+    >
+      <Input
+        label="Nombre del programa"
+        type="text"
+        placeholder="Nombre"
+        {...register("nombre")}
+        isInvalid={!!errors.nombre}
+        errorMessage={errors.nombre?.message}
+      />
 
-    return (
-        <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
-         <Inpu label="Nombre" placeholder="Nombre" type="text" name="nombre" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} />
-            
+      <Controller
+        control={control}
+        name="estado"
+        render={({ field }) => (
+          <Select
+            label="Estado"
+            placeholder="Seleccione un estado"
+            {...field}
+            value={field.value ? "true" : "false"}
+            onChange={(e) => field.onChange(e.target.value === "true")}
+            isInvalid={!!errors.estado}
+            errorMessage={errors.estado?.message}
+          >
+            <SelectItem key="true">Activo</SelectItem>
+            <SelectItem key="false">Inactivo</SelectItem>
+          </Select>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="fk_area"
+        render={({ field }) => (
+          <div className="w-full">
             <Select
-                aria-labelledby="estado"
-                labelPlacement="outside"
-                name="estado"
-                placeholder="Estado"
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value === "true" })} // Convierte a booleano
+              label="Área"
+              placeholder="Selecciona un área"
+              {...field}
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+              isInvalid={!!errors.fk_area}
+              errorMessage={errors.fk_area?.message}
             >
-                <SelectItem key="true">Activo</SelectItem>
-                <SelectItem key="false" >Inactivo</SelectItem>
+              {areas?.length ? (
+                areas.map((area) => (
+                  <SelectItem key={area.id_area}>{area.nombre}</SelectItem>
+                ))
+              ) : (
+                <SelectItem isDisabled>No hay áreas disponibles</SelectItem>
+              )}
             </Select>
-
-            {/* <Inpu label="Estado" placeholder="Estado" type="checkbox" name="estado" value={formData.estado.toString()} onChange={(e) => setFormData({ ...formData, estado: e.target.checked })} /> */}
-
-           
-           
-
-            {/* <Inpu label="area" placeholder="area" type="number" name="fk_area" value={formData.fk_area.toString()} onChange={(e) => setFormData({ ...formData, fk_area: Number(e.target.value) })} /> */}
-              {!loadingAreas && !errorAreas && areas && (
-                                <Select
-                                  label="areas"
-                                  name="fk_area"
-                                  placeholder="Selecciona una area"
-                                  onChange={(e) =>
-                                    setFormData({ ...formData, fk_area: Number(e.target.value) })
-                                  }
-                                >
-                                  {areas.map((area) => (
-                                    <SelectItem key={area.id_area}>
-                                      {area.nombre}
-                                    </SelectItem>
-                                  ))}
-                                </Select>
-                              )}
-        </Form>
-    )
+          </div>
+        )}
+      />
+    </Form>
+  );
 }

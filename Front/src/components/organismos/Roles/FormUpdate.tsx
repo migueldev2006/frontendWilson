@@ -1,75 +1,79 @@
-import React, { useState, useEffect } from "react";
 import { Form } from "@heroui/form";
-import Inpu from "@/components/molecules/input";
-import { Rol } from "@/types/Rol";
 import { useRol } from "@/hooks/Roles/useRol";
+import { RolUpdate, RolUpdateSchema } from "@/schemas/Rol";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
+import { addToast } from "@heroui/react";
 
 type Props = {
-  roles: Rol[];
+  roles: (RolUpdate & { id_rol?: number })[];
   rolId: number;
   id: string;
   onclose: () => void;
 };
 
 export const FormUpdate = ({ roles, rolId, id, onclose }: Props) => {
-  const [formData, setFormData] = useState<Partial<Rol>>({
-    id_rol: 0,
-    nombre: "",
-    estado: true,
-  });
-
   const { updateRol, getRolById } = useRol();
 
-  useEffect(() => {
-    // se ejecuta cuando algo se cambie en un usuario, obtiene el id y modifica el FormData
-    const foundRol = getRolById(rolId);
+  const foundRol = getRolById(rolId, roles) as RolUpdate;
 
-    if (foundRol) {
-      setFormData(foundRol);
-    }
-  }, [roles, rolId]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<RolUpdate>({
+    resolver: zodResolver(RolUpdateSchema),
+    mode: "onChange",
+    defaultValues: {
+      id_rol: foundRol.id_rol,
+      nombre: foundRol.nombre,
+      estado: foundRol.estado,
+    },
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //se ejecuta cuando el usuario cambia algo en un campo
-    const { name, value, type, checked } = e.target;
-
-    setFormData((prev: Partial<Rol>) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.id_rol) {
-      return <p className="text-center text-gray-500">Rol no encontrado</p>;
-    }
-
+  const onSubmit = async (data: RolUpdate) => {
+    console.log(data);
+    if (!data.id_rol) return;
     try {
-      await updateRol(formData.id_rol, formData);
+      await updateRol(data.id_rol, data);
       onclose();
+      addToast({
+        title: "Actualizacion Exitosa",
+        description: "Rol actualizado correctamente",
+        color: "primary",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
     } catch (error) {
-      console.log("Error al actualizar el rol", error);
+      console.log("Error al actualizar el rol : ", error);
     }
   };
+
+  console.log("Errores", errors);
 
   return (
-    <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit}>
-      <Inpu
+    <Form
+      id={id}
+      className="w-full space-y-4"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Input
         label="Nombre"
         placeholder="Nombre"
-        type="text"
-        name="nombre"
-        value={formData.nombre ?? ""}
-        onChange={handleChange}
+        {...register("nombre")}
+        isInvalid={!!errors.nombre}
+        errorMessage={errors.nombre?.message}
       />
       <div className="justify-center pl-10">
-        <button
+        <Button
           type="submit"
-          className="w-80 bg-blue-700 text-white p-2 rounded-xl"
+          isLoading={isSubmitting}
+          className="w-full bg-blue-700 text-white p-2 rounded-xl"
         >
-          Guardar Cambios
-        </button>
+          Guardar
+        </Button>
       </div>
     </Form>
   );

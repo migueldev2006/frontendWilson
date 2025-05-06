@@ -1,8 +1,10 @@
-import React from "react";
+
 import { Form } from "@heroui/form"
-import Inpu from "@/components/molecules/input";
-import { Categoria } from "@/types/Categorias";
+import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CategoriaSchema, Categoria } from "@/schemas/Categorias";
 
 type FormularioProps = {
 
@@ -14,43 +16,56 @@ type FormularioProps = {
 export default function FormCategorias({ addData, onClose, id }: FormularioProps) {
 
 
-    const [formData, setFormData] = React.useState<Categoria>({
-        id_categoria: 0,
-        nombre: "",
-        estado: true
-    });
-
-    const onSubmit = async (e : React.FormEvent) => { //preguntar si esta bien no usar el e: React.FormEvent
-        //y aqui el preventdefault
-        e.preventDefault();
-        try {
-            await addData(formData);
-            setFormData({
-                id_categoria: 0,
-                nombre: "",
-                estado: true
-            });
-            onClose();
-        } catch (error) {
-            console.error("Error al cargar la categoria", error);
-        }
-    }
+    const {
+           control,
+           register,
+           handleSubmit,
+           formState: { errors },
+       } = useForm<Categoria>({
+           resolver: zodResolver(CategoriaSchema),
+           mode: "onChange"
+       });
+   
+   
+       const onSubmit = async (data: Categoria) => {
+           console.log(data);
+           try {
+               await addData(data);
+               onClose();
+   
+           } catch (error) {
+               console.error("Error al guardar:", error);
+           }
+       };
+   
 
     return (
-        <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
+        <Form id={id} onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
             
-            <Inpu label="Nombre" placeholder="Nombre" type="text" name="nombre" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} />
-
-            <Select
-                aria-labelledby="estado"
-                labelPlacement="outside"
+            <Input
+                label="Nombre"
+                type="text"
+                placeholder="Nombre"
+                {...register("nombre")}
+                isInvalid={!!errors.nombre}
+                errorMessage={errors.nombre?.message}
+            />
+            <Controller
+                control={control}
                 name="estado"
-                placeholder="Estado"
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value === "true" })} 
-            >
-                <SelectItem key="true">Activo</SelectItem>
-                <SelectItem key="false" >Inactivo</SelectItem>
-            </Select>
+                render={({ field }) => (
+                    <Select
+                        label="Estado"
+                        placeholder="Selecciona estado"
+                        {...field}
+                        value={field.value ? "true" : "false"}
+                        onChange={(e) => field.onChange(e.target.value === "true")}
+                    >
+                        <SelectItem key="true">Activo</SelectItem>
+                        <SelectItem key="false">Inactivo</SelectItem>
+                    </Select>
+                )}
+            />
 
         </Form>
     )

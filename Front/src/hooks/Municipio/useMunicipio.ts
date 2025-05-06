@@ -1,5 +1,5 @@
 import { axiosAPI } from '@/axios/axiosAPI';
-import { Municipio } from '@/types/Municipio'
+import { Municipio } from '@/schemas/Municipio'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export function useMunicipio() {

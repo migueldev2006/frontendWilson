@@ -8,6 +8,8 @@ import { Movimiento } from "@/types/Movimiento";
 import Formulario from "@/components/organismos/Movimientos/FormRegister";
 import { FormUpdate } from "@/components/organismos/Movimientos/FormUpdate";
 import { Chip } from "@heroui/chip";
+import { useNavigate } from "react-router-dom";
+import { Button, Card, CardBody } from "@heroui/react";
 
 export const MovimientoTable = () => {
   const { movimientos, isLoading, isError, error, addMovimiento } =
@@ -19,26 +21,34 @@ export const MovimientoTable = () => {
 
   //Modal actualizar
   const [IsOpenUpdate, setIsOpenUpdate] = useState(false);
-  const [selectedMovimiento, setSelectedMovimiento] = useState<Movimiento | null>(
-    null
-  );
+  const [selectedMovimiento, setSelectedMovimiento] =
+    useState<Movimiento | null>(null);
+
+    const navigate = useNavigate()
+
+    const handleGoToTipo = () => {
+      navigate('/bodega/tipos')
+    }
+    const handleGoToSitio = () => {
+      navigate('/admin/sitios')
+    }
 
   const handleCloseUpdate = () => {
     setIsOpenUpdate(false);
     setSelectedMovimiento(null);
   };
 
-  const handleAddMovimiento = async (elemento: Movimiento) => {
+  const handleAddMovimiento = async (movimiento: Movimiento) => {
     try {
-      await addMovimiento(elemento);
+      await addMovimiento(movimiento);
       handleClose(); // Cerrar el modal después de darle agregar usuario
     } catch (error) {
       console.error("Error al agregar el usuario:", error);
     }
   };
 
-  const handleEdit = (elemento: Movimiento) => {
-    setSelectedMovimiento(elemento);
+  const handleEdit = (movimiento: Movimiento) => {
+    setSelectedMovimiento(movimiento);
     setIsOpenUpdate(true);
   };
 
@@ -49,15 +59,15 @@ export const MovimientoTable = () => {
     { key: "hora_ingreso", label: "Ingreso" },
     { key: "hora_salida", label: "Salida" },
     {
-      key: "tipo_movimiento",
+      key: "tipo_bien",
       label: "Tipo Movimiento",
       render: (movimiento: Movimiento) => (
         <span>
           {movimiento.devolutivo
             ? "Devolutivo"
             : movimiento.no_devolutivo
-            ? "No Devolutivo"
-            : "No especificado"}
+              ? "No Devolutivo"
+              : "No especificado"}
         </span>
       ),
     },
@@ -66,11 +76,13 @@ export const MovimientoTable = () => {
       label: "Fecha Creación",
       render: (movimiento: Movimiento) => (
         <span>
-          {new Date(movimiento.created_at).toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          })}
+          {movimiento.created_at
+            ? new Date(movimiento.created_at).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              })
+            : "N/A"}
         </span>
       ),
     },
@@ -79,11 +91,13 @@ export const MovimientoTable = () => {
       label: "Fecha Actualización",
       render: (movimiento: Movimiento) => (
         <span>
-          {new Date(movimiento.updated_at).toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          })}
+          {movimiento.updated_at
+            ? new Date(movimiento.updated_at).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              })
+            : "N/A"}
         </span>
       ),
     },
@@ -123,30 +137,40 @@ export const MovimientoTable = () => {
   }
 
   const MovimientoWithKey = movimientos
-    ?.filter((elemento) => elemento?.id_movimiento !== undefined)
-    .map((elemento) => ({
-      ...elemento,
-      key: elemento.id_movimiento
-        ? elemento.id_movimiento.toString()
+    ?.filter((movimiento) => movimiento?.id_movimiento !== undefined)
+    .map((movimiento) => ({
+      ...movimiento,
+      key: movimiento.id_movimiento
+        ? movimiento.id_movimiento.toString()
         : crypto.randomUUID(),
-
+        id_movimiento: movimiento.id_movimiento || 0
     }));
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">
-        Movimiento Registrados
-      </h1>
-
-      <Buton
-        text="Nuevo Movimiento"
-        onPress={() => setIsOpen(true)}
-        type="button"
-        color="primary"
-        variant="solid"
-        className="mb-8"
-      />
-
+      <div className="flex pb-4 pt-4">
+        <Card className="w-full">
+          <CardBody>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">Gestionar Movimientos</h1>
+              <div className="flex gap-2">
+                <Button
+                  className="text-white bg-blue-700"
+                  onPress={handleGoToTipo}
+                >
+                  Gestionar Tipos Movimiento
+                </Button>
+                <Button
+                  className="text-white bg-blue-700"
+                  onPress={handleGoToSitio}
+                >
+                  Gestionar Sitios 
+                </Button>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
       <Modall
         ModalTitle="Registrar Nuevo Movimiento"
         isOpen={isOpen}
@@ -157,13 +181,15 @@ export const MovimientoTable = () => {
           addData={handleAddMovimiento}
           onClose={handleClose}
         />
-        <button
+      <div className="justify-center pt-2">
+        <Button
           type="submit"
           form="movimiento-form"
-          className="bg-blue-500 text-white p-2 rounded-md"
+          className="w-full bg-blue-700 text-white p-2 rounded-xl"
         >
           Guardar
-        </button>
+        </Button>
+      </div>
       </Modall>
 
       <Modall
@@ -174,7 +200,7 @@ export const MovimientoTable = () => {
         {selectedMovimiento && (
           <FormUpdate
             movimientos={MovimientoWithKey ?? []}
-            movimientoId={selectedMovimiento.id_movimiento}
+            movimientoId={selectedMovimiento.id_movimiento as number}
             id="FormUpdate"
             onclose={handleCloseUpdate}
           />
@@ -185,9 +211,17 @@ export const MovimientoTable = () => {
         <Globaltable
           data={MovimientoWithKey}
           columns={columns}
-        onEdit={handleEdit}
-        showActions={true}
-        showEstado={false}
+          onEdit={handleEdit}
+          showEstado={false}
+          extraHeaderContent={
+            <Buton
+              text="Nuevo Movimiento"
+              onPress={() => setIsOpen(true)}
+              type="button"
+              variant="solid"
+              className="text-white bg-blue-700"
+            />
+          }
         />
       )}
     </div>

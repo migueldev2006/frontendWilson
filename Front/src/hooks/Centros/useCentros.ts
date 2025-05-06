@@ -22,11 +22,11 @@ export function useCentro() {
             return newCentro
         },
         onSuccess: (centros) => {
-            console.log("Vieja info: ",queryClient.getQueryData(["centros"]));
+            
             queryClient.setQueryData<Centro[]>(["centros"], (oldData) =>
                 oldData ? [...oldData,centros] : [centros]
             );
-            console.log("Nueva info: ",queryClient.getQueryData(["centros"]));
+            
         },
         onError: (error) => {
             console.log("Error al cargar el centro", error);
@@ -43,7 +43,6 @@ export function useCentro() {
             return {id, update}
         },
         onSuccess: ({ id, update }) => {
-            console.log("dato 1: ",id," dato 2: ",update);
             queryClient.setQueryData<Centro[]>(["centros"], (oldData) =>
                 oldData
                     ? oldData.map((centro) =>

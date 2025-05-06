@@ -1,30 +1,27 @@
-import { axiosAPI } from "@/axios/axiosAPI";
+import { deleteTipo } from "@/axios/TiposMovimiento/deleteTipo";
+import { getTipo } from "@/axios/TiposMovimiento/getTipo";
+import { postTipo } from "@/axios/TiposMovimiento/postTipo";
+import { putTipo } from "@/axios/TiposMovimiento/putTipo";
 import { TipoMovimiento } from "@/types/TipoMovimiento";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useTipoMovimiento() {
   const queryClient = useQueryClient();
 
-  const url = "tipoMovimiento";
-
   const { data, isLoading, isError, error } = useQuery<TipoMovimiento[]>({
     queryKey: ["tipos"],
-    queryFn: async () => {
-      const res = await axiosAPI.get(url);
-      return res.data;
-    },
+    queryFn: getTipo,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
   });
 
   const addTipoMutation = useMutation({
-    mutationFn: async (newTipo: TipoMovimiento) => {
-      await axiosAPI.post<TipoMovimiento>(url, newTipo);
-      return newTipo;
-    },
-    onSuccess: (tipo) => {
-      console.log(tipo);
-      queryClient.setQueryData<TipoMovimiento[]>(["tipos"], (oldData) =>
-        oldData ? [...oldData, tipo] : [tipo]
-      );
+    mutationFn: postTipo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tipos"],
+      });
     },
     onError: (error) => {
       console.log("Error al cargar el tipo de movimiento", error);
@@ -39,27 +36,11 @@ export function useTipoMovimiento() {
   };
 
   const updateTipoMutation = useMutation({
-    mutationFn: async ({
-      id,
-      update,
-    }: {
-      id: number;
-      update: Partial<TipoMovimiento>;
-    }) => {
-      await axiosAPI.put<TipoMovimiento>(`${url}/${id}`, update);
-      return { id, update };
-    },
-    onSuccess: ({ id, update }) => {
-      console.log("dato 1: ", id, " dato 2: ", update);
-      queryClient.setQueryData<TipoMovimiento[]>(["tipos"], (oldData) =>
-        oldData
-          ? oldData.map((tipo) =>
-              tipo.id_tipo === id
-                ? { ...tipo, ...update }
-                : tipo
-            )
-          : []
-      );
+    mutationFn: ({ id, data }: { id: number; data: TipoMovimiento }) => putTipo(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tipos"],
+      });
     },
 
     onError: (error) => {
@@ -68,21 +49,12 @@ export function useTipoMovimiento() {
   });
 
   const changeStateMutation = useMutation({
-    mutationFn: async (id_tipo: number) => {
-      await axiosAPI.put<TipoMovimiento>(`tipoMovimiento/cambiarEstado/${id_tipo}`);
-      return id_tipo;
-    },
+    mutationFn: deleteTipo,
 
-    onSuccess: (id_tipo: number) => {
-      queryClient.setQueryData<TipoMovimiento[]>(["tipos"], (oldData) =>
-        oldData
-          ? oldData.map((tipo: TipoMovimiento) =>
-              tipo.id_tipo == id_tipo
-                ? { ...tipo, estado: !tipo.estado }
-                : tipo
-            )
-          : []
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["tipos"],
+      });
     },
 
     onError: (error) => {
@@ -94,8 +66,8 @@ export function useTipoMovimiento() {
     return addTipoMutation.mutateAsync(tipoMovimiento);
   };
 
-  const updateTipoMovimiento = async (id: number, update: Partial<TipoMovimiento>) => {
-    return updateTipoMutation.mutateAsync({ id, update });
+  const updateTipoMovimiento = async (id: number, data: TipoMovimiento) => {
+    return updateTipoMutation.mutateAsync({ id, data });
   };
 
   const changeState = async (id_tipo: number) => {

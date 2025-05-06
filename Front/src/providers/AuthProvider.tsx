@@ -3,8 +3,8 @@ import Cookies from "universal-cookie";
 import { jwtDecode } from 'jwt-decode'
 
 type Auth = {
-    authenticated : boolean,
-    setAuthenticated : React.Dispatch<React.SetStateAction<boolean>>,
+    authenticated : boolean | undefined,
+    setAuthenticated : React.Dispatch<React.SetStateAction<boolean | undefined>>,
     nombre : string | undefined,
     setNombre : React.Dispatch<React.SetStateAction<string | undefined>>
 }
@@ -15,7 +15,7 @@ export const useAuth = () => useContext(AuthContext) as Auth;
 
 export default function AuthProvider({children}:{children : React.ReactNode}) {
     
-    const [authenticated, setAuthenticated] = useState<boolean>(false)
+    const [authenticated, setAuthenticated] = useState<boolean | undefined>(undefined)
     const [nombre,setNombre] = useState<string | undefined>(undefined);
     
     const cookies = new Cookies();

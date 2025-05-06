@@ -13,7 +13,7 @@ type FormularioProps = {
 
 export default function FormTipos({ addData, onClose, id }: FormularioProps) {
 
-    const { register, handleSubmit, formState : {errors}, setValue } = useForm({
+    const { register, handleSubmit, formState : {errors}, setValue, watch } = useForm({
         resolver : zodResolver(TipoSitioSchema)
     });
 
@@ -30,21 +30,23 @@ export default function FormTipos({ addData, onClose, id }: FormularioProps) {
     return (
         <Form id={id} onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
 
-            <Input {...register("nombre")} label="Nombre" type="text" name="nombre" />
-            {errors.nombre && <p className="text-red-500">{errors.nombre.message}</p>}
-
+            <Input {...register("nombre")} label="Nombre" type="text" name="nombre" 
+             isInvalid={!!errors.nombre}
+             errorMessage={errors.nombre?.message}
+            />
+          
             <Select
+                onChange={(e) =>  setValue("estado", e.target.value === 'true' ? true : false)}
                 aria-labelledby="estado"
                 labelPlacement="outside"
                 placeholder="Estado"
-                onChange={(e) => setValue("estado",e.target.value === 'true' ? true : false)} // Convierte a booleano
+                isInvalid={!!errors.estado}
+                errorMessage={errors.estado?.message}
             >
                 <SelectItem key="true">Activo</SelectItem>
                 <SelectItem key="false" >Inactivo</SelectItem>
             </Select>
 
-            
-            
         </Form>
     )
 }

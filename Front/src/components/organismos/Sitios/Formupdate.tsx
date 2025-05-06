@@ -1,81 +1,104 @@
-import React, { useState, useEffect } from "react";
-import { Sitios } from "@/types/sitios";
-import { Form } from "@heroui/form"
-import Inpu from "@/components/molecules/input";
-import {useSitios} from "@/hooks/sitios/useSitios";
-
-
+import { Form } from "@heroui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
+import { sitio, sitioUpdate, sitioUpdateSchema } from "@/schemas/sitios";
+import { useSitios } from "@/hooks/sitios/useSitios";
+import { addToast } from "@heroui/react";
 
 type Props = {
-    sitios: Sitios[] ;
-    sitioId: number;
-    id: string
-    onclose: () => void;
+  sitios: (sitioUpdate & { id_sitio?: number })[];
+  sitioId: number;
+  id: string;
+  onclose: () => void;
+};
 
-}
+export const FormUpdate = ({ sitios, sitioId, id, onclose }: Props) => {
+  const { updateSitio, getSitioById } = useSitios();
 
-const FormuUpdate = ({ sitios, sitioId, id, onclose }: Props) => {
-    const [formData, setFormData] = useState<Partial<Sitios>>({
-        id_sitio: 0,
-        nombre: "",
-        persona_encargada: "",
-        estado: false,
-        fk_tipo_sitio: 0,
-        fk_area: 0,
-    });
+  const foundSitio = getSitioById(sitioId, sitios) as sitio;
 
-    const {updateSitio, getSitioById} = useSitios()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<sitioUpdate>({
+    resolver: zodResolver(sitioUpdateSchema),
+    mode: "onChange",
+    defaultValues: {
+      id_sitio: foundSitio.id_sitio ?? 0,
+      nombre: foundSitio.nombre,
+      persona_encargada: foundSitio.persona_encargada,
+      ubicacion: foundSitio.ubicacion,
+      estado: foundSitio.estado,
+      fk_tipo_sitio: foundSitio.fk_tipo_sitio,
+      fk_area: foundSitio.fk_area,
+    },
+  });
 
-    useEffect(() => { // se ejecuta cuando algo se cambie en un usuario, obtiene el id y modifica el FormData
-        const foundSitio = getSitioById(sitioId);
-
-        if (foundSitio) {
-            setFormData(foundSitio);
-        }
-
-    }, [sitios, sitioId]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => { //se ejecuta cuando el usuario cambia algo en un campo
-        const { name, value, type, checked } = e.target;
-
-        setFormData((prev : Partial<Sitios>) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-        }));
-    };
-
-
-    const handleSubmit = async (e : React.FormEvent) => {
-
-        e.preventDefault();
-        if (!formData.id_sitio) {
-            return <p className="text-center text-gray-500">Sitio no encontrado</p>;
-        }
-        
-        try {
-            await updateSitio(formData.id_sitio, formData);
-            onclose();
-        } catch (error) {
-            console.log("Error al actualizar el sitio", error);
-        }
+  const onSubmit = async (data: sitioUpdate) => {
+    console.log(data);
+    if (!data.id_sitio) return;
+    try {
+      await updateSitio(data.id_sitio, data);
+      onclose();
+      addToast({
+        title: "Actualizacion Exitosa",
+        description: "Sitio actualizado correctamente",
+        color: "primary",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
+    } catch (error) {
+      console.log("Error al actualizar la sede : ", error);
     }
+  };
 
+  console.log("Errores", errors);
 
+  return (
+    <Form
+      id={id}
+      className="w-full space-y-4"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Input
+        label="Nombre del sitio"
+        type="text"
+        placeholder="Nombre"
+        {...register("nombre")}
+        isInvalid={!!errors.nombre}
+        errorMessage={errors.nombre?.message}
+      />
 
+      <Input
+        label="Persona encargada"
+        type="text"
+        placeholder="Encargado"
+        {...register("persona_encargada")}
+        isInvalid={!!errors.persona_encargada}
+        errorMessage={errors.persona_encargada?.message}
+      />
 
-    return (
-        <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit}>
-            <Inpu label="Nombre" placeholder="Nombre" type="text" name="nombre" value={formData.nombre ?? ''} onChange={handleChange} />
-            <Inpu label="persona_encargada" placeholder="persona_encargada" type="text" name="persona_encargada" value={formData.persona_encargada} onChange={handleChange} />
-  
+      <Input
+        label="Ubicación"
+        type="text"
+        placeholder="Ubicación"
+        {...register("ubicacion")}
+        isInvalid={!!errors.ubicacion}
+        errorMessage={errors.ubicacion?.message}
+      />
 
-            <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
-                Guardar Cambios
-            </button>
-        </Form>
-    )
-
-}
-
-
-export default FormuUpdate;
+      <div className="justify-center pl-10">
+        <Button
+          type="submit"
+          isLoading={isSubmitting}
+          className="w-full bg-blue-700 text-white p-2 rounded-xl"
+        >
+          Guardar
+        </Button>
+      </div>
+    </Form>
+  );
+};

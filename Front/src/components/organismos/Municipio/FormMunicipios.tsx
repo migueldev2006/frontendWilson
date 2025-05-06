@@ -1,8 +1,10 @@
-import React from "react";
 import { Form } from "@heroui/form"
-import Inpu from "@/components/molecules/input";
-import { Municipio } from "@/types/Municipio";
+import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Municipio, MunicipioSchema } from "@/schemas/Municipio";
+
 
 type FormularioProps = {
 
@@ -13,49 +15,68 @@ type FormularioProps = {
 
 export default function FormMunicipios({ addData, onClose, id }: FormularioProps) {
 
-
-    const [formData, setFormData] = React.useState<Municipio>({
-        id_municipio: 0,
-        nombre: "",
-        departamento: "",
-        estado: true
+    const {
+        control,
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<Municipio>({
+        resolver: zodResolver(MunicipioSchema),
+        mode: "onChange"
     });
 
-    const onSubmit = async (e: React.FormEvent) => { 
-        
-        e.preventDefault();
+
+    const onSubmit = async (data: Municipio) => {
+        console.log(data);
         try {
-            await addData(formData);
-            setFormData({
-                id_municipio: 0,
-                nombre: "",
-                departamento: "",
-                estado: true
-            });
+            await addData(data);
             onClose();
+
         } catch (error) {
-            console.error("Error al cargar el municipio", error);
+            console.error("Error al guardar:", error);
         }
-    }
+    };
 
     return (
-        <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
+        <Form id={id} onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
 
-            <Inpu label="Nombre" placeholder="Nombre" type="text" name="nombre" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} />
-            <Inpu label="Departamento" placeholder="Departamento" type="text" name="departaento" value={formData.departamento} onChange={(e) => setFormData({ ...formData, departamento: e.target.value })} />
+            <Input
+                label="Nombre"
+                type="text"
+                placeholder="Nombre"
+                {...register("nombre")}
+                isInvalid={!!errors.nombre}
+                errorMessage={errors.nombre?.message}
+            />
 
-            <Select
-                aria-labelledby="estado"
-                labelPlacement="outside"
+            <Input
+                label="Departamento"
+                type="text"
+                placeholder="Departamento"
+                {...register("departamento")}
+                isInvalid={!!errors.departamento}
+                errorMessage={errors.departamento?.message}
+            />
+            <Controller
+                control={control}
                 name="estado"
-                placeholder="Estado"
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value === "true" })} // Convierte a booleano
-            >
-                <SelectItem key="true">Activo</SelectItem>
-                <SelectItem key="false" >Inactivo</SelectItem>
-            </Select>
+                render={({ field }) => (
+                    <Select
+                        label="Estado"
+                        placeholder="Selecciona estado"
+                        {...field}
+                        value={field.value ? "true" : "false"}
+                        onChange={(e) => field.onChange(e.target.value === "true")}
+                        isInvalid={!!errors.estado}
+                        errorMessage={errors.estado?.message}
+                    >
+                        <SelectItem key="true">Activo</SelectItem>
+                        <SelectItem key="false">Inactivo</SelectItem>
+                    </Select>
+                )}
+            />
 
-            
+
         </Form>
     )
 }

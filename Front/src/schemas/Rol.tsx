@@ -1,12 +1,19 @@
-import { z } from "zod";
+import {z} from 'zod'
 
-export const RolSchema = z.object({
-  nombre: z.string({
-    required_error: "El nombre es obligatorio",
-    invalid_type_error: "Debe ser de tipo String",
-  }),
+export const RolUpdateSchema = z.object({
+    id_rol:z.number(),
 
-  estado: z.boolean({ required_error: "El estado es requerido" }),
-});
+    nombre:z.string().min(1, {message:"Nombre es  requerido"}).min(3,{message:"Debe contener como mimimo 3 caracteres"}),
 
-export type Rol = z.infer<typeof RolSchema>
+    estado:z.boolean({required_error:"Estado es requerido"})
+})
+
+export type RolUpdate = z.infer<typeof RolUpdateSchema> 
+
+export const RolCreateSchema = z.object({
+
+    nombre:z.string().min(1, {message:"Nombre es  requerido"}).min(3,{message:"Debe contener como mimimo 3 caracteres"}),
+
+    estado:z.boolean({required_error:"Estado es requerido"})
+})
+export type RolCreate = z.infer<typeof RolCreateSchema>

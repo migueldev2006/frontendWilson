@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
 import {
   HomeIcon,
   UserIcon,
@@ -8,96 +7,48 @@ import {
   DocumentChartBarIcon,
   ChartBarIcon,
   Bars3Icon,
-  UserCircleIcon,
-  BuildingOffice2Icon,
-  BuildingOfficeIcon,
-  DocumentCheckIcon,
-  DocumentTextIcon,
-  TagIcon,
-  RectangleGroupIcon,
-  UsersIcon,
-  RocketLaunchIcon,
-  HomeModernIcon,
-  DocumentIcon,
-  AcademicCapIcon,
-  BuildingLibraryIcon,
-  GlobeAmericasIcon,
-  ClipboardDocumentListIcon,
-  RectangleStackIcon,
   ArrowsRightLeftIcon,
-  ArrowPathRoundedSquareIcon,
-  StopIcon,
-  InboxIcon,
+  BuildingOfficeIcon,
+  ClipboardDocumentListIcon,
+  ArchiveBoxIcon,
+  GlobeAmericasIcon,
+  TagIcon,
 } from "@heroicons/react/24/outline";
+import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
   { name: "Inicio", icon: HomeIcon, href: "/" },
+
   {
     name: "Admin",
     icon: UserIcon,
     href: "#",
-    subMenu: [
-      { name: "Usuarios", icon: UserCircleIcon, href: "/usuarios" },
-      { name: "Tipos Sitios", icon: BuildingOffice2Icon, href: "/tipoSitio" },
-      { name: "Sitios", icon: BuildingOfficeIcon, href: "/sitios" },
-      { name: "Municipios", icon: HomeModernIcon, href: "/municipios" },
-      { name: "Centros", icon: AcademicCapIcon, href: "/centros" },
-      { name: "Sedes", icon: BuildingLibraryIcon, href: "/sedes" },
-      { name: "Areas", icon: GlobeAmericasIcon, href: "/areas" },
-      { name: "Programas Formacion", icon: DocumentIcon, href: "/programas" },
-      { name: "Fichas", icon: TagIcon, href: "/fichas" },
-      { name: "Usuario Ficha", icon: UserCircleIcon, href: "/usuarioFicha" },
-      { name: "Roles", icon: UsersIcon, href: "/roles" },
-      { name: "Rol Modulo", icon: DocumentCheckIcon, href: "/rolModulo" },
-      { name: "Permisos", icon: DocumentTextIcon, href: "/permisos" },
-      { name: "Modulos", icon: RectangleGroupIcon, href: "/modulos" },
-      { name: "Rutas", icon: RocketLaunchIcon, href: "/rutas" },
+    subMenu: [{ name: "Usuarios", icon: UserIcon, href: "/admin/usuarios" },
+      { name: "Fichas", icon: TagIcon, href: "/admin/fichas" },
+      { name: "Areas", icon: GlobeAmericasIcon, href: "/admin/areas" },
+      { name: "Sitios", icon: BuildingOfficeIcon, href: "/admin/sitios" }
+
     ],
   },
 
-  {
-    name: "Bodega",
-    icon: InboxIcon,
-    href: "#",
+  { name: "Bodega", icon: ArchiveBoxIcon, href: "#",
     subMenu: [
-      { name: "Elementos", icon: CubeIcon, href: "/bodega/elementos" },
-      {
-        name: "Tipo Movimientos",
-        icon: ArrowPathRoundedSquareIcon,
-        href: "/bodega/tipos",
-      },
-      { name: "Unidades Medida", icon: StopIcon, href: "/bodega/unidades" },
-      {
-        name: "Categorias",
-        icon: RectangleStackIcon,
-        href: "/bodega/categorias",
-      },
-      {
-        name: "Movimientos",
-        icon: ArrowsRightLeftIcon,
-        href: "/bodega/movimientos",
-      },
-      {
-        name: "Inventario",
-        icon: ClipboardDocumentListIcon,
-        href: "/bodega/inventario/areas",
-      },
+      {name:"Elementos", icon:CubeIcon, href:"/bodega/elementos" },
+      {name:"Movimientos", icon:ArrowsRightLeftIcon, href:"/bodega/movimientos" },
+      {name:"Inventario", icon:ClipboardDocumentListIcon, href:"bodega/inventario/areas" },
     ],
-  },
+   },
+
   { name: "Solicitudes", icon: EnvelopeIcon, href: "/solicitudes" },
-  {
-    name: "Reportes",
-    icon: DocumentChartBarIcon,
-    href: "#",
+
+  { name: "Reportes", icon: DocumentChartBarIcon, href: "#",
     subMenu: [
-      { name: "Inventario", icon: ClipboardDocumentListIcon, href: "/report/inventario" },
-      { name: "Usuarios", icon: UserCircleIcon, href: "/report/usuarios" },    ],
-  },
-  {
-    name: "Estadísticas",
-    icon: ChartBarIcon,
-    href: "/estadisticas/",
-  }
+      {name:"Inventario", icon:CubeIcon, href:"/report/inventario" },
+      {name:"Usuarios", icon:ArrowsRightLeftIcon, href:"/report/usuarios" },
+    ]
+   },
+
+  { name: "Estadisticas", icon: ChartBarIcon, href: "/estadisticas" },
 ];
 
 export default function Sidebar() {

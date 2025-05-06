@@ -1,30 +1,27 @@
-import { axiosAPI } from "@/axios/axiosAPI";
+import { deleteRol } from "@/axios/Roles/deleteRol";
+import { getRol } from "@/axios/Roles/getRol";
+import { postRol } from "@/axios/Roles/postRol";
+import { putRol } from "@/axios/Roles/putRol";
 import { Rol } from "@/types/Rol";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useRol() {
   const queryClient = useQueryClient();
 
-  const url = "rol";
-
   const { data, isLoading, isError, error } = useQuery<Rol[]>({
     queryKey: ["roles"],
-    queryFn: async () => {
-      const res = await axiosAPI.get(url);
-      return res.data;
-    },
+    queryFn: getRol,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
   });
 
   const addRolMutation = useMutation({
-    mutationFn: async (newRol: Rol) => {
-      await axiosAPI.post<Rol>(url, newRol);
-      return newRol;
-    },
-    onSuccess: (rol) => {
-      console.log(rol);
-      queryClient.setQueryData<Rol[]>(["roles"], (oldData) =>
-        oldData ? [...oldData, rol] : [rol]
-      );
+    mutationFn: postRol,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["roles"],
+      });
     },
     onError: (error) => {
       console.log("Error al cargar el rol", error);
@@ -39,27 +36,11 @@ export function useRol() {
   };
 
   const updateRolMutation = useMutation({
-    mutationFn: async ({
-      id,
-      update,
-    }: {
-      id: number;
-      update: Partial<Rol>;
-    }) => {
-      await axiosAPI.put<Rol>(`${url}/${id}`, update);
-      return { id, update };
-    },
-    onSuccess: ({ id, update }) => {
-      console.log("dato 1: ", id, " dato 2: ", update);
-      queryClient.setQueryData<Rol[]>(["roles"], (oldData) =>
-        oldData
-          ? oldData.map((rol) =>
-              rol.id_rol === id
-                ? { ...rol, ...update }
-                : rol
-            )
-          : []
-      );
+    mutationFn: ({ id, data }: { id: number; data: Rol }) => putRol(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["roles"],
+      });
     },
 
     onError: (error) => {
@@ -68,21 +49,11 @@ export function useRol() {
   });
 
   const changeStateMutation = useMutation({
-    mutationFn: async (id_rol: number) => {
-      await axiosAPI.put<Rol>(`rol/cambiarEstado/${id_rol}`);
-      return id_rol;
-    },
-
-    onSuccess: (id_rol: number) => {
-      queryClient.setQueryData<Rol[]>(["roles"], (oldData) =>
-        oldData
-          ? oldData.map((rol: Rol) =>
-              rol.id_rol == id_rol
-                ? { ...rol, estado: !rol.estado }
-                : rol
-            )
-          : []
-      );
+    mutationFn: deleteRol,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["roles"],
+      });
     },
 
     onError: (error) => {
@@ -94,8 +65,8 @@ export function useRol() {
     return addRolMutation.mutateAsync(rol);
   };
 
-  const updateRol = async (id: number, update: Partial<Rol>) => {
-    return updateRolMutation.mutateAsync({ id, update });
+  const updateRol = async (id: number, data: Rol) => {
+    return updateRolMutation.mutateAsync({ id, data });
   };
 
   const changeState = async (id_rol: number) => {

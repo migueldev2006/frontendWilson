@@ -1,69 +1,55 @@
-import React, { useState, useEffect } from "react";
-import { Municipio } from "@/types/Municipio";
 import { Form } from "@heroui/form"
-import Inpu from "@/components/molecules/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@heroui/input";
 import { useMunicipio } from "@/hooks/Municipio/useMunicipio";
+import { MunicipioUP, MunicipioUPSchema } from "@/schemas/Municipio";
+import { useForm } from "react-hook-form";
 
 type Props = {
-    municipios: Municipio[] ;
+    municipios: MunicipioUP[];
     municipioId: number;
     id: string
     onclose: () => void;
 
 }
 
-const FormUpMunicipio = ({ municipios, municipioId, id, onclose }: Props) => {
-    const [formData, setFormData] = useState<Partial<Municipio>>({
-        id_municipio: 0,
-        nombre: "",
-        departamento : "",
-        estado: true,
+const FormUpMunicipio = ({  municipioId, id, onclose }: Props) => {
+    const { updateMunicipio, getMunicipioById } = useMunicipio()
+
+    const foundMunicipio = getMunicipioById(municipioId) as MunicipioUP;
+    console.log(foundMunicipio);
+
+    const { register, handleSubmit, formState: { errors } } = useForm({
+        resolver: zodResolver(MunicipioUPSchema),
+        defaultValues: {
+            id_municipio: foundMunicipio.id_municipio,
+            nombre: foundMunicipio.nombre
+        }
     });
 
-    const {updateMunicipio, getMunicipioById} = useMunicipio()
-
-    useEffect(() => { // se ejecuta cuando algo se cambie en un usuario, obtiene el id y modifica el FormData
-        const foundMunicipio = getMunicipioById(municipioId);
-
-        if (foundMunicipio) {
-            setFormData(foundMunicipio);
-        }
-
-    }, [municipios, municipioId]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => { //se ejecuta cuando el usuario cambia algo en un campo
-        const { name, value, type, checked } = e.target;
-
-        setFormData((prev : Partial<Municipio>) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-        }));
-    };
-
-
-    const handleSubmit = async (e : React.FormEvent) => {
-
-        e.preventDefault();
-        if (!formData.id_municipio) {
-            return <p className="text-center text-gray-500">Municipio no encontrado</p>;
-        }
-        
+    const onSubmit = async (data: MunicipioUP) => {
+        console.log("submiting...");
+        console.log(data);
         try {
-            await updateMunicipio(formData.id_municipio, formData);
+            await updateMunicipio(data.id_municipio, data);
+            console.log("Sended success")
             onclose();
         } catch (error) {
-            console.log("Error al actualizar el municipio", error);
+            console.log("Error al actualizar el centro", error);
         }
     }
 
 
 
-
     return (
-        <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit}>
-            <Inpu label="Nombre" placeholder="Nombre" type="text" name="nombre" value={formData.nombre ?? ''} onChange={handleChange} />
-            <Inpu label="Departamento" placeholder="Departamento" type="text" name="departamento" value={formData.departamento ?? ''} onChange={handleChange} />
-
+        <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
+            <Input
+                {...register("nombre")}
+                label="Nombre"
+                type="text"
+                isInvalid={!!errors.nombre}
+                errorMessage={errors.nombre?.message}
+            />
             <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
                 Guardar Cambios
             </button>

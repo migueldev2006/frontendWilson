@@ -1,78 +1,81 @@
-import React, { useState, useEffect } from "react";
-import { Sede } from "@/types/sedes";
-import { Form } from "@heroui/form"
-import Inpu from "@/components/molecules/input";
-import {useSede} from "@/hooks/sedes/useSedes";
-
-
+import { Form } from "@heroui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
+import { sedeUpdate, sedeUpdateSchema } from "@/schemas/sedes";
+import { useSede } from "@/hooks/sedes/useSedes";
+import { addToast } from "@heroui/react";
 
 type Props = {
-    sedes: Sede[] ;
-    sedeId: number;
-    id: string
-    onclose: () => void;
+  sedes: (sedeUpdate & { id_sede?: number })[];
+  sedeId: number;
+  id: string;
+  onclose: () => void;
+};
 
-}
+export const FormUpdate = ({ sedes, sedeId, id, onclose }: Props) => {
+  const { updateSede, getSedeById } = useSede();
 
-const FormuUpdate = ({ sedes, sedeId, id, onclose }: Props) => {
-    const [formData, setFormData] = useState<Partial<Sede>>({
-        id_sede: 0,
-        nombre: "",
-        estado: true,
-        fk_centro: 0,
-    });
+  const foundSede = getSedeById(sedeId, sedes) as sedeUpdate;
 
-    const {updateSede, getSedeById} = useSede()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<sedeUpdate>({
+    resolver: zodResolver(sedeUpdateSchema),
+    mode: "onChange",
+    defaultValues: {
+      id_sede: foundSede.id_sede,
+      nombre: foundSede.nombre,
+      estado: foundSede.estado,
+      fk_centro: foundSede.fk_centro,
+    },
+  });
 
-    useEffect(() => { // se ejecuta cuando algo se cambie en un usuario, obtiene el id y modifica el FormData
-        const foundSede = getSedeById(sedeId);
-
-        if (foundSede) {
-            setFormData(foundSede);
-        }
-
-    }, [sedes, sedeId]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => { //se ejecuta cuando el usuario cambia algo en un campo
-        const { name, value, type, checked } = e.target;
-
-        setFormData((prev : Partial<Sede>) => ({
-            ...prev,
-            [name]: type === "checkbox" ? checked : value,
-        }));
-    };
-
-
-    const handleSubmit = async (e : React.FormEvent) => {
-
-        e.preventDefault();
-        if (!formData.id_sede) {
-            return <p className="text-center text-gray-500">Sede no encontrado</p>;
-        }
-        
-        try {
-            await updateSede(formData.id_sede, formData);
-            onclose();
-        } catch (error) {
-            console.log("Error al actualizar la Sede", error);
-        }
+  const onSubmit = async (data: sedeUpdate) => {
+    console.log(data);
+    if (!data.id_sede) return;
+    try {
+      await updateSede(data.id_sede, data);
+      onclose();
+      addToast({
+        title: "Actualizacion Exitosa",
+        description: "Sede actualizada correctamente",
+        color: "primary",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
+    } catch (error) {
+      console.log("Error al actualizar la sede : ", error);
     }
+  };
 
+  console.log("Errores", errors);
 
-
-
-    return (
-        <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit}>
-            <Inpu label="Nombre" placeholder="Nombre" type="text" name="nombre" value={formData.nombre ?? ''} onChange={handleChange} />
-           
-
-            <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
-                Guardar Cambios
-            </button>
-        </Form>
-    )
-
-}
-
-
-export default FormuUpdate;
+  return (
+    <Form
+      id={id}
+      className="w-full space-y-4"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Input
+        label="Nombre"
+        placeholder="Nombre"
+        {...register("nombre")}
+        isInvalid={!!errors.nombre}
+        errorMessage={errors.nombre?.message}
+      />
+      <div className="justify-center pl-10">
+        <Button
+          type="submit"
+          isLoading={isSubmitting}
+          className="w-full bg-blue-700 text-white p-2 rounded-xl"
+        >
+          Guardar
+        </Button>
+      </div>
+    </Form>
+  );
+};

@@ -6,8 +6,7 @@ const cookies = new Cookies();
 export const axiosAPI = axios.create({
     baseURL : `${import.meta.env.VITE_API_CLIENT}`,
     headers : {
-        'Content-Type' : 'application/json'
-    }
+        'Content-Type' : 'application/json',    }
 });
 
 axiosAPI.interceptors.request.use((config) => {

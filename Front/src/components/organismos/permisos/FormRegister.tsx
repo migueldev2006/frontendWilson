@@ -1,62 +1,87 @@
-import React from "react";
 import { Form } from "@heroui/form";
-import Inpu from "@/components/molecules/input";
-import { Permisos } from "@/types/permisos";
-// import { Select, SelectItem } from "@heroui/react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@heroui/input";
+import { addToast, Select, SelectItem } from "@heroui/react";
+import { useModulo } from "@/hooks/Modulos/useModulo";
+import { PermisoCreate, PermisoCreateSchema } from "@/schemas/Permiso";
 
 type FormularioProps = {
-
-    addData: (permiso: Permisos) => Promise<void>;
-    onClose: () => void;
-    id: string
-}
+  addData: (permiso: PermisoCreate) => Promise<void>;
+  onClose: () => void;
+  id: string;
+};
 
 export default function Formulario({ addData, onClose, id }: FormularioProps) {
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PermisoCreate>({
+    resolver: zodResolver(PermisoCreateSchema),
+    mode: "onChange",
+  });
 
+  const { modulos } = useModulo();
 
-    const [formData, setFormData] = React.useState<Permisos>({
-        id_permiso: 0,
-        permiso: ""
-    });
-
-    const onSubmit = async (e : React.FormEvent) => { //preguntar si esta bien no usar el e: React.FormEvent
-        //y aqui el preventdefault
-        e.preventDefault();
-        try {
-            console.log("Enviando formulario con datos:", formData);
-            await addData(formData);
-            console.log("permiso guardado correctamente");
-            setFormData({
-                id_permiso: 0,
-                permiso: ""
-
-            });
-            onClose();
-        } catch (error) {
-            console.error("Error al cargar el permiso", error);
-        }
+  const onSubmit = async (data: PermisoCreate) => {
+    try {
+      await addData(data);
+      onClose();
+      addToast({
+        title: "Registro Exitoso",
+        description: "Permiso agregado correctamente",
+        color: "success",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
+    } catch (error) {
+      console.error("Error al cargar el permiso", error);
     }
-
-    return (
-        <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
-    
-            <Inpu label="permiso" placeholder="permiso" type="text" name="permiso" value={formData.permiso} onChange={(e) => setFormData({ ...formData, permiso: e.target.value })} />
-           
-            {/* <Select
-                aria-labelledby="estado"
-                labelPlacement="outside"
-                name="estado"
-                placeholder="Estado"
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value === "true" })} // Convierte a booleano
+  };
+  console.log("Errores", errors)
+  return (
+    <Form
+      id={id}
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full space-y-4"
+    >
+      <Input
+        label="Permiso"
+        placeholder="permiso"
+        {...register("permiso")}
+        isInvalid={!!errors.permiso}
+        errorMessage={errors.permiso?.message}
+      />
+      <Controller
+        control={control}
+        name="fk_modulo"
+        render={({ field }) => (
+          <div className="w-full">
+            <Select
+              label="Modulo"
+              {...field}
+              className="w-full"
+              placeholder="Selecciona un modulo..."
+              aria-label="Seleccionar Modulo"
+              onChange={(e) => field.onChange(Number(e.target.value))}
+              isInvalid={!!errors.fk_modulo}
+              errorMessage={errors.fk_modulo?.message}
             >
-                <SelectItem key="true">Activo</SelectItem>
-                <SelectItem key="false" >Inactivo</SelectItem>
-            </Select> */}
-
-            {/* <Inpu label="Estado" placeholder="Estado" type="checkbox" name="estado" value={formData.estado.toString()} onChange={(e) => setFormData({ ...formData, estado: e.target.checked })} /> */}
-
-            
-
-        </Form>
-    )
+              {modulos?.length ? (
+                modulos.map((modulo) => (
+                  <SelectItem key={modulo.id_modulo} textValue={modulo.nombre}>
+                    {modulo.nombre}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem isDisabled>No hay modulos disponibles</SelectItem>
+              )}
+            </Select>
+          </div>
+        )}
+      />
+    </Form>
+  );
 }

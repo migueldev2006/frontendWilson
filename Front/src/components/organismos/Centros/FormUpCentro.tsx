@@ -16,19 +16,19 @@ type Props = {
 
 }
 
-const FormUpCentro = ({ centros, centroId, id, onclose }: Props) => {
-    console.log("Todos los centros:",centros);
+const FormUpCentro = ({  centroId, id, onclose }: Props) => {
+    
     
     const { updateCentro, getCentroById } = useCentro()
+
     const foundCentro = getCentroById(centroId) as CentroUpdate;
     console.log(foundCentro);
 
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm({
+    const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(CentroUpdateSchema),
         defaultValues : {
             id_centro : foundCentro.id_centro,
-            nombre : foundCentro.nombre,
-            fk_municipio : foundCentro.fk_municipio
+            nombre : foundCentro.nombre
         }
     });
 
@@ -37,6 +37,7 @@ const FormUpCentro = ({ centros, centroId, id, onclose }: Props) => {
         console.log(data);
         try {
             await updateCentro(data.id_centro, data);
+            console.log("Sended success")
             onclose();
         } catch (error) {
             console.log("Error al actualizar el centro", error);
@@ -48,11 +49,15 @@ const FormUpCentro = ({ centros, centroId, id, onclose }: Props) => {
 
     return (
         <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
-            <Input {...register("nombre")} label="Nombre" type="text"/>
-            {errors.nombre && <p className="text-red-500">{errors.nombre.message}</p>}
-
-            <Input onChange={(e)=>setValue("fk_municipio",parseInt(e.target.value))} label="Municipio" type="number"/>
-            {errors.fk_municipio && <p className="text-red-500">{errors.fk_municipio.message}</p>}
+            
+            <Input 
+            {...register("nombre")} 
+            label="Nombre" 
+            type="text"
+            isInvalid={!!errors.nombre}
+            errorMessage={errors.nombre?.message}
+            />
+            
 
             <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
                 Guardar Cambios

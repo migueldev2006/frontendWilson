@@ -1,6 +1,5 @@
 import { useElemento } from "@/hooks/Elementos/useElemento";
 import { useMovimiento } from "@/hooks/Movimientos/useMovimiento";
-import { useVerificacion } from "@/hooks/Verificaciones/useVerificacion";
 import { Card } from "@heroui/react";
 import {
   Chart as ChartJS,
@@ -16,7 +15,6 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 const Dashboard = () => {
   const { elementos: elementos = [] } = useElemento();
   const { movimientos: movimientos = [] } = useMovimiento();
-  const { verificaciones: verificaciones = [] } = useVerificacion();
 
   const movimientosPendientes = movimientos.filter(
     (m: any) => m.en_proceso && !m.aceptado && !m.cancelado
@@ -63,16 +61,16 @@ const Dashboard = () => {
             </p>
         </Card>
         <Card className="bg-green-100 dark:bg-zinc-800 dark:text-white">
-            <p className="text-sm text-green-700">Verificaciones Realizadas</p>
+            <p className="text-sm text-green-700">Total Elementos</p>
             <p className="text-2xl font-bold text-green-900">
-              {verificaciones.length}
+              {elementos.length}
             </p>
         </Card>
       </div>
 
       <div className="bg-white p-4 rounded-xl shadow dark:bg-zinc-800 dark:text-white">
         <h2 className="text-lg font-semibold mb-4">Movimientos por Estado</h2>
-        <div className="w-full h-72">
+        <div className="w-full">
           <Bar
             data={estadisticas}
             options={{

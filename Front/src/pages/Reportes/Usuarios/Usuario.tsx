@@ -1,6 +1,6 @@
 import { useState } from "react";
-import useReportes from "@/hooks/Usuarios/useReporte";  // Ajusta la ruta si es necesario
-import { VisualizadorPDF } from "@/components/organismos/PDFVisualizer";
+import useReportes from "@/hooks/Usuarios/useReporte"; // Ajusta la ruta si es necesario
+import { VisualizadorPDF } from "@/components/organismos/pdf/PDFVisualizer";
 import { ReportTemplate } from "@/components/templates/Report";
 import { ReportCard } from "@/components/molecules/ReportCard";
 import {
@@ -8,7 +8,7 @@ import {
   ReporteUsuario,
   ReporteUsuariosPorFicha,
   ReporteMovimientosUsuarioElemento,
-} from "@/types/Usuario";  // Ajusta la ruta si es necesario
+} from "@/types/Usuario"; // Ajusta la ruta si es necesario
 
 export default function UsuariosReportPage() {
   const {
@@ -34,7 +34,12 @@ export default function UsuariosReportPage() {
         "documento",
         "elementos_asignados",
       ],
-      headers: ["ID Usuario", "Nombre Usuario", "Documento", "Elementos Asignados"],
+      headers: [
+        "ID Usuario",
+        "Nombre Usuario",
+        "Documento",
+        "Elementos Asignados",
+      ],
       withTable: true,
       filterFn: () => usuariosConElementos || [],
     },
@@ -51,7 +56,14 @@ export default function UsuariosReportPage() {
         "nombre_elemento",
         "fecha_asignacion",
       ],
-      headers: ["ID Usuario", "Nombre Usuario", "Documento", "Rol", "Elemento", "Fecha Asignación"],
+      headers: [
+        "ID Usuario",
+        "Nombre Usuario",
+        "Documento",
+        "Rol",
+        "Elemento",
+        "Fecha Asignación",
+      ],
       withTable: true,
       filterFn: () => usuariosConRolYElementos || [],
     },
@@ -78,7 +90,14 @@ export default function UsuariosReportPage() {
         "nombre_elemento",
         "total_movimientos",
       ],
-      headers: ["ID Usuario", "Nombre Usuario", "Documento", "Rol", "Elemento", "Total de Movimientos"],
+      headers: [
+        "ID Usuario",
+        "Nombre Usuario",
+        "Documento",
+        "Rol",
+        "Elemento",
+        "Total de Movimientos",
+      ],
       withTable: true,
       filterFn: () => usuariosConMovimientos || [],
     },

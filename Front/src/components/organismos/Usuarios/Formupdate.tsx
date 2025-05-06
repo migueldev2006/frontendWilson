@@ -97,8 +97,6 @@ type FormuProps = {
         Guardar Cambios
       </button>
     </Form>
-      );
+);
 
 };
-
-

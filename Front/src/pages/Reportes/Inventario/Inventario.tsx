@@ -1,6 +1,6 @@
 import { useState } from "react";
 import useReporte from "@/hooks/Inventarios/useReporte";
-import { VisualizadorPDF } from "@/components/organismos/PDFVisualizer";
+import { VisualizadorPDF } from "@/components/organismos/pdf/PDFVisualizer";
 import { ReportTemplate } from "@/components/templates/Report";
 import { ReportCard } from "@/components/molecules/ReportCard";
 import {
