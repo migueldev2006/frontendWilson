@@ -14,3 +14,11 @@ export type Elemento = {
   fk_caracteristica: number;
   tipo_elemento: string;
 };
+
+
+export type ElementUso = {
+  elemento: string;
+  stock_total: number;
+  total_usado: number;
+  indice_uso: number;
+}

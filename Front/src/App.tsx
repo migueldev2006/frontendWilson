@@ -40,6 +40,7 @@ import { useAuth } from "./providers/AuthProvider"
 import StockEstadisticas from "./pages/Estadisticas/Stock";
 import TopElementosUsados from "./pages/Estadisticas/TopElementos";
 import MovimientosMensuales from "./pages/Estadisticas/MovimientoMes";
+import ElementosEstadisticas from "./pages/Estadisticas/ElementosUso";
 
 
 function App() {
@@ -53,19 +54,18 @@ function App() {
           <Route path="/reportes/usuarios" element={<UserReportSelector />} />
           <Route path="/estadisticas/usuarios" element={<UsuariosEstadisticas />} />
           <Route path="/centros" element={<CentrosTable />} />
-          <Route path="/estadisticas/centros" element={<CentrosEstadisticas />} />
+          
           <Route path="/reportes/centros" element={<CentroReport />} />
           <Route path="/tiposSitios" element={<TipoSitioTable />} />
-          <Route path="/estadisticas/tiposSitios" element={<TipoSitioEstadisticas />} />
           <Route path="/municipios" element={<MunicipiosTable />} />
           <Route path="/reportes/municipios" element={<MunicipioReport />} />
-          <Route path="/estadisticas/municipios" element={<MunicipioEstadisticas />} />
+  
           <Route path="/reportes/categorias" element={<CategoriaReport />} />
-          <Route path="/estadisticas/categorias" element={<CategoriasEstadisticas />} />
+         
           <Route path="/reportes/modulos" element={<ModulosReport />} />
           <Route path="/modulos" element={<ModulosTable />} />
-          <Route path="/estadisticas/modulos" element={<ModulosEstadisticas />} />
-          <Route path="/estadisticas/caracteristicas" element={<CaracteristicasEstadisticas />} />
+         
+          
           <Route path="areas" element={<AreaTable />} />
           <Route path="/rutas" element={<RutasTable />} />
           <Route path="/estadisticas/rutas" element={<RutasEstadisticas />} />
@@ -77,9 +77,12 @@ function App() {
           <Route path="roles" element={<RolTable />} />
           <Route path="unidades" element={<UnidadTable />} />
           <Route path="elementos" element={<ElementosTable />} />
+          <Route path="elementos/estadistica" element={<ElementosEstadisticas />} />
           <Route path="inventario" element={<Inventario />} />
           <Route path="inventario/estadistica" element={<StockEstadisticas />} />
+          <Route path="inventario/estadistica/" element={<StockEstadisticas />} />
           <Route path="movimientos" element={<MovimientoTable />} />
+
           <Route path="movimientos/estadistica" element={<TopElementosUsados />} />
           <Route path="movimientos/mes/estadistica" element={<MovimientosMensuales />} />
           <Route path="tipos" element={<TipoMovimientoTable />} />
