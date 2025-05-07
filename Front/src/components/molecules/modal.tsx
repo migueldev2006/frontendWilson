@@ -9,7 +9,7 @@ import {
 type PropsModal = {
         ModalTitle: string
         children: React.ReactNode
-        isOpen?: boolean
+        isOpen?: boolean | undefined
         onOpenChange?: () => void
 
 }

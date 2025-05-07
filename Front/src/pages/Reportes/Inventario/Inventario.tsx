@@ -24,32 +24,35 @@ export default function InventarioReportPage() {
   const [fechaInicio, setFechaInicio] = useState<string>("");
   const [fechaFin, setFechaFin] = useState<string>("");
 
-  function filtrarPorFecha<T extends { fecha?: string }>(
+  const filtrarPorFechas = <T extends { created_at: string }>(
     data: T[],
-    fechaInicio?: string,
-    fechaFin?: string
-  ): T[] {
+    fechaInicio: string,
+    fechaFin: string
+  ): T[] => {
+    if (!fechaInicio || !fechaFin) return data;
+    const inicio = new Date(fechaInicio);
+    const fin = new Date(fechaFin);
     return data.filter((item) => {
-      if (!item.fecha) return false;
-      if (fechaInicio && !fechaFin) {
-        return item.fecha >= fechaInicio;
-      }
-      if (!fechaInicio && fechaFin) {
-        return item.fecha <= fechaFin;
-      }
-      if (fechaInicio && fechaFin) {
-        return item.fecha >= fechaInicio && item.fecha <= fechaFin;
-      }
-      return true;
+      const fecha = new Date(item.created_at);
+      return fecha >= inicio && fecha <= fin;
     });
-  }
+  };
+
+  const formatFecha = (fecha: string) => {
+    if (!fecha) return "sin filtro";
+    return new Date(fecha).toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  };
 
   const reports = [
     {
       id: "general",
       title: "REPORTE GENERAL DE INVENTARIO – SGDSS Sede Yamboro",
       description: (data: ReporteInventario[]) =>
-        `${fechaInicio || "sin filtro"} a ${fechaFin || "sin filtro"}
+        `${formatFecha(fechaInicio)} al ${formatFecha(fechaFin)}
       
 Este reporte resume todos los elementos registrados en el sistema de gestión de inventarios del SGDSS, incluyendo su categoría, cantidad actual, unidad de medida, y ubicación por sede y sitio.
       
@@ -75,10 +78,11 @@ footerText:
         "unidad_medida",
         "nombre_sede",
         "nombre_sitio",
+        "created_at"
       ],
-      headers: ["Elemento", "Categoría", "Cantidad", "Unidad", "Sede", "Sitio"],
+      headers: ["Elemento", "Categoría", "Cantidad", "Unidad", "Sede", "Sitio", "Fecha"],
       withTable: true,
-      filterFn: () => reporteInventario || [],
+      filterFn: () => filtrarPorFechas(reporteInventario || [], fechaInicio, fechaFin),
     },
 
     {
@@ -86,7 +90,7 @@ footerText:
       title: "ELEMENTOS POR AGOTARSE – Alerta de Stock Bajo",
       description: (data: ReporteElementosPorAgotarse[]) =>
         `
-${fechaInicio || "sin filtro"} a ${fechaFin || "sin filtro"}
+${formatFecha(fechaInicio)} al ${formatFecha(fechaFin)}
         
 Este reporte identifica los elementos cuyo stock ha caído por debajo del umbral crítico (menos de 5 unidades).
 Actualmente hay ${data.length} elementos en esta condición.`,
@@ -110,7 +114,7 @@ Se recomienda a los responsables revisar estos datos de forma periódica y progr
       title: "CONTEO DE ELEMENTOS EN INVENTARIO",
       description: (data: ReporteCantidadElementosPorArea[]) =>
         ` 
-${fechaInicio || "sin filtro"} a ${fechaFin || "sin filtro"}
+${formatFecha(fechaInicio)} al ${formatFecha(fechaFin)}
         
 Este informe presenta un resumen del número total de elementos por cada área funcional.\n\nSe registran ${data.reduce((acc, d) => acc + d.cantidad, 0)} elementos en ${data.length} áreas.`,
       tableDescription: `
@@ -126,7 +130,7 @@ La disponibilidad de estos datos respalda la toma de decisiones basadas en evide
       accessors: ["nombre_area", "cantidad"],
       headers: ["Área", "Cantidad Total"],
       withTable: true,
-      filterFn: () => conteoInventarioElemento || [],
+      filterFn: () => (conteoInventarioElemento || []),
     },
     {
       id: "area-mas-elementos",
@@ -138,7 +142,7 @@ La disponibilidad de estos datos respalda la toma de decisiones basadas en evide
 
         const top = data[0];
         return `
-${fechaInicio || "sin filtro"} a ${fechaFin || "sin filtro"}
+${formatFecha(fechaInicio)} al ${formatFecha(fechaFin)}
 
 Este reporte identifica el área con mayor cantidad de elementos registrados.
 

@@ -1,6 +1,6 @@
 export type Inventario = {
   id_inventario?: number;
-  stock?: number;
+  stock: number;
   estado: boolean;
   created_at?:string;
   updated_at?:string;
@@ -18,6 +18,7 @@ export type ReporteInventario = {
   unidad_medida: string;
   nombre_sede: string;
   nombre_sitio: string;
+  created_at:string;
 };
 
 export type ReporteAreaConMasElementos = {
