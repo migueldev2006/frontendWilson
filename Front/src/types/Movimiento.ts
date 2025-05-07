@@ -18,3 +18,14 @@ export type Movimiento = {
   fk_inventario: number;
   tipo_movimiento: string;
 };
+
+export type MovimientoResumen = {
+  nombre: string;
+  total_usos: number;
+};
+
+export type MovimientoMes = {
+  tipo_movimiento: string;
+  mes: string; 
+  total: number;
+};

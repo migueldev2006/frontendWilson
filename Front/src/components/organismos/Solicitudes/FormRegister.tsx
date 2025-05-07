@@ -80,6 +80,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
 
   return (
     <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
+
       <Inpu
         label="Descripcion"
         placeholder="Descripcion"

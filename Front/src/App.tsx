@@ -23,7 +23,7 @@ import UsuariosReportPage from "./pages/Reportes/Usuarios/Usuario";
 
 
 function App() {
-  const { authenticated } = useAuth();
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>

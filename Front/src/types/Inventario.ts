@@ -35,3 +35,8 @@ export type ReporteElementosPorAgotarse = {
   nombre_elemento: string;
   stock: number;
 };
+export type InventarioItem = {
+  sitio: string;
+  elemento: string;
+  stock: number;
+};

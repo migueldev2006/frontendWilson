@@ -22,7 +22,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
         formState: { errors },
     } = useForm<User>({
         resolver: zodResolver(UserSchema),
-        mode: "onChange", 
+    
     });
 
     const onSubmit = async (data: User) => {
@@ -40,7 +40,7 @@ export default function Formulario({ addData, onClose, id }: FormularioProps) {
     return (
         
         <Form id={id} onSubmit={handleSubmit(onSubmit)} className="w-full space-y-4">
-            <p>JSON.strin</p>
+            <p>JSON</p>
             <Input
                 label="Documento"
                 type="text"
