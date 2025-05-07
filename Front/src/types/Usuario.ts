@@ -40,6 +40,7 @@ export interface ReporteUsuario {
   }
   
   export interface ReporteAsignacionElemento {
+    created_at: string;
     id_usuario: number;
     nombre_usuario: string;
     documento: string;
@@ -53,6 +54,7 @@ export interface ReporteUsuario {
     codigo: string;
     nombre: string;
     total_usuarios: number;
+    created_at: string; 
   }
   
   export interface ReporteMovimientosUsuarioElemento {
@@ -63,5 +65,6 @@ export interface ReporteUsuario {
     id_elemento: number;
     nombre_elemento: string;
     total_movimientos: number;
+    created_at: string; 
   }
   

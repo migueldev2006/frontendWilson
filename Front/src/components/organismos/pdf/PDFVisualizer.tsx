@@ -18,10 +18,10 @@ export const VisualizadorPDF = ({ component, onBack }: Props) => {
   return (
     <div className="space-y-4">
       <div className="flex gap-4 mb-2 mt-4 ml-4">
-        <Button className="bg-blue-700 text-white dark:bg-zinc-800 dark:text-white" onClick={onBack}>
+        <Button className="bg-blue-700 text-white dark:bg-zinc-800 dark:text-white" onPress={onBack}>
           Volver reportes
         </Button>
-        <Button className="bg-blue-700 text-white dark:bg-zinc-800 dark:text-white" onClick={handleDownload}>
+        <Button className="bg-blue-700 text-white dark:bg-zinc-800 dark:text-white" onPress ={handleDownload}>
           Descargar PDF
         </Button>
       </div>
