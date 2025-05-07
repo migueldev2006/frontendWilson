@@ -1,92 +1,142 @@
-import React from "react";
-import { Form } from "@heroui/form"
-import Inpu from "@/components/molecules/input";
-import { Area } from "@/types/area";
-import { Select, SelectItem } from "@heroui/react";
-import {useSede} from "@/hooks/sedes/useSedes"
-
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, Controller } from "react-hook-form";
+import { Form } from "@heroui/form";
+import { Input } from "@heroui/input";
+import { AreaCreate, AreaCreateSchema } from "@/schemas/Area";
+import { addToast, Select, SelectItem } from "@heroui/react";
+import { useSede } from "@/hooks/sedes/useSedes";
+import { useUsuario } from "@/hooks/Usuarios/useUsuario";
 
 type FormularioProps = {
-
-    addData: (area: Area) => Promise<void>;
-    onClose: () => void;
-    id: string
-}
+  addData: (area: AreaCreate) => Promise<void>;
+  onClose: () => void;
+  id: string;
+};
 
 export default function Formulario({ addData, onClose, id }: FormularioProps) {
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<AreaCreate>({
+    resolver: zodResolver(AreaCreateSchema),
+    mode: "onChange",
+  });
 
-    const { sede, isLoading: loadingSedes, isError: errorSedes } = useSede();
+  const { sede } = useSede();
+  const { users } = useUsuario();
 
-    const [formData, setFormData] = React.useState<Area>({
-        id_area: 0,
-        nombre: "",
-        persona_encargada: "",
-        estado: true,
-        created_at:"",
-        updated_at:"",
-        fk_sede: 0,
-    });
-
-    const onSubmit = async (e : React.FormEvent) => { //preguntar si esta bien no usar el e: React.FormEvent
-        //y aqui el preventdefault
-        e.preventDefault();
-        try {
-            console.log("Enviando formulario con datos:", formData);
-            await addData(formData);
-            console.log("area guardado correctamente");
-            setFormData({
-                id_area: 0,
-                nombre: "",
-                persona_encargada: "",
-                estado: true,
-                created_at:"",
-                updated_at:"",
-                fk_sede: 0,
-            });
-            onClose();
-        } catch (error) {
-            console.error("Error al cargar el area", error);
-        }
+  const onSubmit = async (data: AreaCreate) => {
+    try {
+      await addData(data);
+      onClose();
+      addToast({
+        title: "Registro Exitoso",
+        description: "Area agregada correctamente",
+        color: "success",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
+    } catch (error) {
+      console.error("Error al guardar:", error);
     }
+  };
+  console.log("Errores", errors)
+  return (
+    <Form
+      id={id}
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full space-y-4"
+    >
+      <Input
+        label="Nombre"
+        type="text"
+        placeholder="Nombre"
+        {...register("nombre")}
+        isInvalid={!!errors.nombre}
+        errorMessage={errors.nombre?.message}
+      />
 
-    return (
-        <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
-            <Inpu label="Nombre" placeholder="Nombre" type="text" name="nombre" value={formData.nombre} onChange={(e) => setFormData({ ...formData, nombre: e.target.value })} />
-            <Inpu label="persona_encargada" placeholder="persona_encargada" type="text" name="persona_encargada" value={formData.persona_encargada} onChange={(e) => setFormData({ ...formData, persona_encargada: e.target.value })} />
+      <Controller
+        control={control}
+        name="estado"
+        render={({ field }) => (
+          <Select
+            label="Estado"
+            placeholder="Seleccione un estado"
+            {...field}
+            value={field.value ? "true" : "false"}
+            onChange={(e) => field.onChange(e.target.value === "true")}
+            isInvalid={!!errors.estado}
+            errorMessage={errors.estado?.message}
+          >
+            <SelectItem key="true">Activo</SelectItem>
+            <SelectItem key="false">Inactivo</SelectItem>
+          </Select>
+        )}
+      />
 
+      <Controller
+        control={control}
+        name="fk_sede"
+        render={({ field }) => (
+          <div className="w-full">
             <Select
-                aria-labelledby="estado"
-                labelPlacement="outside"
-                name="estado"
-                placeholder="Estado"
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value === "true" })} // Convierte a booleano
+              label="Sede"
+              {...field}
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+              className="w-full"
+              placeholder="Selecciona una sede..."
+              aria-label="Seleccionar Sede"
+              isInvalid={!!errors.fk_sede}
+              errorMessage={errors.fk_sede?.message}
             >
-                <SelectItem key="true">Activo</SelectItem>
-                <SelectItem key="false" >Inactivo</SelectItem>
+              {sede?.length ? (
+                sede.map((s) => (
+                  <SelectItem key={s.id_sede} textValue={s.nombre}>
+                    {s.nombre}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem isDisabled>No hay sedes disponibles</SelectItem>
+              )}
             </Select>
+          </div>
+        )}
+      />
 
-            {/* <Inpu label="Estado" placeholder="Estado" type="checkbox" name="estado" value={formData.estado.toString()} onChange={(e) => setFormData({ ...formData, estado: e.target.checked })} /> */}
-
-            
-
-            {/* <Inpu label="Sede" placeholder="Sede" type="number" name="fk_sede" value={formData.fk_sede.toString()} onChange={(e) => setFormData({ ...formData, fk_sede: Number(e.target.value) })} /> */}
-
-            {!loadingSedes && !errorSedes && sede && (
-                    <Select
-                      label="sedes"
-                      name="fk_sede"
-                      placeholder="Selecciona una sede"
-                      onChange={(e) =>
-                        setFormData({ ...formData, fk_sede: Number(e.target.value) })
-                      }
-                    >
-                      {sede.map((sedes) => (
-                        <SelectItem key={sedes.id_sede}>
-                          {sedes.nombre}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  )}
-        </Form>
-    )
+      <Controller
+        control={control}
+        name="fk_usuario"
+        render={({ field }) => (
+          <div className="w-full">
+            <Select
+              label="Usuario"
+              {...field}
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+              className="w-full"
+              placeholder="Selecciona un usuario..."
+              aria-label="Seleccionar Usuario"
+              isInvalid={!!errors.fk_usuario}
+              errorMessage={errors.fk_usuario?.message}
+            >
+              {/* Asegúrate de que users no sea undefined */}
+              {users?.length ? (
+                users.map((u) => (
+                  <SelectItem key={u.id_usuario} textValue={u.nombre}>
+                    {u.nombre}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem isDisabled>No hay usuarios disponibles</SelectItem>
+              )}
+            </Select>
+          </div>
+        )}
+      />
+    </Form>
+  );
 }

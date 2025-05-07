@@ -1,75 +1,79 @@
-import React, { useState, useEffect } from "react";
 import { Form } from "@heroui/form";
-import Inpu from "@/components/molecules/input";
-import { Unidad } from "@/types/Unidad";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
 import { useUnidad } from "@/hooks/UnidadesMedida/useUnidad";
+import { UnidadUpdate, UnidadUpdateSchema } from "@/schemas/Unidad";
+import { addToast } from "@heroui/react";
 
 type Props = {
-  unidades: Unidad[];
+  unidades: (UnidadUpdate & { id_unidad?: number })[];
   unidadId: number;
   id: string;
   onclose: () => void;
 };
 
 export const FormUpdate = ({ unidades, unidadId, id, onclose }: Props) => {
-  const [formData, setFormData] = useState<Partial<Unidad>>({
-    id_unidad: 0,
-    nombre: "",
-    estado: true,
-  });
-
   const { updateUnidad, getUnidadById } = useUnidad();
 
-  useEffect(() => {
-    // se ejecuta cuando algo se cambie en un usuario, obtiene el id y modifica el FormData
-    const foundUnidad = getUnidadById(unidadId);
+  const foundUnidad = getUnidadById(unidadId, unidades) as UnidadUpdate;
 
-    if (foundUnidad) {
-      setFormData(foundUnidad);
-    }
-  }, [unidades, unidadId]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<UnidadUpdate>({
+    resolver: zodResolver(UnidadUpdateSchema),
+    mode: "onChange",
+    defaultValues: {
+      id_unidad: foundUnidad.id_unidad ?? 0,
+      nombre: foundUnidad.nombre,
+      estado: foundUnidad.estado,
+    },
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //se ejecuta cuando el usuario cambia algo en un campo
-    const { name, value, type, checked } = e.target;
-
-    setFormData((prev: Partial<Unidad>) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.id_unidad) {
-      return <p className="text-center text-gray-500">Unidad no encontrada</p>;
-    }
-
+  const onSubmit = async (data: UnidadUpdate) => {
+    console.log(data);
+    if (!data.id_unidad) return;
     try {
-      await updateUnidad(formData.id_unidad, formData);
+      await updateUnidad(data.id_unidad, data);
       onclose();
+      addToast({
+        title: "Actualizacion Exitosa",
+        description: "Unidad actualizada correctamente",
+        color: "primary",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
     } catch (error) {
-      console.log("Error al actualizar la unidad", error);
+      console.log("Error al actualizar la unidad : ", error);
     }
   };
+
+  console.log("Errores", errors);
 
   return (
-    <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit}>
-      <Inpu
+    <Form
+      id={id}
+      className="w-full space-y-4"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Input
         label="Nombre"
         placeholder="Nombre"
-        type="text"
-        name="nombre"
-        value={formData.nombre ?? ""}
-        onChange={handleChange}
+        {...register("nombre")}
+        isInvalid={!!errors.nombre}
+        errorMessage={errors.nombre?.message}
       />
       <div className="justify-center pl-10">
-        <button
+        <Button
           type="submit"
-          className="w-80 bg-blue-700 text-white p-2 rounded-xl"
+          isLoading={isSubmitting}
+          className="w-full bg-blue-700 text-white p-2 rounded-xl"
         >
-          Guardar Cambios
-        </button>
+          Guardar
+        </Button>
       </div>
     </Form>
   );

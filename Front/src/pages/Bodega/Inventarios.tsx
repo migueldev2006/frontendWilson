@@ -1,4 +1,4 @@
-import { Button, Card } from "@heroui/react";
+import { Card } from "@heroui/react";
 import { useAreas } from "@/hooks/areas/useAreas";
 import { Link } from "react-router-dom";
 
@@ -10,13 +10,6 @@ export const Inventario = () => {
 
   return (
     <>
-      <Link to={`/bodega`}>
-        <h2 className="text-lg m-4 font-semibold">
-          <Button className=" bg-blue-600 text-white hover:bg-blue-800 hover:text-white dark:hover:text-white">
-            Regresar
-          </Button>
-        </h2>
-      </Link>
       <h1 className="text-2xl text-center font-bold mb-6">
         Inventarios Por Área
       </h1>

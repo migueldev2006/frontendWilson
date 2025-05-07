@@ -23,7 +23,7 @@ export const UserUpdateSchema = z.object({
         .string()
         .email({ message: "Correo es requerido" }),
     cargo: z
-        .string({ required_error: "Cargo es requerido" }),
+        .string().min(1,{ message: "Cargo es requerido" }),
 })
 
 export type UserUpdate = z.infer<typeof UserUpdateSchema>
@@ -59,12 +59,13 @@ export const UserSchema = z.object({
     estado: z
         .boolean({ required_error: "Estado es requerido" }),
     cargo: z
-        .string({ required_error: "Cargo es requerido" }),
+        .string()
+        .min(1, { message: "Cargo es requerido" }),
     password: z
         .string({ required_error: "Contraseña es requerido" }),
     created_at: z.string().default(""),
     fk_rol: z
-        .number({ required_error: "Rol es requerido" })
+        .number({ message: "Rol es requerido y debe ser un numero" })
 })
 
 export type User = z.infer<typeof UserSchema>

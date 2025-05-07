@@ -1,105 +1,87 @@
-import { axiosAPI } from '@/axios/axiosAPI';
-import { Sitios } from '@/types/sitios'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { deleteSitio } from "@/axios/Sitios/deleteSitio";
+import { getSitio } from "@/axios/Sitios/getSitio";
+import { postSitio } from "@/axios/Sitios/postSitio";
+import { putSitio } from "@/axios/Sitios/putSitio";
+import { Sitios } from "@/types/sitios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useSitios() {
+  const queryClient = useQueryClient();
 
-    const queryClient = useQueryClient();
+  const { data, isLoading, isError, error } = useQuery<Sitios[]>({
+    queryKey: ["sitios"],
+    queryFn:getSitio,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+  });
 
-    const url = 'Sitio';
-
-    const { data, isLoading, isError, error } = useQuery<Sitios[]>({
+  const addSitioMutation = useMutation({
+    mutationFn: postSitio,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
         queryKey: ["sitios"],
-        queryFn: async () => {
-            const res = await axiosAPI.get(url);
-            return res.data;
-        }
-    });
+      });
+    },
+    onError: (error) => {
+      console.log("Error al cargar el sitio", error);
+    },
+  });
 
-    const addSitioMutation = useMutation({
-        mutationFn: async(newSitio: Sitios) => {
-            await axiosAPI.post<Sitios>(url, newSitio)
-            return newSitio
-        },
-        onSuccess: (sitio) => {
-            console.log(sitio);
-            queryClient.setQueryData<Sitios[]>(["sitios"], (oldData) =>
-                oldData ? [...oldData,sitio] : [sitio]
-            );
-        },
-        onError: (error) => {
-            console.log("Error al cargar el sitio", error);
-        }
-    });
+  const getSitioById = (
+    id: number,
+    sitios: Sitios[] | undefined = data
+  ): Sitios | null => {
+    return sitios?.find((sitio) => sitio.id_sitio === id) || null;
+  };
 
-    const getSitioById = (id: number, sitios : Sitios[] | undefined = data ): Sitios | null => {
-        return sitios?.find((sitio) => sitio.id_sitio === id) || null;
-    }
+  const updateSitioMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Sitios }) => putSitio(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["sitios"],
+      });
+    },
 
-    const updateSitioMutation = useMutation({
-        mutationFn: async({ id, update } : { id: number; update: Partial<Sitios> }) => {
-            await axiosAPI.put<Sitios>(`${url}/${id}`, update);
-            return {id, update}
-        },
-        onSuccess: ({ id, update }) => {
-            console.log("dato 1: ",id," dato 2: ",update);
-            queryClient.setQueryData<Sitios[]>(["sitios"], (oldData) =>
-                oldData
-                    ? oldData.map((sitio) =>
-                        sitio.id_sitio === id ? { ...sitio, ...update } : sitio
-                    )
-                    : []
-            );
-        },
+    onError: (error) => {
+      console.error("Error al actualizar:", error);
+    },
+  });
 
-        onError: (error) => {
-            console.error("Error al actualizar:", error);
-        }
-    });
+  const changeStateMutation = useMutation({
+    mutationFn: deleteSitio,
 
-    const changeStateMutation = useMutation({
-        mutationFn: async (id_sitio: number) => {
-            await axiosAPI.put<Sitios>(`sitio/estado/${id_sitio}`);
-            return id_sitio
-        },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["sitios"],
+      });
+    },
 
-        onSuccess: (id_sitio: number) => {
-            queryClient.setQueryData<Sitios[]>(["sitios"], (oldData) =>
-                oldData
-                    ? oldData.map((sitio: Sitios) =>
-                        sitio.id_sitio == id_sitio
-                            ? { ...sitio, estado: !sitio.estado }
-                            : sitio
-                    )
-                    : []
-            );
-        },
+    onError: (error) => {
+      console.error("Error al actualizar estado:", error);
+    },
+  });
 
-        onError: (error) => {
-            console.error("Error al actualizar estado:", error);
-        },
-    });
+  const addSitio = async (sitio: Sitios) => {
+    return addSitioMutation.mutateAsync(sitio);
+  };
 
-    const addSitio = async (sitio: Sitios) => {
-        return addSitioMutation.mutateAsync(sitio);
-    };
+  const updateSitio = async (id: number, data: Sitios) => {
+    return updateSitioMutation.mutateAsync({ id, data });
+  };
 
-    const updateSitio = async (id: number, update: Partial<Sitios>) => {
-        return updateSitioMutation.mutateAsync({ id, update });
-    };
+  const changeState = async (id_sitio: number) => {
+    return changeStateMutation.mutateAsync(id_sitio);
+  };
 
-    const changeState = async (id_sitio: number) => {
-        return changeStateMutation.mutateAsync(id_sitio);
-    };
-
-    return {
-        sitios: data,
-        isLoading,
-        isError,
-        error,
-        addSitio,
-        changeState,
-        getSitioById,
-        updateSitio
-    }
+  return {
+    sitios: data,
+    isLoading,
+    isError,
+    error,
+    addSitio,
+    changeState,
+    getSitioById,
+    updateSitio,
+  };
 }

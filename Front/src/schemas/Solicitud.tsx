@@ -1,20 +1,57 @@
 import { z } from "zod";
 
-export const MovimientoSchema = z.object({
-  descripcion: z
-    .string({
-      required_error: "Debe agregar una descripcion, es necesaria",
-      invalid_type_error: "La descripcion debe ser de tipo String",
-    })
-    .min(5, {
-      message: "La descripcion debe contar con al menos 5 argumentos",
-    }),
+export const SolicitudUpdateSchema = z.object({
+  id_solicitud: z.number(),
 
-  cantidad: z.number({ required_error: "Cantidad es requerida" }).min(1, {
-    message:
-      "Debe contener por lo menos una cantidad minima de 1 para poder realizar el movimiento",
+  descripcion: z
+    .string()
+    .min(1, { message: "Descripcion es  requerida" })
+    .min(2, { message: "Debe contener como mimimo 2 caracteres" }),
+
+  cantidad: z.number({
+    required_error: "Cantidad es requerida y debe ser entero",
   }),
 
-  fk_usuario: z.number({ required_error: "El Usuario es requreido" }),
-  fk_inventario: z.number({ required_error: "El Inventario es requreido" }),
+  estado: z.boolean({ required_error: "Estado es requerido" }).optional(),
+
+  aceptada: z.boolean().optional(),
+
+  pendiente: z.boolean().optional(),
+
+  rechazada: z.boolean().optional(),
+
+  fk_sitio: z.number({ message: "Sitio es requerido" }).optional(),
+
+  fk_usuario: z.number({ message: "Usuario es requerido" }).optional(),
+
+  fk_inventario: z.number({ message: "Elemento del Inventario es requerido" }).optional(),
 });
+
+export type SolicitudUpdate = z.infer<typeof SolicitudUpdateSchema>;
+
+export const SolicitudCreateSchema = z.object({
+  descripcion: z
+    .string()
+    .min(1, { message: "Descripcion es  requerida" })
+    .min(2, { message: "Debe contener como mimimo 2 caracteres" }),
+
+  cantidad: z.number({
+    required_error: "Cantidad es requerida y debe ser entero",
+  }),
+
+  estado: z.boolean().default(true).optional(),
+
+  aceptada: z.boolean().default(false).optional(),
+
+  pendiente: z.boolean().default(true).optional(),
+
+  rechazada: z.boolean().default(false).optional(),
+
+  fk_sitio: z.number({ message: "Sitio es requerido" }),
+
+  fk_usuario: z.number({ message: "Usario es requerido" }),
+
+  fk_inventario: z.number({ message: "Elemento del Inventario es requerido" }),
+
+});
+export type SolicitudCreate = z.infer<typeof SolicitudCreateSchema>;

@@ -17,8 +17,9 @@ export function useCaracteristica() {
     });
 
     const addCaracteristicaMutation = useMutation({
-        mutationFn: async(newCaracteristica: Caracteristicas) => {
-            await axiosAPI.post<Caracteristicas>(url, newCaracteristica)
+        mutationFn: async(newCaracteristica: Caracteristica) => {
+            console.log("Nuevo objeto de caracteristica a enviar:", newCaracteristica); 
+            await axiosAPI.post<Caracteristica>(url, newCaracteristica)
             return newCaracteristica
         },
         onSuccess: (caracteristica) => {

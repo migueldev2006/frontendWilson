@@ -1,16 +1,16 @@
-export type Elemento = {
-  id_elemento: number;
-  nombre: string;
-  descripcion: string;
-  valor: number;
-  perecedero: boolean;
-  no_perecedero: boolean;
-  estado: boolean;
-  imagen_elemento: string | File;
-  created_at: string;
-  updated_at: string;
-  fk_unidad_medida: number;
-  fk_categoria: number;
-  fk_caracteristica: number;
-  tipo_elemento: string;
-};
+import { ElementoPostData } from "@/axios/Elementos/postElemento";
+
+export interface Elemento extends ElementoPostData {
+  id_elemento?: number;
+  created_at?: string | undefined;
+  updated_at?: string | undefined;
+  tipoElemento: "perecedero" | "no_perecedero";
+}
+
+
+export type ElementUso = {
+  elemento: string;
+  stock_total: number;
+  total_usado: number;
+  indice_uso: number;
+}

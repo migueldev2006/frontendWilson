@@ -1,91 +1,107 @@
-import React from "react";
-import { Form } from "@heroui/form"
-import Inpu from "@/components/molecules/input";
-import { Ficha } from "@/types/Ficha";
-import { Select, SelectItem } from "@heroui/react";
-import {usePrograma} from "@/hooks/programas/usePrograma"
-
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, Controller } from "react-hook-form";
+import { Form } from "@heroui/form";
+import { Input } from "@heroui/input";
+import { addToast, Select, SelectItem } from "@heroui/react";
+import { usePrograma } from "@/hooks/programas/usePrograma";
+import { FichaCreate, fichaCreateSchema } from "@/schemas/Fichas";
 
 type FormularioProps = {
-
-    addData: (ficha: Ficha) => Promise<void>;
-    onClose: () => void;
-    id: string
-}
+  addData: (ficha: FichaCreate) => Promise<void>;
+  onClose: () => void;
+  id: string;
+};
 
 export default function Formulario({ addData, onClose, id }: FormularioProps) {
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FichaCreate>({
+    resolver: zodResolver(fichaCreateSchema),
+    mode: "onChange",
+  });
 
-    const { programas, isLoading: loadingProgramas, isError: errorPrograma } = usePrograma();
-    const [formData, setFormData] = React.useState<Ficha>({
-        id_ficha: 0,
-        codigo_ficha: 0,
-        estado: true,
-        created_at:"",
-        updated_at:"",
-        fk_programa: 0,
-    });
+  const { programas } = usePrograma();
 
-    const onSubmit = async (e : React.FormEvent) => { //preguntar si esta bien no usar el e: React.FormEvent
-        //y aqui el preventdefault
-        e.preventDefault();
-        try {
-            console.log("Enviando formulario con datos:", formData);
-            await addData(formData);
-            console.log("ficha guardada correctamente");
-            setFormData({
-                id_ficha: 0,
-                codigo_ficha: 0,
-                estado: true,
-                created_at:"",
-                updated_at:"",
-                fk_programa: 0,
-            });
-            onClose();
-        } catch (error) {
-            console.error("Error al cargar el fichas", error);
-        }
+  const onSubmit = async (data: FichaCreate) => {
+    try {
+      await addData(data);
+      onClose();
+      addToast({
+        title: "Registro Exitoso",
+        description: "Ficha agregada correctamente",
+        color: "success",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
+    } catch (error) {
+      console.error("Error al guardar la ficha:", error);
     }
+  };
+  console.log("Errores", errors)
+  return (
+    <Form
+      id={id}
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full space-y-4"
+    >
+      <Input
+        label="Código de Ficha"
+        type="text"
+        placeholder="Código de Ficha"
+        {...register("codigo_ficha", { valueAsNumber: true })}
+        isInvalid={!!errors.codigo_ficha}
+        errorMessage={errors.codigo_ficha?.message}
+      />
 
-    return (
-        <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
-            <Inpu label="codigo_ficha" placeholder="codigo_ficha" type="text" name="codigo_ficha" onChange={(e) => setFormData({ ...formData, codigo_ficha: Number(e.target.value) })} />
-            
+      <Controller
+        control={control}
+        name="estado"
+        render={({ field }) => (
+          <Select
+            label="Estado"
+            placeholder="Seleccione un estado"
+            {...field}
+            value={field.value ? "true" : "false"}
+            onChange={(e) => field.onChange(e.target.value === "true")}
+            isInvalid={!!errors.estado}
+            errorMessage={errors.estado?.message}
+          >
+            <SelectItem key="true">Activo</SelectItem>
+            <SelectItem key="false">Inactivo</SelectItem>
+          </Select>
+        )}
+      />
+
+      <Controller
+        control={control}
+        name="fk_programa"
+        render={({ field }) => (
+          <div className="w-full">
             <Select
-                aria-labelledby="estado"
-                labelPlacement="outside"
-                name="estado"
-                placeholder="Estado"
-                onChange={(e) => setFormData({ ...formData, estado: e.target.value === "true" })} 
+              label="Programa"
+              placeholder="Selecciona un programa"
+              {...field}
+              value={field.value ?? ""}
+              onChange={(e) => field.onChange(Number(e.target.value))}
+              isInvalid={!!errors.fk_programa}
+              errorMessage={errors.fk_programa?.message}
             >
-                <SelectItem key="true">Activo</SelectItem>
-                <SelectItem key="false" >Inactivo</SelectItem>
+              {programas?.length ? (
+                programas.map((programa) => (
+                  <SelectItem key={programa.id_programa}>
+                    {programa.nombre}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem isDisabled>No hay programas disponibles</SelectItem>
+              )}
             </Select>
-
-            {/* <Inpu label="Estado" placeholder="Estado" type="checkbox" name="estado" value={formData.estado.toString()} onChange={(e) => setFormData({ ...formData, estado: e.target.checked })} /> */}
-
-           
-           
-
-            {/* <Inpu label="programa" placeholder="programa" type="number" name="fk_programa" value={formData.fk_programa.toString()} onChange={(e) => setFormData({ ...formData, fk_programa: Number(e.target.value) })} /> */}
-
-
-            {!loadingProgramas && !errorPrograma && programas && (
-                    <Select
-                      label="programa"
-                      name="fk_programa"
-                      placeholder="Selecciona un programa"
-                      onChange={(e) =>
-                        setFormData({ ...formData, fk_programa: Number(e.target.value) })
-                      }
-                    >
-                      {programas.map((programa) => (
-                        <SelectItem key={programa.id_programa}>
-                          {programa.nombre}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  )}
-        
-        </Form>
-    )
+          </div>
+        )}
+      />
+    </Form>
+  );
 }

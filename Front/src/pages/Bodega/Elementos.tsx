@@ -1,4 +1,4 @@
-import Globaltable from "@/components/organismos/table.tsx"; // Importar la tabla reutilizable
+import Globaltable from "@/components/organismos/table.tsx";
 import { TableColumn } from "@/components/organismos/table.tsx";
 import Buton from "@/components/molecules/Buton";
 import Modall from "@/components/molecules/modal";
@@ -7,7 +7,9 @@ import { useElemento } from "@/hooks/Elementos/useElemento";
 import { Elemento } from "@/types/Elemento";
 import Formulario from "@/components/organismos/Elementos/FormRegister";
 import { FormUpdate } from "@/components/organismos/Elementos/FormUpdate";
-
+import { Button, Card, CardBody } from "@heroui/react";
+import { useNavigate } from "react-router-dom";
+import { ElementoCreate } from "@/schemas/Elemento";
 
 export const ElementosTable = () => {
   const { elementos, isLoading, isError, error, addElemento, changeState } =
@@ -23,21 +25,35 @@ export const ElementosTable = () => {
     null
   );
 
+  const navigate = useNavigate();
+
+  const handleGoToUnidad = () => {
+    navigate("/bodega/unidades");
+  };
+  const handleGoToCategoria = () => {
+    navigate("/bodega/categorias");
+  };
+
   const handleCloseUpdate = () => {
     setIsOpenUpdate(false);
     setSelectedElemento(null);
   };
 
-  const handleState = async (elemento: Elemento) => {
-    await changeState(elemento.id_elemento);
+  const handleState = async (id_elemento: number) => {
+    await changeState(id_elemento);
   };
 
-  const handleAddElemento = async (elemento: Elemento) => {
+  const handleAddElemento = async (elemento: ElementoCreate):Promise<{id_elemento:number}>   => {
     try {
-      await addElemento(elemento);
-      handleClose(); // Cerrar el modal después de darle agregar usuario
+      const response = await addElemento(elemento);
+      if (!response || !response.id_elemento) {
+        throw new Error("No se pudo agregar el elemento. La respuesta no contiene id_elemento.");
+      }
+      handleClose(); // Cierra el modal solo si se ha agregado correctamente
+      return { id_elemento: response.id_elemento };
     } catch (error) {
       console.error("Error al agregar el usuario:", error);
+      throw new Error("Error al agregar el elemento: ");
     }
   };
 
@@ -49,11 +65,16 @@ export const ElementosTable = () => {
   // Definir las columnas de la tabla
   const columns: TableColumn<Elemento>[] = [
     {
-      label:"Imagen",
-      key: 'imagen_elemento',
+      label: "Imagen",
+      key: "imagen_elemento",
       render: (item: Elemento) => {
         return item.imagen_elemento ? (
-          <img src={`http://localhost:3000/img/${item.imagen_elemento}`} alt="Imagen" width={200} height={50} />
+          <img
+            src={`http://localhost:3000/img/${item.imagen_elemento}`}
+            alt="Imagen"
+            width={200}
+            height={50}
+          />
         ) : (
           <span>Sin imagen</span>
         );
@@ -62,44 +83,50 @@ export const ElementosTable = () => {
     { key: "nombre", label: "Nombre" },
     { key: "descripcion", label: "Descripcion" },
     { key: "valor", label: "Valor" },
-    { key: "tipo_elemento", label: "Tipo Elemento",
-      render:(elementos:Elemento) => (
+    {
+      key: "tipoElemento",
+      label: "Tipo Elemento",
+      render: (elementos: Elemento) => (
         <span>
-        {elementos.perecedero
-          ? "Perecedero"
-          :elementos.no_perecedero
-          ? "No Perecedero"
-          :"No Especificado"
-        }</span>
+          {elementos.perecedero
+            ? "Perecedero"
+            : elementos.no_perecedero
+              ? "No Perecedero"
+              : "No Especificado"}
+        </span>
       ),
-     },
+    },
     {
       key: "created_at",
       label: "Fecha Creación",
-      render: (rol: Elemento) => (
+      render: (elemento: Elemento) => (
         <span>
-          {new Date(rol.created_at).toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          })}
+          {elemento.created_at
+            ? new Date(elemento.created_at).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              })
+            : "N/A"}
         </span>
       ),
     },
     {
       key: "updated_at",
       label: "Fecha Actualización",
-      render: (rol: Elemento) => (
+      render: (elemento: Elemento) => (
         <span>
-          {new Date(rol.updated_at).toLocaleDateString("es-ES", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-          })}
+          {elemento.updated_at
+            ? new Date(elemento.updated_at).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              })
+            : "N/A"}
         </span>
       ),
     },
-    { key: "estado", label: "Estado"},
+    { key: "estado", label: "Estado" },
   ];
 
   if (isLoading) {
@@ -117,23 +144,35 @@ export const ElementosTable = () => {
       key: elemento.id_elemento
         ? elemento.id_elemento.toString()
         : crypto.randomUUID(),
+      id_elemento: elemento.id_elemento || 0,
       estado: Boolean(elemento.estado),
     }));
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">
-        Elementos Registrados
-      </h1>
-
-      <Buton
-        text="Nuevo elemento"
-        onPress={() => setIsOpen(true)}
-        type="button"
-        color="primary"
-        variant="solid"
-        className="mb-8"
-      />
+      <div className="flex pb-4 pt-4">
+        <Card className="w-full">
+          <CardBody>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">Gestionar Elementos</h1>
+              <div className="flex gap-2">
+                <Button
+                  className="text-white bg-blue-700"
+                  onPress={handleGoToUnidad}
+                >
+                  Gestionar Unidad
+                </Button>
+                <Button
+                  className="text-white bg-blue-700"
+                  onPress={handleGoToCategoria}
+                >
+                  Gestionar Categoria
+                </Button>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
 
       <Modall
         ModalTitle="Registrar Nuevo Elemento"
@@ -145,13 +184,15 @@ export const ElementosTable = () => {
           addData={handleAddElemento}
           onClose={handleClose}
         />
-        <button
+      <div className="justify-center pt-2">
+        <Button
           type="submit"
           form="element-form"
-          className="bg-blue-500 text-white p-2 rounded-md"
+          className="w-full bg-blue-700 text-white p-2 rounded-xl"
         >
           Guardar
-        </button>
+        </Button>
+      </div>
       </Modall>
 
       <Modall
@@ -162,7 +203,7 @@ export const ElementosTable = () => {
         {selectedElemento && (
           <FormUpdate
             elementos={ElementosWithKey ?? []}
-            elementoId={selectedElemento.id_elemento}
+            elementoId={selectedElemento.id_elemento as number}
             id="FormUpdate"
             onclose={handleCloseUpdate}
           />
@@ -174,7 +215,16 @@ export const ElementosTable = () => {
           data={ElementosWithKey}
           columns={columns}
           onEdit={handleEdit}
-          onDelete={handleState}
+          onDelete={(elemento) => handleState(elemento.id_elemento)}
+          extraHeaderContent={
+            <Buton
+              text="Nuevo elemento"
+              onPress={() => setIsOpen(true)}
+              type="button"
+              variant="solid"
+              className="text-white bg-blue-700"
+            />
+          }
         />
       )}
     </div>

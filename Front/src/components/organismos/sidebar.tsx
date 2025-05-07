@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
 import {
   HomeIcon,
   UserIcon,
@@ -8,130 +7,61 @@ import {
   DocumentChartBarIcon,
   ChartBarIcon,
   Bars3Icon,
-  UserCircleIcon,
-  BuildingOffice2Icon,
-  BuildingOfficeIcon,
-  DocumentCheckIcon,
-  DocumentTextIcon,
-  TagIcon,
-  RectangleGroupIcon,
-  UsersIcon,
-  RocketLaunchIcon,
-  HomeModernIcon,
-  DocumentIcon,
-  AcademicCapIcon,
-  BuildingLibraryIcon,
-  GlobeAmericasIcon,
-  ClipboardDocumentListIcon,
-  RectangleStackIcon,
   ArrowsRightLeftIcon,
-  ArrowPathRoundedSquareIcon,
-  StopIcon,
-  InboxIcon,
+  BuildingOfficeIcon,
+  ClipboardDocumentListIcon,
+  ArchiveBoxIcon,
+  GlobeAmericasIcon,
+  TagIcon,
+  UserCircleIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
+import { Link, useLocation } from "react-router-dom";
 
 const menuItems = [
   { name: "Inicio", icon: HomeIcon, href: "/" },
+
   {
     name: "Admin",
     icon: UserIcon,
     href: "#",
-    subMenu: [
-      { name: "Usuarios", icon: UserCircleIcon, href: "/usuarios" },
-      { name: "Tipos Sitios", icon: BuildingOffice2Icon, href: "/tiposSitios" },
-      { name: "Sitios", icon: BuildingOfficeIcon, href: "/sitios" },
-      { name: "Municipios", icon: HomeModernIcon, href: "/municipios" },
-      { name: "Centros", icon: AcademicCapIcon, href: "/centros" },
-      { name: "Sedes", icon: BuildingLibraryIcon, href: "/sedes" },
-      { name: "Areas", icon: GlobeAmericasIcon, href: "/areas" },
-      { name: "Programas Formacion", icon: DocumentIcon, href: "/programas" },
-      { name: "Fichas", icon: TagIcon, href: "/fichas" },
-      { name: "Roles", icon: UsersIcon, href: "/roles" },
-      { name: "Permisos", icon: DocumentTextIcon, href: "/permisos" },
-      { name: "Modulos", icon: RectangleGroupIcon, href: "/modulos" },
-      { name: "Rutas", icon: RocketLaunchIcon, href: "/rutas" },
+    subMenu: [{ name: "Usuarios", icon: UserIcon, href: "/admin/usuarios" },
+      { name: "Fichas", icon: TagIcon, href: "/admin/fichas" },
+      { name: "Areas", icon: GlobeAmericasIcon, href: "/admin/areas" },
+      { name: "Sitios", icon: BuildingOfficeIcon, href: "/admin/sitios" }
+
     ],
   },
 
-  {
-    name: "Bodega",
-    icon: InboxIcon,
-    href: "#",
+  { name: "Bodega", icon: ArchiveBoxIcon, href: "#",
     subMenu: [
-      { name: "Elementos", icon: CubeIcon, href: "/bodega/elementos" },
-      {
-        name: "Tipo Movimientos",
-        icon: ArrowPathRoundedSquareIcon,
-        href: "/bodega/tipos",
-      },
-      { name: "Unidades Medida", icon: StopIcon, href: "/bodega/unidades" },
-      {
-        name: "Categorias",
-        icon: RectangleStackIcon,
-        href: "/bodega/categorias",
-      },
-      {
-        name: "Movimientos",
-        icon: ArrowsRightLeftIcon,
-        href: "/bodega/movimientos",
-      },
-      {
-        name: "Inventario",
-        icon: ClipboardDocumentListIcon,
-        href: "/bodega/inventario/areas",
-      },
+      {name:"Elementos", icon:CubeIcon, href:"/bodega/elementos" },
+      {name:"Movimientos", icon:ArrowsRightLeftIcon, href:"/bodega/movimientos" },
+      {name:"Inventario", icon:ClipboardDocumentListIcon, href:"bodega/inventario/areas" },
     ],
-  },
+   },
+
   { name: "Solicitudes", icon: EnvelopeIcon, href: "/solicitudes" },
-  {
-    name: "Reportes",
-    icon: DocumentChartBarIcon,
-    href: "#",
+
+  { name: "Reportes", icon: DocumentChartBarIcon, href: "#",
     subMenu: [
       { name: "Inventario", icon: ClipboardDocumentListIcon, href: "/report/inventario" },
-      { name: "Usuarios", icon: UserCircleIcon, href: "/report/usuarios" },    ],
+      { name: "Elementos", icon: CubeIcon, href: "/report/elementos" },    
+      { name: "Movimientos", icon: ArrowPathIcon, href: "/report/movimientos" },    
+      { name: "Solicitudes", icon: ArrowsRightLeftIcon, href: "/report/solicitudes" },    
+    ],
   },
   {
     name: "Estadísticas",
     icon: ChartBarIcon,
     href: "#",
-    children: [
+    subMenu: [
       { name: "Usuarios", icon: UserCircleIcon, href: "/estadisticas/usuarios" },
-      // { name: "Centros", icon: UserCircleIcon, href: "/estadisticas/centros" },
-      // { name: "Tipos Sitios", icon: BuildingOffice2Icon, href: "/estadisticas/tiposSitios" },
-      // { name: "Sitios", icon: BuildingOfficeIcon, href: "/sitios" },
-      // { name: "Municipios", icon: HomeModernIcon, href: "/estadisticas/municipios" },
-      // { name: "Centros", icon: AcademicCapIcon, href: "/centros" },
-      // { name: "Sedes", icon: BuildingLibraryIcon, href: "/sedes" },
-      // { name: "Areas", icon: GlobeAmericasIcon, href: "/areas" },
-      // { name: "Programas Formacion", icon: DocumentIcon, href: "/programas" },
-      // { name: "Fichas", icon: TagIcon, href: "/fichas" },
-      // { name: "Usuario Ficha", icon: UserCircleIcon, href: "/usuarioFicha" },
-      // { name: "Roles", icon: UsersIcon, href: "/roles" },
-      // { name: "Rol Modulo", icon: DocumentCheckIcon, href: "/rolModulo" },
-      // { name: "Permisos", icon: DocumentTextIcon, href: "/permisos" },
-      // { name: "Modulos", icon: RectangleGroupIcon, href: "/estadisticas/modulos" },
-      // { name: "Rutas", icon: RocketLaunchIcon, href: "/estadisticas/rutas" },
-      // { name: "Elementos", icon: CubeIcon, href: "/elementos" },
-      // { name: "Tipo Movimientos", icon: ArrowPathRoundedSquareIcon, href: "/tipos" },
-      // { name: "Unidades Medida", icon: StopIcon, href: "/unidades" },
-      // { name: "Categorias", icon: RectangleStackIcon, href: "/estadisticas/categorias" },
-      // { name: "Caracteristicas", icon: RectangleStackIcon, href: "/estadisticas/caracteristicas" },
       { name: "Elementos mas usados", icon: ArrowsRightLeftIcon, href: "/movimientos/estadistica" },
+      { name: "Elementos indice de uso", icon: ArrowsRightLeftIcon, href: "/elementos/estadistica" },
       { name: "Movimientos por mes", icon: ArrowsRightLeftIcon, href: "/movimientos/mes/estadistica" },
       { name: "Stock por area", icon: ClipboardDocumentListIcon, href: "/inventario/estadistica" }
     ],
-  },
-  {
-    name: "Verificaciones",
-    icon: ClipboardDocumentCheckIcon,
-    href: "/verificaciones",
-  },
-  {
-    name: "Configuración",
-    icon: Cog6ToothIcon,
-    href: "/datos",
-    children: [{ name: "f", icon: "", href: "" }],
   },
 ];
 

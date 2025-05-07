@@ -6,35 +6,44 @@ import { useState } from "react";
 import Formulario from "@/components/organismos/Inventarios/FormRegister";
 import { useInventario } from "@/hooks/Inventarios/useInventario";
 import { Inventario } from "@/types/Inventario";
-import { FormUpdate } from "@/components/organismos/Inventarios/FormUpdate";
 import { Elemento } from "@/types/Elemento";
 import { useElemento } from "@/hooks/Elementos/useElemento";
+import { Button } from "@heroui/button";
 
 interface InventariosTableProps {
   inventarios?: Inventario[];
   idSitio?: number;
 }
 
-export const InventariosTable = ({ inventarios: inventariosProp, idSitio }: InventariosTableProps) => {
-  const { inventarios: inventariosHook, isLoading, isError, error, addInventario, changeState } =
-    useInventario();
-    const { elementos: elementos } = useElemento();
+export const InventariosTable = ({
+  inventarios: inventariosProp,
+  idSitio,
+}: InventariosTableProps) => {
+  const {
+    inventarios: inventariosHook,
+    isLoading,
+    isError,
+    error,
+    addInventario,
+    changeState,
+  } = useInventario();
+  const { elementos: elementos } = useElemento();
   //Modal agregar
   const [isOpen, setIsOpen] = useState(false);
   const handleClose = () => setIsOpen(false);
 
   //Modal actualizar
-  const [IsOpenUpdate, setIsOpenUpdate] = useState(false);
-  const [selectedInventario, setSelectedInventario] =
-    useState<Inventario | null>(null);
+  // const [IsOpenUpdate, setIsOpenUpdate] = useState(false);
+  // const [selectedInventario, setSelectedInventario] =
+  //   useState<Inventario | null>(null);
 
-  const handleCloseUpdate = () => {
-    setIsOpenUpdate(false);
-    setSelectedInventario(null);
-  };
+  // const handleCloseUpdate = () => {
+  //   setIsOpenUpdate(false);
+  //   setSelectedInventario(null);
+  // };
 
-  const handleState = async (inventario: Inventario) => {
-    await changeState(inventario.id_inventario);
+  const handleState = async (id_inventario: number) => {
+    await changeState(id_inventario);
   };
 
   const handleAddInventario = async (inventario: Inventario) => {
@@ -46,10 +55,10 @@ export const InventariosTable = ({ inventarios: inventariosProp, idSitio }: Inve
     }
   };
 
-  const handleEdit = (inventario: Inventario) => {
-    setSelectedInventario(inventario);
-    setIsOpenUpdate(true);
-  };
+  // const handleEdit = (inventario: Inventario) => {
+  //   setSelectedInventario(inventario);
+  //   setIsOpenUpdate(true);
+  // };
 
   // Definir las columnas de la tabla
   const columns = (elementos: Elemento[]): TableColumn<Inventario>[] => [
@@ -64,18 +73,19 @@ export const InventariosTable = ({ inventarios: inventariosProp, idSitio }: Inve
       },
     },
     {
-      key:"imagen_elemento", label:"Imagen",
+      key: "imagen_elemento",
+      label: "Imagen",
       render: (inventario: Inventario) => {
         const elemento = elementos.find(
           (el) => el.id_elemento === inventario.fk_elemento
         );
-      
+
         const imagen = elemento?.imagen_elemento;
-      
+
         if (!imagen) return <span>No encontrado</span>;
-      
-        const src = `http://localhost:3000/img/${imagen}`; 
-      
+
+        const src = `http://localhost:3000/img/${imagen}`;
+
         return (
           <img
             src={src}
@@ -89,18 +99,34 @@ export const InventariosTable = ({ inventarios: inventariosProp, idSitio }: Inve
     {
       key: "created_at",
       label: "Fecha Creación",
-      render: (rol: Inventario) => (
-        <span>{new Date(rol.created_at).toLocaleDateString("es-ES", { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
+      render: (inventario: Inventario) => (
+        <span>
+          {inventario.created_at
+            ? new Date(inventario.created_at).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              })
+            : "N/A"}
+        </span>
       ),
     },
     {
       key: "updated_at",
       label: "Fecha Actualización",
-      render: (rol: Inventario) => (
-        <span>{new Date(rol.updated_at).toLocaleDateString("es-ES", { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>
+      render: (inventario: Inventario) => (
+        <span>
+          {inventario.updated_at
+            ? new Date(inventario.updated_at).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              })
+            : "N/A"}
+        </span>
       ),
     },
-    { key: "estado", label:"Estado"}
+    { key: "estado", label: "Estado" },
   ];
 
   if (isLoading && !inventariosProp) {
@@ -114,12 +140,17 @@ export const InventariosTable = ({ inventarios: inventariosProp, idSitio }: Inve
   const filtered = inventariosProp ?? inventariosHook;
 
   const InventariosWithKey = filtered
-    ?.filter((inventario) => inventario?.id_inventario !== undefined && (idSitio ? inventario.fk_sitio === idSitio : true))
+    ?.filter(
+      (inventario) =>
+        inventario?.id_inventario !== undefined &&
+        (idSitio ? inventario.fk_sitio === idSitio : true)
+    )
     .map((inventario) => ({
       ...inventario,
       key: inventario.id_inventario
         ? inventario.id_inventario.toString()
         : crypto.randomUUID(),
+      id_inventario: inventario.id_inventario || 0,
       estado: Boolean(inventario.estado),
     }));
 
@@ -130,17 +161,6 @@ export const InventariosTable = ({ inventarios: inventariosProp, idSitio }: Inve
           Inventarios Registrados
         </h1>
       )}
-
-      
-        <Buton
-          text="Nuevo inventario"
-          onPress={() => setIsOpen(true)}
-          type="button"
-          variant="solid"
-          className="relative top-12 text-white bg-blue-700"
-        />
-      
-
       <Modall
         ModalTitle="Registrar Nuevo Inventario"
         isOpen={isOpen}
@@ -152,36 +172,31 @@ export const InventariosTable = ({ inventarios: inventariosProp, idSitio }: Inve
           onClose={handleClose}
           idSitio={idSitio!}
         />
-        <button
+      <div className="justify-center pt-2">
+        <Button
           type="submit"
           form="inventario-form"
-          className="bg-blue-700 text-white p-2 rounded-md"
+          className="w-full bg-blue-700 text-white p-2 rounded-xl"
         >
           Guardar
-        </button>
-      </Modall>
-
-      <Modall
-        ModalTitle="Editar Elemento del Inventario"
-        isOpen={IsOpenUpdate}
-        onOpenChange={handleCloseUpdate}
-      >
-        {selectedInventario && (
-          <FormUpdate
-            inventarios={InventariosWithKey ?? []}
-            inventarioId={selectedInventario.id_inventario}
-            id="FormUpdate"
-            onclose={handleCloseUpdate}
-          />
-        )}
+        </Button>
+      </div>
       </Modall>
 
       {InventariosWithKey && (
         <Globaltable
           data={InventariosWithKey}
           columns={columns(elementos ?? [])}
-          onEdit={handleEdit}
-          onDelete={handleState}
+          onDelete={(inventario) => handleState(inventario.id_inventario)}
+          extraHeaderContent={
+            <Buton
+              text="Nuevo inventario"
+              onPress={() => setIsOpen(true)}
+              type="button"
+              variant="solid"
+              className="text-white bg-blue-700"
+            />
+          }
         />
       )}
     </div>

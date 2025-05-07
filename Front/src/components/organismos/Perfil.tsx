@@ -2,10 +2,9 @@ import { useUsuario } from "@/hooks/Usuarios/useUsuario";
 import { useNavigate } from "react-router-dom";
 import { User } from "@/types/Usuario";
 import React, { useEffect } from "react";
-import { Card } from "../atoms/Card";
-import { Button } from "../atoms/Button";
+import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
-import { Avatar } from "@heroui/react";
+import { Avatar, Card } from "@heroui/react";
 
 export const Perfil = () => {
   const navigate = useNavigate();
@@ -134,16 +133,16 @@ export const Perfil = () => {
 
         <div className="flex justify-center gap-4 mb-4">
           {!isEditing ? (
-            <Button onClick={() => setIsEditing(true)}>Editar Perfil</Button>
+            <Button onPress={() => setIsEditing(true)}>Editar Perfil</Button>
           ) : (
             <>
-              <Button onClick={handleActualizar}>Guardar Cambios</Button>
-              <Button variant="outline" onClick={() => setIsEditing(false)}>
+              <Button onPress={handleActualizar}>Guardar Cambios</Button>
+              <Button  onPress={() => setIsEditing(false)}>
                 Cancelar
               </Button>
             </>
           )}
-          <Button onClick={handleClosePerfil} variant="secondary">
+          <Button onPress={handleClosePerfil} >
             Volver al Inicio
           </Button>
         </div>

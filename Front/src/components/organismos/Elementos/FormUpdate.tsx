@@ -1,139 +1,125 @@
-import React, { useState, useEffect } from "react";
+import { Input } from "@heroui/input";
+import { useForm } from "react-hook-form";
 import { Form } from "@heroui/form";
-import Inpu from "@/components/molecules/input";
-import { Elemento } from "@/types/Elemento";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@heroui/button";
+import { addToast } from "@heroui/react";
+import { ElementoUpdateSchema, ElementoUpdate } from "@/schemas/Elemento";
 import { useElemento } from "@/hooks/Elementos/useElemento";
 
 type Props = {
-  elementos: Elemento[];
+  elementos: ElementoUpdate[];
   elementoId: number;
   id: string;
   onclose: () => void;
 };
 
-export const FormUpdate = ({ elementos, elementoId, id, onclose }: Props) => {
-  const [formData, setFormData] = useState<Partial<Elemento>>({
-    id_elemento: 0,
-    nombre: "",
-    valor: 0,
-    perecedero: true,
-    no_perecedero: false,
-    estado: true,
-    imagen_elemento: "",
-    fk_unidad_medida: 0,
-    fk_categoria: 0,
-    fk_caracteristica: 0,
-  });
-
+export const FormUpdate = ({
+  elementos,
+  elementoId,
+  id,
+  onclose,
+}: Props) => {
   const { updateElemento, getElementoById } = useElemento();
 
-  useEffect(() => {
-    // se ejecuta cuando algo se cambie en un usuario, obtiene el id y modifica el FormData
-    const foundElemento = getElementoById(elementoId);
+  const foundElemento = getElementoById(elementoId, elementos) as ElementoUpdate;
 
-    if (foundElemento) {
-      setFormData(foundElemento);
-    }
-  }, [elementos, elementoId]);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<ElementoUpdate>({
+    resolver: zodResolver(ElementoUpdateSchema),
+    mode: "onChange",
+    defaultValues: foundElemento,
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //se ejecuta cuando el usuario cambia algo en un campo
-    const { name, value, type, checked } = e.target;
+  const imagen = watch("imagen_elemento");
 
-    setFormData((prev: Partial<Elemento>) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.id_elemento) {
-      return (
-        <p className="text-center text-gray-500">Elemento no encontrado</p>
-      );
-    }
-
+  const onSubmit = async (data: ElementoUpdate) => {
+    if (!data.id_elemento) return;
     try {
-      const updatedData: Partial<Elemento> = {
-        ...formData,
-      };
-
-      if (formData.imagen_elemento instanceof File) {
-        updatedData.imagen_elemento = formData.imagen_elemento;
-      }
-      await updateElemento(formData.id_elemento, formData);
+      await updateElemento(data.id_elemento, data);
       onclose();
+      addToast({
+        title: "Elemento actualizado",
+        description: "Los datos del elemento fueron actualizados correctamente.",
+        color: "primary",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
     } catch (error) {
-      console.log("Error al actualizar el Elemento", error);
+      console.error("Error al actualizar el Elemento", error);
     }
   };
-
+  console.log("Errores", errors)
   return (
-    <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit}>
-      <Inpu
+    <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <Input
         label="Nombre"
-        placeholder="Nombre"
-        type="text"
-        name="nombre"
-        value={formData.nombre ?? ""}
-        onChange={handleChange}
+        placeholder="Nombre del elemento"
+        {...register("nombre")}
+        isInvalid={!!errors.nombre}
+        errorMessage={errors.nombre?.message}
       />
-      <Inpu
-        label="Descripcion"
-        placeholder="Descripcion"
-        type="text"
-        name="descripcion"
-        value={formData.descripcion ?? ""}
-        onChange={handleChange}
+
+      <Input
+        label="Descripción"
+        placeholder="Descripción del elemento"
+        {...register("descripcion")}
+        isInvalid={!!errors.descripcion}
+        errorMessage={errors.descripcion?.message}
       />
-      <Inpu
+
+      <Input
         label="Valor"
-        placeholder="Valor"
+        placeholder="Valor del elemento"
         type="number"
-        name="valor"
-        value={String(formData.valor) ?? ""}
-        onChange={handleChange}
+        {...register("valor")}
+        isInvalid={!!errors.valor}
+        errorMessage={errors.valor?.message}
       />
-      {formData.imagen_elemento &&
-        typeof formData.imagen_elemento === "string" && (
-          <div className="flex justify-center">
-            <img
-              src={`http://localhost:3000/img/${formData.imagen_elemento}`}
-              alt="Imagen actual"
-              className="w-40 h-40 object-cover rounded-lg mb-4"
-            />
-          </div>
-        )}
-      {formData.imagen_elemento instanceof File && (
+
+      {imagen && typeof imagen === "string" && (
         <div className="flex justify-center">
           <img
-            src={URL.createObjectURL(formData.imagen_elemento)}
+            src={`http://localhost:3000/img/${imagen}`}
+            alt="Imagen actual"
+            className="w-40 h-40 object-cover rounded-lg mb-4"
+          />
+        </div>
+      )}
+
+      {imagen instanceof File && (
+        <div className="flex justify-center">
+          <img
+            src={URL.createObjectURL(imagen)}
             alt="Nueva imagen"
             className="w-40 h-40 object-cover rounded-lg mb-4"
           />
         </div>
       )}
 
-      <Inpu
+      <Input
         label="Imagen"
         type="file"
-        name="imagen_elemento"
         accept="image/*"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) {
-            setFormData({ ...formData, imagen_elemento: file });
-          }
+          if (file) setValue("imagen_elemento", file);
         }}
       />
+
       <div className="justify-center pl-10">
-        <button
+        <Button
           type="submit"
-          className="w-80 bg-blue-700 text-white p-2 rounded-xl"
+          isLoading={isSubmitting}
+          className="w-full bg-blue-700 text-white p-2 rounded-xl"
         >
-          Guardar Cambios
-        </button>
+          Guardar
+        </Button>
       </div>
     </Form>
   );

@@ -1,66 +1,75 @@
-import React from "react";
 import { Form } from "@heroui/form";
-import Inpu from "@/components/molecules/input";
-import { Select, SelectItem } from "@heroui/react";
-import { Unidad } from "@/types/Unidad";
+import { addToast, Input, Select, SelectItem } from "@heroui/react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UnidadCreate, UnidadCreateSchema } from "@/schemas/Unidad";
 
 type FormularioProps = {
-  addData: (unidad: Unidad) => Promise<void>;
+  addData: (unidad: UnidadCreate) => Promise<void>;
   onClose: () => void;
   id: string;
 };
 
 export default function Formulario({ addData, onClose, id }: FormularioProps) {
-  const [formData, setFormData] = React.useState<Unidad>({
-    id_unidad: 0,
-    nombre: "",
-    estado: true,
-    created_at: "",
-    updated_at: "",
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UnidadCreate>({
+    resolver: zodResolver(UnidadCreateSchema),
+    mode: "onChange",
   });
 
-  const onSubmit = async (e: React.FormEvent) => {
-    //preguntar si esta bien no usar el e: React.FormEvent
-    //y aqui el preventdefault
-    e.preventDefault();
+  const onSubmit = async (data: UnidadCreate) => {
     try {
-      console.log("Enviando formulario con datos:", formData);
-      await addData(formData);
-      console.log("Unidad guardado correctamente");
-      setFormData({
-        id_unidad: 0,
-        nombre: "",
-        estado: true,
-        created_at: "",
-        updated_at: "",
-      });
+      await addData(data);
       onClose();
+      addToast({
+        title: "Registro Exitoso",
+        description: "Unidad agregada correctamente",
+        color: "success",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
     } catch (error) {
-      console.error("Error al cargar la unidad", error);
+      console.error("Error al guardar:", error);
     }
   };
-
+  console.log("Errores", errors);
   return (
-    <Form id={id} onSubmit={onSubmit} className="w-full space-y-4">
-      <Inpu
+    <Form
+      id={id}
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full space-y-4"
+    >
+      <Input
         label="Nombre"
         placeholder="Nombre"
         type="text"
-        name="nombre"
-        value={formData.nombre}
-        onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+        {...register("nombre")}
+        isInvalid={!!errors.nombre}
+        errorMessage={errors.nombre?.message}
       />
-      <Select
-        label="Estado"
+      <Controller
+        control={control}
         name="estado"
-        placeholder="Estado"
-        onChange={(e) =>
-          setFormData({ ...formData, estado: e.target.value === "true" })
-        } // Convierte a booleano
-      >
-        <SelectItem key="true">Activo</SelectItem>
-        <SelectItem key="false">Inactivo</SelectItem>
-      </Select>
+        render={({ field }) => (
+          <Select
+            label="Estado"
+            placeholder="Seleccione un estado"
+            {...field}
+            value={field.value ? "true" : "false"}
+            onChange={(e) => field.onChange(e.target.value === "true")}
+            isInvalid={!!errors.estado}
+            errorMessage={errors.estado?.message}
+          >
+            <SelectItem key="true">Activo</SelectItem>
+            <SelectItem key="false">Inactivo</SelectItem>
+          </Select>
+        )}
+      />
+
     </Form>
   );
 }

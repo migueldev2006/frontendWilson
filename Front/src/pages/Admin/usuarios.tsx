@@ -4,9 +4,10 @@ import Buton from "@/components/molecules/Buton";
 import Modall from "@/components/molecules/modal";
 import FormRegister from "@/components/organismos/Usuarios/FormRegister";
 import { useState } from "react";
-import { FormUpdate} from "@/components/organismos/Usuarios/Formupdate";
+import { FormUpdate } from "@/components/organismos/Usuarios/Formupdate";
 import { User } from "@/schemas/User";
 import { useUsuario } from "@/hooks/Usuarios/useUsuario";
+import { Card, CardBody } from "@heroui/react";
 
 const UsersTable = () => {
   const { users, isLoading, isError, error, addUser, changeState } =
@@ -20,14 +21,16 @@ const UsersTable = () => {
   const [IsOpenUpdate, setIsOpenUpdate] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
+
+
   const handleCloseUpdate = () => {
     setIsOpenUpdate(false);
     setSelectedUser(null);
   };
 
-    const handleState = async (user: User) => {
-        await changeState(user.id_usuario as number);
-    }
+  const handleState = async (user: User) => {
+    await changeState(user.id_usuario as number);
+  };
 
   const handleAddUser = async (user: User) => {
     try {
@@ -42,15 +45,17 @@ const UsersTable = () => {
     setSelectedUser(user);
     setIsOpenUpdate(true);
   };
-    // Definir las columnas de la tabla
-    const columns: TableColumn<User>[] = [
-        { key: "nombre", label: "Nombre" },
-        { key: "apellido", label: "Apellido" },
-        { key: "edad", label: "edad" },
-        { key: "telefono", label: "telefono" },
-        { key: "correo", label: "Correo" },
-        { key: "cargo", label: "Cargo" },
-        {key: "estado",label: "estado" },];
+
+  // Definir las columnas de la tabla
+  const columns: TableColumn<User>[] = [
+    { key: "nombre", label: "Nombre" },
+    { key: "apellido", label: "Apellido" },
+    { key: "edad", label: "edad" },
+    { key: "telefono", label: "telefono" },
+    { key: "correo", label: "Correo" },
+    { key: "cargo", label: "Cargo" },
+    { key: "estado", label: "estado" },
+  ];
 
   if (isLoading) {
     return <span>Cargando datos...</span>;
@@ -68,27 +73,51 @@ const UsersTable = () => {
       estado: Boolean(user.estado),
     }));
 
+  return (
+    <div className="p-4">
+      <div className="flex pb-4 pt-4">
+        <Card className="w-full">
+          <CardBody>
+            <div className="flex items-center justify-center">
+              <h1 className="text-2xl  font-bold">Gestionar Usuarios</h1>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
 
-    return (
+      <Modall
+        ModalTitle="Agregar Usuario"
+        isOpen={isOpen}
+        onOpenChange={handleClose}
+      >
+        <FormRegister
+          id="user-form"
+          addData={handleAddUser}
+          onClose={handleClose}
+        />
+        <button
+          type="submit"
+          form="user-form"
+          className="bg-blue-500 text-white p-2 rounded-md"
+        >
+          Guardar
+        </button>
+      </Modall>
 
-        <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4 text-center">Tabla de Usuarios</h1>
-            <Buton text="Añadir Usuario" onPress={() => setIsOpen(true)} type="button" color="primary" variant="solid" className="mb-8" />
-
-            <Modall ModalTitle="Agregar Usuario" isOpen={isOpen} onOpenChange={handleClose}>
-           
-                <FormRegister id="user-form" addData={handleAddUser} onClose={handleClose} />
-                <button type="submit" form="user-form" className="bg-blue-500 text-white p-2 rounded-md">
-                    Guardar
-                </button>
-            </Modall>
-
-            <Modall ModalTitle="Editar Usuario" isOpen={IsOpenUpdate} onOpenChange={handleCloseUpdate}>
-                {selectedUser && (
-                    <FormUpdate Users={usersWithKey ?? []} userId={selectedUser.id_usuario as number} id="FormUpdate" onclose={handleCloseUpdate} />
-                )}
-
-            </Modall>
+      <Modall
+        ModalTitle="Editar Usuario"
+        isOpen={IsOpenUpdate}
+        onOpenChange={handleCloseUpdate}
+      >
+        {selectedUser && (
+          <FormUpdate
+            Users={usersWithKey ?? []}
+            userId={selectedUser.id_usuario as number}
+            id="FormUpdate"
+            onclose={handleCloseUpdate}
+          />
+        )}
+      </Modall>
 
       {usersWithKey && (
         <Globaltable
@@ -96,6 +125,15 @@ const UsersTable = () => {
           columns={columns}
           onEdit={handleEdit}
           onDelete={handleState}
+          extraHeaderContent={
+            <Buton
+              text="Añadir Usuario"
+              onPress={() => setIsOpen(true)}
+              type="button"
+              variant="solid"
+              className="text-white bg-blue-700"
+            />
+          }
         />
       )}
     </div>

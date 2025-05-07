@@ -61,10 +61,10 @@ export default function useReportes() {
   });
 
   return {
-    usuariosConElementos,
-    usuariosConRolYElementos,
-    fichasConUsuarios,
-    usuariosConMovimientos,
+    usuariosConElementos: usuariosConElementos ?? [],
+    usuariosConRolYElementos: usuariosConRolYElementos ?? [],
+    fichasConUsuarios: fichasConUsuarios ?? [],
+    usuariosConMovimientos: usuariosConMovimientos ?? [],
 
     // Estados combinados
     isLoading:

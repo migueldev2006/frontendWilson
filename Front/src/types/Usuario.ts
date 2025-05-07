@@ -25,9 +25,6 @@ export type LoginRes = {
     password : string
 }
 
-
-// types/Reportes.ts
-
 export interface ReporteUsuario {
     id_usuario: number;
     nombre_completo: string;
@@ -36,19 +33,20 @@ export interface ReporteUsuario {
     rol: string;
     centro: string | null;
     estado: boolean;
-    created_at: string; // o Date si haces parseo
-    updated_at: string; // o Date si haces parseo
+    created_at: string; 
+    updated_at: string; 
     total_fichas: number;
-    elementos_asignados: string[]; // nombres de elementos
+    elementos_asignados: string[]; 
   }
   
   export interface ReporteAsignacionElemento {
+    created_at: string;
     id_usuario: number;
     nombre_usuario: string;
     documento: string;
     rol: string;
     nombre_elemento: string | null;
-    fecha_asignacion: string | null; // o Date si haces parseo
+    fecha_asignacion: string | null;
   }
   
   export interface ReporteUsuariosPorFicha {
@@ -56,6 +54,7 @@ export interface ReporteUsuario {
     codigo: string;
     nombre: string;
     total_usuarios: number;
+    created_at: string; 
   }
   
   export interface ReporteMovimientosUsuarioElemento {
@@ -66,5 +65,6 @@ export interface ReporteUsuario {
     id_elemento: number;
     nombre_elemento: string;
     total_movimientos: number;
+    created_at: string; 
   }
   

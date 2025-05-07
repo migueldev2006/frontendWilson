@@ -6,8 +6,10 @@ import { useState } from "react";
 import { FormUpdate } from "@/components/organismos/Solicitudes/FormUpdate";
 import Formulario from "@/components/organismos/Solicitudes/FormRegister";
 import { useSolicitud } from "@/hooks/Solicitudes/useSolicitud";
-import { Solicitud } from "@/types/Solicitud";
 import { Chip } from "@heroui/chip";
+import { Solicitud } from "@/types/Solicitud";
+import { Button, Card, CardBody } from "@heroui/react";
+import { useNavigate } from "react-router-dom";
 
 export const SolicitudTable = () => {
   const { solicitudes, isLoading, isError, error, addSolicitud } =
@@ -23,6 +25,11 @@ export const SolicitudTable = () => {
     null
   );
 
+  const navigate = useNavigate()
+
+  const handleGoToSitio = () => {
+    navigate('/admin/sitios')
+  }
   const handleCloseUpdate = () => {
     setIsOpenUpdate(false);
     setSelectedSolicitud(null);
@@ -50,29 +57,57 @@ export const SolicitudTable = () => {
       key: "created_at",
       label: "Fecha Solicitud",
       render: (solicitud: Solicitud) => (
-        <span>{new Date(solicitud.created_at).toLocaleDateString("es-ES")}</span>
+        <span>
+          {solicitud.created_at
+            ? new Date(solicitud.created_at).toLocaleDateString("es-ES", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            })
+            : "N/A"}
+        </span>
       ),
     },
     {
       key: "updated_at",
       label: "Fecha Actualización",
       render: (solicitud: Solicitud) => (
-        <span>{new Date(solicitud.updated_at).toLocaleDateString("es-ES")}</span>
+        <span>
+          {solicitud.updated_at
+            ? new Date(solicitud.updated_at).toLocaleDateString("es-ES", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+            })
+            : "N/A"}
+        </span>
       ),
     },
     {
-      key: "estado", 
+      key: "estado",
       label: "Estado",
       render: (item) => {
         if (item.aceptada)
-          return <Chip color="success" variant="flat">Aceptada</Chip>;
+          return (
+            <Chip color="success" variant="flat">
+              Aceptada
+            </Chip>
+          );
         if (item.rechazada)
-          return <Chip color="danger" variant="flat">Rechazada</Chip>;
+          return (
+            <Chip color="danger" variant="flat">
+              Rechazada
+            </Chip>
+          );
         if (item.pendiente)
-          return <Chip color="warning" variant="flat">Pendiente</Chip>;
+          return (
+            <Chip color="warning" variant="flat">
+              Pendiente
+            </Chip>
+          );
         return <Chip color="default">Sin estado</Chip>;
-      }
-    }
+      },
+    },
   ];
 
   if (isLoading) {
@@ -90,23 +125,28 @@ export const SolicitudTable = () => {
       key: solicitud.id_solicitud
         ? solicitud.id_solicitud.toString()
         : crypto.randomUUID(),
+      id_solicitud: solicitud.id_solicitud || 0,
     }));
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">
-        Solicituds Registrados
-      </h1>
-
-      <Buton
-        text="Nuevo solicitud"
-        onPress={() => setIsOpen(true)}
-        type="button"
-        color="primary"
-        variant="solid"
-        className="mb-8"
-      />
-
+      <div className="flex pb-4 pt-4">
+        <Card className="w-full">
+          <CardBody>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">Gestionar Solicitudes</h1>
+              <div className="flex gap-2">
+              <Button
+                  className="text-white bg-blue-700"
+                  onPress={handleGoToSitio}
+                >
+                  Gestionar Sitios 
+                </Button>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
       <Modall
         ModalTitle="Registrar Nuevo Solicitud"
         isOpen={isOpen}
@@ -134,7 +174,7 @@ export const SolicitudTable = () => {
         {selectedSolicitud && (
           <FormUpdate
             solicitudes={SolicitudsWithKey ?? []}
-            solicitudId={selectedSolicitud.id_solicitud}
+            solicitudId={selectedSolicitud.id_solicitud as number}
             id="FormUpdate"
             onclose={handleCloseUpdate}
           />
@@ -148,6 +188,15 @@ export const SolicitudTable = () => {
           onEdit={handleEdit}
           showActions={true}
           showEstado={false}
+          extraHeaderContent={
+            <Buton
+              text="Nuevo solicitud"
+              onPress={() => setIsOpen(true)}
+              type="button"
+              variant="solid"
+              className="text-white bg-blue-700"
+            />
+          }
         />
       )}
     </div>

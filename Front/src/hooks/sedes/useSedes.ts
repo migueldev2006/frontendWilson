@@ -1,105 +1,87 @@
-import { axiosAPI } from '@/axios/axiosAPI';
-import { Sede } from '@/types/sedes'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { deleteSede } from "@/axios/Sedes/deleteSede";
+import { getSede } from "@/axios/Sedes/getSede";
+import { postSede } from "@/axios/Sedes/postSede";
+import { putSede } from "@/axios/Sedes/putSede";
+import { Sede } from "@/types/sedes";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useSede() {
+  const queryClient = useQueryClient();
 
-    const queryClient = useQueryClient();
+  const { data, isLoading, isError, error } = useQuery<Sede[]>({
+    queryKey: ["sedes"],
+    queryFn: getSede,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
+  });
 
-    const url = 'Sede';
-
-    const { data, isLoading, isError, error } = useQuery<Sede[]>({
+  const addSedeMutation = useMutation({
+    mutationFn: postSede,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
         queryKey: ["sedes"],
-        queryFn: async () => {
-            const res = await axiosAPI.get(url);
-            return res.data;
-        }
-    });
-    
-    const addSedeMutation = useMutation({
-        mutationFn: async(newSede: Sede) => {
-            await axiosAPI.post<Sede>(url, newSede)
-            return newSede
-        },
-        onSuccess: (sede) => {
-            console.log(sede);
-            queryClient.setQueryData<Sede[]>(["sedes"], (oldData) =>
-                oldData ? [...oldData,sede] : [sede]
-            );
-        },
-        onError: (error) => {
-            console.log("Error al cargar la sede", error);
-        }
-    });
+      });
+    },
+    onError: (error) => {
+      console.log("Error al cargar la sede", error);
+    },
+  });
 
-    const getSedeById = (id: number, sedes : Sede[] | undefined = data ): Sede | null => {
-        return sedes?.find((sede) => sede.id_sede === id) || null;
-    }
+  const getSedeById = (
+    id: number,
+    sedes: Sede[] | undefined = data
+  ): Sede | null => {
+    return sedes?.find((sede) => sede.id_sede === id) || null;
+  };
 
-    const updateSedesMutation = useMutation({
-        mutationFn: async({ id, update } : { id: number; update: Partial<Sede> }) => {
-            await axiosAPI.put<Sede>(`${url}/${id}`, update);
-            return {id, update}
-        },
-        onSuccess: ({ id, update }) => {
-            console.log("dato 1: ",id," dato 2: ",update);
-            queryClient.setQueryData<Sede[]>(["sedes"], (oldData) =>
-                oldData
-                    ? oldData.map((sede) =>
-                        sede.id_sede === id ? { ...sede, ...update } : sede
-                    )
-                    : []
-            );
-        },
+  const updateSedesMutation = useMutation({
+    mutationFn: ({id,data}:{id: number, data: Sede; }) =>putSede(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["sedes"],
+      });
+    },
 
-        onError: (error) => {
-            console.error("Error al actualizar:", error);
-        }
-    });
+    onError: (error) => {
+      console.error("Error al actualizar:", error);
+    },
+  });
 
-    const changeStateMutation = useMutation({
-        mutationFn: async (id_sede: number) => {
-            await axiosAPI.put<Sede>(`sede/estado/${id_sede}`);
-            return id_sede
-        },
+  const changeStateMutation = useMutation({
+    mutationFn:deleteSede,
 
-        onSuccess: (id_sede: number) => {
-            queryClient.setQueryData<Sede[]>(["sedes"], (oldData) =>
-                oldData
-                    ? oldData.map((sede: Sede) =>
-                        sede.id_sede == id_sede
-                            ? { ...sede, estado: !sede.estado }
-                            : sede
-                    )
-                    : []
-            );
-        },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["sedes"],
+      });
+    },
 
-        onError: (error) => {
-            console.error("Error al actualizar estado:", error);
-        },
-    });
+    onError: (error) => {
+      console.error("Error al actualizar estado:", error);
+    },
+  });
 
-    const addSede = async (sede: Sede) => {
-        return addSedeMutation.mutateAsync(sede);
-    };
+  const addSede = async (sede: Sede) => {
+    return addSedeMutation.mutateAsync(sede);
+  };
 
-    const updateSede = async (id: number, update: Partial<Sede>) => {
-        return updateSedesMutation.mutateAsync({ id, update });
-    };
+  const updateSede = async (id: number, data:Sede) => {
+    return updateSedesMutation.mutateAsync({ id, data });
+  };
 
-    const changeState = async (id_sede: number) => {
-        return changeStateMutation.mutateAsync(id_sede);
-    };
+  const changeState = async (id_sede: number) => {
+    return changeStateMutation.mutateAsync(id_sede);
+  };
 
-    return {
-        sede: data,
-        isLoading,
-        isError,
-        error,
-        addSede,
-        changeState,
-        getSedeById,
-        updateSede
-    }
+  return {
+    sede: data,
+    isLoading,
+    isError,
+    error,
+    addSede,
+    changeState,
+    getSedeById,
+    updateSede,
+  };
 }

@@ -1,94 +1,92 @@
-import React, { useState, useEffect } from "react";
 import { Form } from "@heroui/form";
-import Inpu from "@/components/molecules/input";
-import { Solicitud } from "@/types/Solicitud";
+import { Input } from "@heroui/input";
+import { Button } from "@heroui/button";
+import { SolicitudUpdate } from "@/schemas/Solicitud";
 import { useSolicitud } from "@/hooks/Solicitudes/useSolicitud";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { SolicitudUpdateSchema } from "@/schemas/Solicitud";
+import { addToast } from "@heroui/react";
 
 type Props = {
-  solicitudes: Solicitud[];
+  solicitudes: SolicitudUpdate[];
   solicitudId: number;
   id: string;
   onclose: () => void;
 };
 
-export const FormUpdate = ({
-  solicitudes,
-  solicitudId,
-  id,
-  onclose,
-}: Props) => {
-  const [formData, setFormData] = useState<Partial<Solicitud>>({
-    id_solicitud: 0,
-    descripcion: "",
-    cantidad: 0,
-    aceptada: true,
-    pendiente: false,
-    rechazada: false,
-    fk_usuario: 0,
-    fk_inventario: 0,
-  });
-
+export const FormUpdate = ({ solicitudId, id, onclose }: Props) => {
   const { updateSolicitud, getSolicitudById } = useSolicitud();
 
-  useEffect(() => {
-    // se ejecuta cuando algo se cambie en un usuario, obtiene el id y modifica el FormData
-    const foundSolicitud = getSolicitudById(solicitudId);
+  const foundSolicitud = getSolicitudById(solicitudId);
 
-    if (foundSolicitud) {
-      setFormData(foundSolicitud);
-    }
-  }, [solicitudes, solicitudId]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //se ejecuta cuando el usuario cambia algo en un campo
-    const { name, value, type, checked } = e.target;
-
-    setFormData((prev: Partial<Solicitud>) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.id_solicitud) {
-      return <p className="text-center text-gray-500">Solicitud no encontrada</p>;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SolicitudUpdate>({
+    resolver: zodResolver(SolicitudUpdateSchema),
+    mode: "onChange",
+    defaultValues: {
+      id_solicitud: foundSolicitud?.id_solicitud ?? 0,
+      descripcion: foundSolicitud?.descripcion ?? "",
+      cantidad: foundSolicitud?.cantidad ?? 0,
+      aceptada: foundSolicitud?.aceptada ?? true,
+      pendiente: foundSolicitud?.pendiente ?? false,
+      rechazada: foundSolicitud?.rechazada ?? false,
+      fk_usuario: foundSolicitud?.fk_usuario ?? 0,
+      fk_inventario: foundSolicitud?.fk_inventario ?? 0,
+    },
+  });
+  const onSubmit = async (data: SolicitudUpdate) => {
+    if (!data.id_solicitud) {
     }
 
     try {
-      await updateSolicitud(formData.id_solicitud, formData);
+      await updateSolicitud(data.id_solicitud, data);
       onclose();
+      addToast({
+        title: "Actualizacion Exitosa",
+        description: "Solicitud actualizada correctamente",
+        color: "primary",
+        timeout: 3000,
+        shouldShowTimeoutProgress: true,
+      });
     } catch (error) {
       console.log("Error al actualizar la solicitud", error);
     }
   };
-
+  console.log("Errores", errors)
   return (
-    <Form id={id} className="w-full space-y-4" onSubmit={handleSubmit}>
-      <Inpu
-        label="Descripcion"
-        placeholder="Descripcion"
+    <Form
+      id={id}
+      className="w-full space-y-4"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      <Input
+        label="Descripción"
+        placeholder="Descripción"
         type="text"
-        name="descripcion"
-        value={formData.descripcion}
-        onChange={handleChange}
+        {...register("descripcion")}
+        isInvalid={!!errors.descripcion}
+        errorMessage={errors.descripcion?.message}
       />
-      <Inpu
+      <Input
         label="Cantidad"
         placeholder="Cantidad"
         type="number"
-        name="cantidad"
-        value={String(formData.cantidad) ?? ""}
-        onChange={handleChange}
+        {...register("cantidad")}
+        isInvalid={!!errors.cantidad}
+        errorMessage={errors.cantidad?.message}
       />
-
       <div className="justify-center pl-10">
-        <button
+        <Button
           type="submit"
-          className="w-80 bg-blue-700 text-white p-2 rounded-xl "
+          isLoading={isSubmitting}
+          className="w-full bg-blue-700 text-white p-2 rounded-xl"
         >
           Guardar Cambios
-        </button>
+        </Button>
       </div>
     </Form>
   );

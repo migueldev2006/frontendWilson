@@ -28,11 +28,12 @@ export interface TableColumn<T> {
 interface TableProps<T extends { key: string; estado?: boolean }> {
   data: T[];
   columns: TableColumn<T>[];
-  onEdit: (item: T) => void;
+  onEdit?: (item: T) => void | boolean;
   onDelete?: (item: T) => void | undefined | Promise<void>;
   showEstado?: boolean;
   showActions?: boolean;
   searchValue?: (item: T) => string;
+  extraHeaderContent?: React.ReactNode;
 }
 
 const Globaltable = <T extends { key: string; estado?: boolean }>({
@@ -42,6 +43,7 @@ const Globaltable = <T extends { key: string; estado?: boolean }>({
   onDelete,
   showEstado = true,
   showActions = true,
+  extraHeaderContent,
 }: TableProps<T>) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -142,9 +144,11 @@ const Globaltable = <T extends { key: string; estado?: boolean }>({
 
   return (
     <>
-      <div className="flex ml-80 mt-22 space-x-2">
-        <div className="ml-28 ">
+      <div className="flex justify-between items-center flex-wrap gap-4 mt-4 mb-4">
+        {extraHeaderContent}
+        <div className="flex">
           <Input
+            className="mr-4 h-3 mt-1"
             isClearable
             label="Buscar"
             placeholder="Tipo de Busqueda..."
@@ -153,21 +157,23 @@ const Globaltable = <T extends { key: string; estado?: boolean }>({
             onValueChange={setSearchTerm}
             startContent={<MagnifyingGlassIcon className="w-4 h-4" />}
           />
+          <div className="flex items-center">
+          <h1 className="whitespace-nowrap">Buscar por fecha</h1>
+            <Input
+              type="date"
+              value={startDate || ""}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-2 py-1 text-sm dark:bg-zinc-900 dark:text-white"
+            />
+            <span>–</span>
+            <Input
+              type="date"
+              value={endDate || ""}
+              onChange={(e) => setEndDate(e.target.value)}
+              className=" px-2 py-1 text-sm dark:bg-zinc-900 dark:text-white"
+            />
+          </div>
         </div>
-        <h1>Buscar por fecha</h1>
-        <input
-          type="date"
-          value={startDate || ""}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="border rounded-md px-2 py-1 text-sm dark:bg-zinc-900 dark:text-white"
-        />
-        <span>–</span>
-        <input
-          type="date"
-          value={endDate || ""}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="border rounded-md px-2 py-1 text-sm dark:bg-zinc-900 dark:text-white"
-        />
       </div>
       <div className="flex justify-between items-center px-4 py-2">
         <div className="text-sm text-muted-foreground">{`Total ${data.length} elementos`}</div>
@@ -239,39 +245,39 @@ const Globaltable = <T extends { key: string; estado?: boolean }>({
                 // Encuentra la configuración de la columna
                 return (
                   <TableCell className="text-center">
-                  {columns.find(c => c.key === columnKey)?.render
-                    ? columns.find(c => c.key === columnKey)!.render!(item)
-                    : getKeyValue(item, columnKey)}
+                    {columns.find((c) => c.key === columnKey)?.render
+                      ? columns.find((c) => c.key === columnKey)!.render!(item)
+                      : getKeyValue(item, columnKey)}
 
-                  {showEstado && columnKey === "estado" && (
-                    <Chip
-                      className={`px-2 py-1 rounded ${
-                        item.estado ? "text-green-500" : "text-red-500"
-                      }`}
-                      color={item.estado ? "success" : "danger"}
-                      variant="flat"
-                    >
-                      {item.estado ? "Activo" : "Inactivo"}
-                    </Chip>
-                  )}
-                  
-                  {showActions && columnKey === "actions" && (
-                    <div className="flex gap-2 justify-center">
-                      <button onClick={() => onEdit(item)}>
-                        <PencilIcon className="h-5 w-5 text-blue-500" />
-                      </button>
-                      {onDelete && (
-                        <button onClick={() => onDelete?.(item)}>
-                          {item.estado ? (
-                            <TrashIcon className="h-5 w-5 text-red-500" />
-                          ) : (
-                            <CheckIcon className="h-5 w-5 text-green-500" />
-                          )}
+                    {showEstado && columnKey === "estado" && (
+                      <Chip
+                        className={`px-2 py-1 rounded ${
+                          item.estado ? "text-green-500" : "text-red-500"
+                        }`}
+                        color={item.estado ? "success" : "danger"}
+                        variant="flat"
+                      >
+                        {item.estado ? "Activo" : "Inactivo"}
+                      </Chip>
+                    )}
+
+                    {showActions && columnKey === "actions" && (
+                      <div className="flex gap-2 justify-center">
+                        <button onClick={() => onEdit?.(item)}>
+                          <PencilIcon className="h-5 w-5 text-blue-500" />
                         </button>
-                      )}
-                    </div>
-                  )}
-                </TableCell>
+                        {onDelete && (
+                          <button onClick={() => onDelete?.(item)}>
+                            {item.estado ? (
+                              <TrashIcon className="h-5 w-5 text-red-500" />
+                            ) : (
+                              <CheckIcon className="h-5 w-5 text-green-500" />
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </TableCell>
                 );
               }}
             </TableRow>

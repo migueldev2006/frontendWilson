@@ -1,22 +1,23 @@
 export type Movimiento = {
-  id_movimiento: number;
+  id_movimiento?: number;
   descripcion: string;
   cantidad: number;
   hora_ingreso: string;
   hora_salida: string;
-  estado: boolean;
-  aceptado: boolean;
-  en_proceso: boolean;
-  cancelado: boolean;
-  devolutivo: boolean;
-  no_devolutivo: boolean;
-  created_at: string;
-  updated_at: string;
-  fk_usuario: number;
-  fk_tipo_movimiento: number;
-  fk_sitio: number;
-  fk_inventario: number;
-  tipo_movimiento: string;
+  estado?: boolean;
+  aceptado?: boolean;
+  en_proceso?: boolean;
+  cancelado?: boolean;
+  devolutivo?: boolean;
+  no_devolutivo?: boolean;
+  fecha_devolucion?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  fk_usuario?: number;
+  fk_tipo_movimiento?: number;
+  fk_sitio?: number;
+  fk_inventario?: number;
+  tipo_bien?: string;
 };
 
 export type MovimientoResumen = {

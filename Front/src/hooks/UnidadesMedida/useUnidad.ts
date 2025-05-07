@@ -1,30 +1,27 @@
-import { axiosAPI } from "@/axios/axiosAPI";
+import { deleteUnidad } from "@/axios/UnidadesMedida/deleteUnidad";
+import { getUnidad } from "@/axios/UnidadesMedida/getUnidad";
+import { postUnidad } from "@/axios/UnidadesMedida/postUnidad";
+import { putUnidad } from "@/axios/UnidadesMedida/putUnidad";
 import { Unidad } from "@/types/Unidad";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export function useUnidad() {
   const queryClient = useQueryClient();
 
-  const url = "unidad";
-
   const { data, isLoading, isError, error } = useQuery<Unidad[]>({
     queryKey: ["unidades"],
-    queryFn: async () => {
-      const res = await axiosAPI.get(url);
-      return res.data;
-    },
+    queryFn: getUnidad,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 10,
+    refetchOnWindowFocus: false,
   });
 
   const addUnidadMutation = useMutation({
-    mutationFn: async (newUnidad: Unidad) => {
-      await axiosAPI.post<Unidad>(url, newUnidad);
-      return newUnidad;
-    },
-    onSuccess: (unidad) => {
-      console.log(unidad);
-      queryClient.setQueryData<Unidad[]>(["unidades"], (oldData) =>
-        oldData ? [...oldData, unidad] : [unidad]
-      );
+    mutationFn: postUnidad,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["unidades"],
+      });
     },
     onError: (error) => {
       console.log("Error al cargar el unidad", error);
@@ -39,27 +36,12 @@ export function useUnidad() {
   };
 
   const updateUnidadMutation = useMutation({
-    mutationFn: async ({
-      id,
-      update,
-    }: {
-      id: number;
-      update: Partial<Unidad>;
-    }) => {
-      await axiosAPI.put<Unidad>(`${url}/${id}`, update);
-      return { id, update };
-    },
-    onSuccess: ({ id, update }) => {
-      console.log("dato 1: ", id, " dato 2: ", update);
-      queryClient.setQueryData<Unidad[]>(["unidades"], (oldData) =>
-        oldData
-          ? oldData.map((unidad) =>
-              unidad.id_unidad === id
-                ? { ...unidad, ...update }
-                : unidad
-            )
-          : []
-      );
+    mutationFn: ({ id, data }: { id: number; data: Unidad }) =>
+      putUnidad(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["unidades"],
+      });
     },
 
     onError: (error) => {
@@ -68,21 +50,12 @@ export function useUnidad() {
   });
 
   const changeStateMutation = useMutation({
-    mutationFn: async (id_unidad: number) => {
-      await axiosAPI.put<Unidad>(`unidad/cambiarEstado/${id_unidad}`);
-      return id_unidad;
-    },
+    mutationFn: deleteUnidad,
 
-    onSuccess: (id_unidad: number) => {
-      queryClient.setQueryData<Unidad[]>(["unidades"], (oldData) =>
-        oldData
-          ? oldData.map((unidad: Unidad) =>
-              unidad.id_unidad == id_unidad
-                ? { ...unidad, estado: !unidad.estado }
-                : unidad
-            )
-          : []
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["unidades"],
+      });
     },
 
     onError: (error) => {
@@ -94,8 +67,8 @@ export function useUnidad() {
     return addUnidadMutation.mutateAsync(unidad);
   };
 
-  const updateUnidad = async (id: number, update: Partial<Unidad>) => {
-    return updateUnidadMutation.mutateAsync({ id, update });
+  const updateUnidad = async (id: number, data: Unidad) => {
+    return updateUnidadMutation.mutateAsync({ id, data });
   };
 
   const changeState = async (id_unidad: number) => {

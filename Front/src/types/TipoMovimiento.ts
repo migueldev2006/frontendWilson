@@ -1,7 +1,7 @@
 export type TipoMovimiento = {
-  id_tipo: number;
+  id_tipo?: number;
   nombre: string;
   estado: boolean;
-  created_at:string;
-  updated_at:string;
+  created_at?:string;
+  updated_at?:string;
 };
