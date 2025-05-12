@@ -9,6 +9,7 @@ import {
   
 } from "@/types/Usuario";
 
+// ...importaciones
 export default function UsuariosReportPage() {
   const {
     usuariosConElementos,
@@ -17,22 +18,21 @@ export default function UsuariosReportPage() {
   } = useReportes();
 
   const {
-  data: elementosPrestamo,
-  isLoading: isLoadingPrestamo,
-  isError: isErrorPrestamo,
-} = useElementosPrestamo();
-
-
+    data: elementosPrestamo,
+    isLoading: isLoadingPrestamo,
+    isError: isErrorPrestamo,
+  } = useElementosPrestamo();
 
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
   const [fechaInicio, setFechaInicio] = useState<string>("");
   const [fechaFin, setFechaFin] = useState<string>("");
 
   const filtrarPorFechas = <T extends { created_at: string }>(
-    data: T[],
+    data: T[] | undefined,
     fechaInicio: string,
     fechaFin: string
   ): T[] => {
+    if (!Array.isArray(data)) return [];
     if (!fechaInicio || !fechaFin) return data;
     const inicio = new Date(fechaInicio);
     const fin = new Date(fechaFin);
@@ -83,52 +83,50 @@ La trazabilidad que ofrece este reporte permite a los encargados de cada unidad 
       ],
       withTable: true,
       filterFn: () =>
-        filtrarPorFechas(usuariosConElementos || [], fechaInicio, fechaFin),
+        filtrarPorFechas(usuariosConElementos ?? [], fechaInicio, fechaFin),
     },
-   
     {
-  id: "elementos-en-prestamo",
-  title: "ELEMENTOS EN ESTADO DE PRÉSTAMO",
-  description: (data: any[]) => `
+      id: "elementos-en-prestamo",
+      title: "ELEMENTOS EN ESTADO DE PRÉSTAMO",
+      description: (data: any[]) => `
 ${fechaInicio || "sin filtro"} a ${fechaFin || "sin filtro"}
 
 Este reporte presenta un listado de los elementos actualmente en estado de préstamo. Permite conocer qué usuarios tienen elementos en préstamo, la cantidad y detalles de cada elemento, junto con la fecha de salida.
 
 El total de préstamos en proceso es de ${data.length}, lo que refleja la actividad actual del inventario y facilita el seguimiento de materiales prestados.`,
-  tableDescription: `
+      tableDescription: `
 La siguiente tabla detalla cada elemento en estado de préstamo actualmente activo. Incluye el nombre del usuario, el nombre del elemento, su descripción, cantidad y fecha de salida.
 
 Este reporte es útil para llevar control de los elementos en circulación y para planificar recuperaciones o seguimientos.`,
-  footerText:
-    "Este reporte ha sido generado automáticamente por el sistema de gestión del SGDSS. Verifique que los datos correspondan con los registros físicos para evitar inconsistencias.",
-  accessors: [
-    "id_movimiento",
-    "nombre_usuario",
-    "documento",
-    "nombre_elemento",
-    "descripcion_elemento",
-    "cantidad",
-    "fecha_salida",
-  ],
-  headers: [
-    "ID Movimiento",
-    "Nombre Usuario",
-    "Documento",
-    "Elemento",
-    "Descripción",
-    "Cantidad",
-    "Fecha de Salida",
-  ],
-  withTable: true,
-  filterFn: () =>
-    filtrarPorFechas(elementosPrestamo || [], fechaInicio, fechaFin), 
-    }
+      footerText:
+        "Este reporte ha sido generado automáticamente por el sistema de gestión del SGDSS. Verifique que los datos correspondan con los registros físicos para evitar inconsistencias.",
+      accessors: [
+        "id_movimiento",
+        "nombre_usuario",
+        "documento",
+        "nombre_elemento",
+        "descripcion_elemento",
+        "cantidad",
+        "fecha_salida",
+      ],
+      headers: [
+        "ID Movimiento",
+        "Nombre Usuario",
+        "Documento",
+        "Elemento",
+        "Descripción",
+        "Cantidad",
+        "Fecha de Salida",
+      ],
+      withTable: true,
+      filterFn: () =>
+        filtrarPorFechas(elementosPrestamo ?? [], fechaInicio, fechaFin),
+    },
   ];
 
- const selected = reports.find((r) => r.id === selectedReport);
+  const selected = reports.find((r) => r.id === selectedReport);
   const handleBack = () => setSelectedReport(null);
 
-  
   if (selectedReport && selected) {
     const dataFiltrada = selected.filterFn();
     return (
@@ -182,11 +180,7 @@ Este reporte es útil para llevar control de los elementos en circulación y par
           <ReportCard
             key={r.id}
             title={r.title}
-            description={
-              typeof r.description === "function"
-                ? r.description(r.filterFn() as any)
-                : ""
-            }
+            description="Haz clic para generar el reporte."
             onClick={() => setSelectedReport(r.id)}
           />
         ))}
@@ -194,3 +188,4 @@ Este reporte es útil para llevar control de los elementos en circulación y par
     </>
   );
 }
+
