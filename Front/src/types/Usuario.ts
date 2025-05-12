@@ -68,3 +68,6 @@ export interface ReporteUsuario {
     created_at: string; 
   }
   
+
+
+

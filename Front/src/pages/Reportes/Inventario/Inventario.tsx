@@ -5,17 +5,13 @@ import { ReportTemplate } from "@/components/templates/Report";
 import { ReportCard } from "@/components/molecules/ReportCard";
 import {
   ReporteInventario,
-  ReporteAreaConMasElementos,
-  ReporteCantidadElementosPorArea,
   ReporteElementosPorAgotarse,
 } from "@/types/Inventario";
 
 export default function InventarioReportPage() {
   const {
     reporteInventario,
-    areaConMasElementos,
     elementosPorAgotarse,
-    conteoInventarioElemento,
     isLoading,
     isError,
   } = useReporte();
@@ -50,7 +46,7 @@ export default function InventarioReportPage() {
   const reports = [
     {
       id: "general",
-      title: "REPORTE GENERAL DE INVENTARIO – SGDSS Sede Yamboro",
+      title: "Inventario General",
       description: (data: ReporteInventario[]) =>
         `${formatFecha(fechaInicio)} al ${formatFecha(fechaFin)}
       
@@ -87,7 +83,7 @@ footerText:
 
     {
       id: "elementos-por-agotarse",
-      title: "ELEMENTOS POR AGOTARSE – Alerta de Stock Bajo",
+      title: "Materiales próximos a agotarse",
       description: (data: ReporteElementosPorAgotarse[]) =>
         `
 ${formatFecha(fechaInicio)} al ${formatFecha(fechaFin)}
@@ -109,64 +105,7 @@ Se recomienda a los responsables revisar estos datos de forma periódica y progr
       withTable: true,
       filterFn: () => elementosPorAgotarse || [],
     },
-    {
-      id: "conteo-elementos",
-      title: "CONTEO DE ELEMENTOS EN INVENTARIO",
-      description: (data: ReporteCantidadElementosPorArea[]) =>
-        ` 
-${formatFecha(fechaInicio)} al ${formatFecha(fechaFin)}
-        
-Este informe presenta un resumen del número total de elementos por cada área funcional.\n\nSe registran ${data.reduce((acc, d) => acc + d.cantidad, 0)} elementos en ${data.length} áreas.`,
-      tableDescription: `
-Esta tabla presenta una visión global del número total de elementos registrados en cada área funcional dentro del sistema de inventarios del SGDSS.
 
-Cada fila representa un área específica y muestra la cantidad agregada de elementos que le han sido asignados o que se encuentran bajo su responsabilidad. Esta información permite hacer análisis comparativos entre áreas, identificar desequilibrios en la distribución de recursos y orientar decisiones sobre redistribución o planificación de compras.
-El reporte facilita el monitoreo de la carga de inventario por área, promoviendo una gestión más equitativa y transparente de los bienes institucionales. También contribuye al diseño de estrategias logísticas según la demanda operativa de cada unidad.
-
-La disponibilidad de estos datos respalda la toma de decisiones basadas en evidencia y fortalece los procesos de auditoría y control interno. Los responsables de cada área deben utilizar esta tabla para verificar la congruencia entre el inventario físico y el registrado, y comunicar cualquier discrepancia para su ajuste oportuno.`,
-
-      footerText:
-"Este reporte ha sido generado automáticamente por el sistema de gestión de inventarios del SGDSS. La información aquí contenida es confidencial y está destinada exclusivamente para fines de control interno y toma de decisiones logísticas. Cualquier discrepancia detectada debe ser reportada a la coordinación administrativa.",
-      accessors: ["nombre_area", "cantidad"],
-      headers: ["Área", "Cantidad Total"],
-      withTable: true,
-      filterFn: () => (conteoInventarioElemento || []),
-    },
-    {
-      id: "area-mas-elementos",
-      title: "ÁREA CON MÁS ELEMENTOS REGISTRADOS",
-      description: (data: ReporteAreaConMasElementos[]) => {
-        if (!data || data.length === 0) {
-          return "No se encontraron datos suficientes para determinar el área con mayor cantidad de elementos registrados.";
-        }
-
-        const top = data[0];
-        return `
-${formatFecha(fechaInicio)} al ${formatFecha(fechaFin)}
-
-Este reporte identifica el área con mayor cantidad de elementos registrados.
-
-El área "${top.nombre_area}" registra un total de ${top.total_elementos} unidades.
-
-
-          `.trim();
-      },
-      tableDescription: `
-La siguiente tabla muestra cuál es el área funcional que actualmente concentra la mayor cantidad de elementos registrados en el sistema de inventarios.
-
-Este tipo de información es clave para comprender la distribución de activos dentro de la organización y evaluar si dicha concentración responde a necesidades operativas reales, o si por el contrario, podría estar generando un acaparamiento innecesario de recursos.
-
-Identificar el área con más elementos también permite priorizar inspecciones, auditorías o procesos de verificación en dicha unidad, con el fin de garantizar que los recursos estén siendo utilizados eficientemente y no estén subutilizados o en condición de obsolescencia.
-
-Esta tabla puede servir como punto de partida para planes de redistribución o ajustes logísticos, buscando siempre una asignación más racional de los bienes institucionales. Asimismo, fomenta la rendición de cuentas y la transparencia en la gestión del inventario a nivel organizacional.`,
-
-      footerText:
-"Este reporte ha sido generado automáticamente por el sistema de gestión de inventarios del SGDSS. La información aquí contenida es confidencial y está destinada exclusivamente para fines de control interno y toma de decisiones logísticas. Cualquier discrepancia detectada debe ser reportada a la coordinación administrativa.",
-      accessors: ["nombre_area", "total_elementos"],
-      headers: ["Área", "Total de elementos"],
-      withTable: true,
-      filterFn: () => (areaConMasElementos ? [areaConMasElementos] : []),
-    },
   ];
 
   if (isLoading) return <div>Cargando reportes...</div>;
