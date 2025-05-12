@@ -14,6 +14,7 @@ const TopElementosUsados = () => {
   const labels = topElementos.map(e => e.nombre);
   const valores = topElementos.map(e => e.total_usos);
 
+  
   const barData = {
     labels,
     datasets: [

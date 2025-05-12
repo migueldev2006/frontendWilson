@@ -30,6 +30,7 @@ import {
   StopIcon,
   InboxIcon,
 } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 
 const menuItems = [
   { name: "Inicio", icon: HomeIcon, href: "/home" },
@@ -105,7 +106,7 @@ const menuItems = [
     children: [
       { name: "Usuarios", icon: UserCircleIcon, href: "/estadisticas/usuarios" },
       { name: "Elementos mas usados", icon: ArrowsRightLeftIcon, href: "/movimientos/estadistica" },
-      { name: "Elementos indice de uso", icon: ArrowsRightLeftIcon, href: "elementos/estadistica" },
+      { name: "Elementos indice de uso", icon: ArrowsRightLeftIcon, href: "/elementos/estadistica" },
       { name: "Movimientos por mes", icon: ArrowsRightLeftIcon, href: "/movimientos/mes/estadistica" },
       { name: "Stock por area", icon: ClipboardDocumentListIcon, href: "/inventario/estadistica" }
     ],
@@ -158,8 +159,8 @@ export default function Sidebar() {
       <nav className="space-y-2 px-1 flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden scrollbar-thin scrollbar-track-transparent scrollbar-thumb-transparent">
         {menuItems.map((item) => (
           <div key={item.name}>
-            <a
-              href={item.href}
+            <Link
+              to={item.href}
               onClick={() => toggleItem(item.name)}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg w-full text-left transition-colors ${
                 openItems.includes(item.name)
@@ -169,21 +170,21 @@ export default function Sidebar() {
             >
               <item.icon className="w-6 h-6" />
               {!collapsed && <span>{item.name}</span>}
-            </a>
+            </Link>
 
             {item.children && openItems.includes(item.name) && !collapsed && (
               <div className="ml-8 mt-1 space-y-1">
                 {item.children.map((subItem) => (
-                  <a
+                  <Link
                     key={subItem.name}
-                    href={subItem.href}
+                    to={subItem.href}
                     className="flex items-center gap-2 px-2 py-1 text-sm text-white text-black-400 hover:tex-white hover:bg-blue-600 rounded"
                   >
                     {subItem.icon && typeof subItem.icon !== "string" && (
                       <subItem.icon className="w-4 h-4" />
                     )}
                     <span>{subItem.name}</span>
-                  </a>
+                  </Link>
                 ))}
               </div>
             )}

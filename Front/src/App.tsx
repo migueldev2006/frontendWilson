@@ -19,21 +19,16 @@ import UsersTable from "./pages/Admin/usuarios";
 import UsuariosEstadisticas from "./pages/Estadisticas/Usuario";
 import UserReportSelector from "./pages/Reportes/Usuarios/Usuarios";
 import CentrosTable from "./pages/Admin/centros";
-import CentrosEstadisticas from "./pages/Estadisticas/Centros";
+
 import CentroReport from "./pages/Reportes/Centros/Centros";
 import MunicipiosTable from "./pages/Admin/municipio";
 import TipoSitioTable from "./pages/Admin/tipoSitio";
-import TipoSitioEstadisticas from "./pages/Estadisticas/TipoSitio";
+
 import MunicipioReport from "./pages/Reportes/Municipios/Municipios";
 import CategoriaReport from "./pages/Reportes/Categorias/Categorias";
-import MunicipioEstadisticas from "./pages/Estadisticas/Municipios";
-import CategoriasEstadisticas from "./pages/Estadisticas/Categorias";
 import ModulosTable from "./pages/Admin/modulo";
 import ModulosReport from "./pages/Reportes/Modulos/Modulos";
-import ModulosEstadisticas from "./pages/Estadisticas/Modulos";
-import RutasEstadisticas from "./pages/Estadisticas/Rutas";
 import RutasTable from "./pages/Admin/rutas";
-import CaracteristicasEstadisticas from "./pages/Estadisticas/Caracteristicas";
 
 import Login from "./pages/Login"
 import { useAuth } from "./providers/AuthProvider"
@@ -63,12 +58,9 @@ function App() {
           <Route path="/reportes/categorias" element={<CategoriaReport />} />
          
           <Route path="/reportes/modulos" element={<ModulosReport />} />
-          <Route path="/modulos" element={<ModulosTable />} />
-         
-          
+          <Route path="/modulos" element={<ModulosTable />} />    
           <Route path="areas" element={<AreaTable />} />
           <Route path="/rutas" element={<RutasTable />} />
-          <Route path="/estadisticas/rutas" element={<RutasEstadisticas />} />
           <Route path="fichas" element={<FcihasTable />} />
           <Route path="permisos" element={<PermisoTable />} />
           <Route path="programas" element={<ProgramasTable />} />
@@ -80,9 +72,7 @@ function App() {
           <Route path="elementos/estadistica" element={<ElementosEstadisticas />} />
           <Route path="inventario" element={<Inventario />} />
           <Route path="inventario/estadistica" element={<StockEstadisticas />} />
-          <Route path="inventario/estadistica/" element={<StockEstadisticas />} />
           <Route path="movimientos" element={<MovimientoTable />} />
-
           <Route path="movimientos/estadistica" element={<TopElementosUsados />} />
           <Route path="movimientos/mes/estadistica" element={<MovimientosMensuales />} />
           <Route path="tipos" element={<TipoMovimientoTable />} />

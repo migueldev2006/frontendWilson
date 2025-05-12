@@ -15,9 +15,9 @@ export type Elemento = {
   tipo_elemento: string;
 };
 
-
-export type ElementUso = {
+export interface ElementUso {
   elemento: string;
+  area: string; // <-- importante
   stock_total: number;
   total_usado: number;
   indice_uso: number;

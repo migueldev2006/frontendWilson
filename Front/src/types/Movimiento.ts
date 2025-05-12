@@ -20,12 +20,17 @@ export type Movimiento = {
 };
 
 export type MovimientoResumen = {
+  area: string;
   nombre: string;
+  stock_total: number;
   total_usos: number;
+  porcentaje_uso: number;
 };
 
 export type MovimientoMes = {
   tipo_movimiento: string;
-  mes: string; 
+  mes: string;
+  area:string;
+  elemento:string;
   total: number;
 };

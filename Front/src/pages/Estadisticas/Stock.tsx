@@ -7,7 +7,8 @@ import { useAreas } from "@/hooks/areas/useAreas";
 Chart.register(...registerables);
 
 const StockEstadisticas = () => {
-  // 1) Datos de inventario, sitios y áreas
+  
+  
   const { stock: inventarios = [], isLoading: loadStock, isError: errStock, error } = useInventariosStock();
   const { sitios = [], isLoading: loadSitios, isError: errSitios } = useSitios();
   const { areas = [], isLoading: loadAreas, isError: errAreas } = useAreas();
@@ -16,11 +17,11 @@ const StockEstadisticas = () => {
   if (errStock || errSitios || errAreas) return <p>Error cargando datos: {`${error}`}</p>;
   if (!inventarios.length) return <p>No hay datos de inventario.</p>;
 
-  // 2) Map de sitios (por nombre) y áreas
+  
   const sitioMap = sitios.reduce((acc, s) => ({ ...acc, [s.nombre]: s }), {} as Record<string, typeof sitios[0]>);
   const areaMap = areas.reduce((acc, a) => ({ ...acc, [a.id_area]: a.nombre }), {} as Record<number, string>);
 
-  // 3) Enriquecer inventarios con nombre de sitio y área
+  
   const invConArea = inventarios.map(i => {
     const sitio = sitioMap[i.sitio];
     const areaNombre = sitio ? areaMap[sitio.fk_area] : "Sin área";
@@ -31,7 +32,7 @@ const StockEstadisticas = () => {
     };
   });
 
-  // 4) Agrupar por área
+
   const porArea: Record<string, typeof invConArea> = {};
   invConArea.forEach(item => {
     const area = item.areaNombre;
@@ -39,12 +40,11 @@ const StockEstadisticas = () => {
     porArea[area].push(item);
   });
 
-  // 5) Generar gráficas por área
   const graficas = Object.entries(porArea).map(([area, items], idx) => {
     const sitiosUnicos = Array.from(new Set(items.map(i => i.sitioNombre)));
     const elementosUnicos = Array.from(new Set(items.map(i => i.elemento)));
 
-    // stock por sitio y elemento
+   
     const grouped: Record<string, number[]> = {};
     elementosUnicos.forEach(el => {
       grouped[el] = sitiosUnicos.map(sitio => {
@@ -63,20 +63,41 @@ const StockEstadisticas = () => {
     };
 
     return (
-      
-      <GraficaBase
-        key={area}
-        className="bg-white dark:bg-zinc-800 dark:text-white"
-        tipo="bar"
-        data={data}
-        options={{
-          responsive: true,
-          scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } },
-        }}
-        titulo={`Área: ${area}`}
-      />
+      <div key={area}>
+        <GraficaBase
+          className="bg-white dark:bg-zinc-800 dark:text-white"
+          tipo="bar"
+          data={data}
+          options={{
+            responsive: true,
+            scales: { y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 } } },
+          }}
+          titulo={`Área: ${area}`}
+        />
+
+
+
+        {/* advertencia aquis */}
+        {items.some(item => item.stock <= 3) && (
+          <div className="mt-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 text-sm rounded">
+            <strong>Advertencia:</strong>
+            <ul className="list-disc list-inside">
+              {items
+                .filter(item => item.stock <= 3)
+                .map((item, idx) => (
+                  <li key={idx}>
+                    El elemento <strong>{item.elemento}</strong> en el sitio <strong>{item.sitioNombre}</strong> tiene bajo stock ({item.stock}).
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
+      </div>
     );
+
   });
+
+
 
   return (
     <div className="p-3">

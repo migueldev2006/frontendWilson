@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosAPI } from "@/axios/axiosAPI";
 import { MovimientoResumen } from "@/types/Movimiento";
 
+
 export const useMasUsados = () => {
     const url = "/movimiento/materiales";
 
