@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { axiosAPI } from "@/axios/axiosAPI";
-import { MovimientoResumen } from "@/types/Movimiento";
+import { MovimientoMasUsados } from "@/types/Movimiento";
 
 
 export const useMasUsados = () => {
     const url = "/movimiento/materiales";
 
 
-    const { data, isLoading, isError, error } = useQuery<MovimientoResumen[]>({
+    const { data, isLoading, isError, error } = useQuery<MovimientoMasUsados[]>({
         queryKey: ["movimientos-top-elementos"],
         queryFn: async () => {
             const res = await axiosAPI.get(url);

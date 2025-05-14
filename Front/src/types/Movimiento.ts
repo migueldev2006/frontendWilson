@@ -19,12 +19,10 @@ export type Movimiento = {
   tipo_movimiento: string;
 };
 
-export type MovimientoResumen = {
+export type MovimientoMasUsados = {
   area: string;
   nombre: string;
-  stock_total: number;
   total_usos: number;
-  porcentaje_uso: number;
 };
 
 export type MovimientoMes = {

@@ -15,10 +15,12 @@ export type Elemento = {
   tipo_elemento: string;
 };
 
+// types/Elemento.ts
 export interface ElementUso {
   elemento: string;
-  area: string; // <-- importante
+  area: string; 
   stock_total: number;
   total_usado: number;
   indice_uso: number;
 }
+
